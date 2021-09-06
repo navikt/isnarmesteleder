@@ -1,2 +1,2 @@
 # isnarmesteleder
-Applikasjon for å vise informasjon om nærmeste leder i sykefraværsoppfølgings. Henter data fra applikasjonen Narmesteleder.
+Applikasjon for å vise informasjon relasjoner mellom ansatte og deres narmeste leder. Relasjonene lese og replikeres fra applikasjonen Narmesteleder og aggregeres for bruk i Sykefraværsoppfølgingen.
