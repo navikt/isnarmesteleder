@@ -43,6 +43,12 @@ spec:
     application:
       enabled: true
       tenant: trygdeetaten.no
+  gcp:
+    sqlInstances:
+      - type: POSTGRES_12
+        databases:
+          - name: isnarmesteleder-db
+        diskAutoresize: true
   env:
     - name: KTOR_ENV
       value: "production"
