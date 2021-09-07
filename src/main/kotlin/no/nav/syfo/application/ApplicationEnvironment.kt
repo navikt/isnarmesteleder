@@ -3,10 +3,10 @@ package no.nav.syfo.application
 import io.ktor.application.*
 
 data class Environment(
-    val azureAppClient: String = getEnvVar("AZURE_APP_CLIENT_ID"),
+    val azureAppClientId: String = getEnvVar("AZURE_APP_CLIENT_ID"),
     val azureAppSecret: String = getEnvVar("AZURE_APP_CLIENT_SECRET"),
     val azureAppWellKnownUrl: String = getEnvVar("AZURE_APP_WELL_KNOWN_URL"),
-    val aazureOpenIdTokenEndpoint: String = getEnvVar("AZURE_OPENID_CONFIG_TOKEN_ENDPOINT"),
+    val azureOpenIdTokenEndpoint: String = getEnvVar("AZURE_OPENID_CONFIG_TOKEN_ENDPOINT"),
 )
 
 fun getEnvVar(varName: String, defaultValue: String? = null) =

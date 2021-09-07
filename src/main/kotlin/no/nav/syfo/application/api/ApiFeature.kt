@@ -1,4 +1,4 @@
-package no.nav.syfo.application.api.authentication
+package no.nav.syfo.application.api
 
 import io.ktor.application.*
 import io.ktor.features.*
