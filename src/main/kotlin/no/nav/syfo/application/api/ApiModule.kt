@@ -8,6 +8,7 @@ import no.nav.syfo.application.Environment
 import no.nav.syfo.application.api.authentication.*
 import no.nav.syfo.application.database.DatabaseInterface
 import no.nav.syfo.client.wellknown.WellKnown
+import no.nav.syfo.narmestelederrelasjon.NarmesteLederRelasjonService
 import no.nav.syfo.narmestelederrelasjon.api.registrerNarmesteLederRelasjonApi
 
 fun Application.apiModule(
@@ -30,6 +31,10 @@ fun Application.apiModule(
     )
     installStatusPages()
 
+    val narmesteLederRelasjonService = NarmesteLederRelasjonService(
+        database = database,
+    )
+
     routing {
         registerPodApi(
             applicationState = applicationState,
@@ -37,7 +42,9 @@ fun Application.apiModule(
         )
         registerPrometheusApi()
         authenticate(JwtIssuerType.INTERNAL_AZUREAD.name) {
-            registrerNarmesteLederRelasjonApi()
+            registrerNarmesteLederRelasjonApi(
+                narmesteLederRelasjonService = narmesteLederRelasjonService,
+            )
         }
     }
 }
