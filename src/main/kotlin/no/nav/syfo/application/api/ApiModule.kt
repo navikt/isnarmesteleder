@@ -6,11 +6,13 @@ import io.ktor.routing.*
 import no.nav.syfo.application.ApplicationState
 import no.nav.syfo.application.Environment
 import no.nav.syfo.application.api.authentication.*
+import no.nav.syfo.application.database.DatabaseInterface
 import no.nav.syfo.client.wellknown.WellKnown
 import no.nav.syfo.narmestelederrelasjon.api.registrerNarmesteLederRelasjonApi
 
 fun Application.apiModule(
     applicationState: ApplicationState,
+    database: DatabaseInterface,
     environment: Environment,
     wellKnownInternalAzureAD: WellKnown,
 ) {
@@ -29,7 +31,10 @@ fun Application.apiModule(
     installStatusPages()
 
     routing {
-        registerPodApi(applicationState)
+        registerPodApi(
+            applicationState = applicationState,
+            database = database,
+        )
         registerPrometheusApi()
         authenticate(JwtIssuerType.INTERNAL_AZUREAD.name) {
             registrerNarmesteLederRelasjonApi()

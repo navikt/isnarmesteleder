@@ -16,15 +16,20 @@ import testhelper.UserConstants.VEILEDER_IDENT
 class NarmestelederApiSpek : Spek({
     val objectMapper: ObjectMapper = configuredJacksonMapper()
 
-    describe(NarmestelederApiSpek::class.java.simpleName) {
-        with(TestApplicationEngine()) {
-            start()
+    with(TestApplicationEngine()) {
+        start()
 
-            val externalMockEnvironment = ExternalMockEnvironment()
+        val externalMockEnvironment = ExternalMockEnvironment()
 
-            application.testApiModule(
-                externalMockEnvironment = externalMockEnvironment,
-            )
+        application.testApiModule(
+            externalMockEnvironment = externalMockEnvironment,
+        )
+
+        afterGroup {
+            externalMockEnvironment.stopExternalMocks()
+        }
+
+        describe(NarmestelederApiSpek::class.java.simpleName) {
 
             describe("Get list of NarmestelederRelasjon for PersonIdent") {
                 val url = "$narmesteLederApiV1Path$narmesteLederApiV1PersonIdentPath"
