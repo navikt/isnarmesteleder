@@ -10,6 +10,11 @@ fun testEnvironment(
     azureAppSecret = "isdialogmote-secret",
     azureAppWellKnownUrl = "wellknown",
     azureOpenIdTokenEndpoint = azureOpenIdTokenEndpoint,
+    isnarmestelederDbHost = "localhost",
+    isnarmestelederDbPort = "5432",
+    isnarmestelederDbName = "isnarmesteleder_dev",
+    isnarmestelederDbUsername = "username",
+    isnarmestelederDbPassword = "password",
 )
 
 fun testAppState() = ApplicationState(

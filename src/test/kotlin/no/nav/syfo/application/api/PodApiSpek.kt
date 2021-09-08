@@ -8,18 +8,22 @@ import org.amshove.kluent.shouldBeEqualTo
 import org.amshove.kluent.shouldNotBeEqualTo
 import org.spekframework.spek2.Spek
 import org.spekframework.spek2.style.specification.describe
+import testhelper.TestDatabase
+import testhelper.TestDatabaseNotResponding
 
 object PodApiSpek : Spek({
 
     describe("Successful liveness and readiness checks") {
         with(TestApplicationEngine()) {
             start()
+            val database = TestDatabase()
             application.routing {
                 registerPodApi(
-                    ApplicationState(
+                    applicationState = ApplicationState(
                         alive = true,
                         ready = true,
                     ),
+                    database = database,
                 )
             }
 
@@ -42,18 +46,49 @@ object PodApiSpek : Spek({
     describe("Unsuccessful liveness and readiness checks") {
         with(TestApplicationEngine()) {
             start()
+            val database = TestDatabase()
             application.routing {
                 registerPodApi(
-                    ApplicationState(
+                    applicationState = ApplicationState(
                         alive = false,
                         ready = false,
                     ),
+                    database = database,
                 )
             }
 
             it("Returns internal server error when liveness check fails") {
                 with(handleRequest(HttpMethod.Get, "/is_alive")) {
                     response.status() shouldBeEqualTo HttpStatusCode.InternalServerError
+                    response.content shouldNotBeEqualTo null
+                }
+            }
+
+            it("Returns internal server error when readiness check fails") {
+                with(handleRequest(HttpMethod.Get, "/is_ready")) {
+                    response.status() shouldBeEqualTo HttpStatusCode.InternalServerError
+                    response.content shouldNotBeEqualTo null
+                }
+            }
+        }
+    }
+    describe("Successful liveness and unsuccessful readiness checks when database not working") {
+        with(TestApplicationEngine()) {
+            start()
+            val database = TestDatabaseNotResponding()
+            application.routing {
+                registerPodApi(
+                    applicationState = ApplicationState(
+                        alive = true,
+                        ready = true,
+                    ),
+                    database = database,
+                )
+            }
+
+            it("Returns ok on is_alive") {
+                with(handleRequest(HttpMethod.Get, "/is_alive")) {
+                    response.status()?.isSuccess() shouldBeEqualTo true
                     response.content shouldNotBeEqualTo null
                 }
             }

@@ -8,6 +8,7 @@ fun Application.testApiModule(
 ) {
     this.apiModule(
         applicationState = externalMockEnvironment.applicationState,
+        database = externalMockEnvironment.database,
         environment = externalMockEnvironment.environment,
         wellKnownInternalAzureAD = externalMockEnvironment.wellKnownInternalAzureAD,
     )

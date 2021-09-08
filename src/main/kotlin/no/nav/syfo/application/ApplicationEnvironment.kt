@@ -7,7 +7,17 @@ data class Environment(
     val azureAppSecret: String = getEnvVar("AZURE_APP_CLIENT_SECRET"),
     val azureAppWellKnownUrl: String = getEnvVar("AZURE_APP_WELL_KNOWN_URL"),
     val azureOpenIdTokenEndpoint: String = getEnvVar("AZURE_OPENID_CONFIG_TOKEN_ENDPOINT"),
-)
+
+    val isnarmestelederDbHost: String = getEnvVar("NAIS_DATABASE_ISNARMESTELEDER_ISNARMESTELEDER_DB_HOST"),
+    val isnarmestelederDbPort: String = getEnvVar("NAIS_DATABASE_ISNARMESTELEDER_ISNARMESTELEDER_DB_PORT"),
+    val isnarmestelederDbName: String = getEnvVar("NAIS_DATABASE_ISNARMESTELEDER_ISNARMESTELEDER_DB_DATABASE"),
+    val isnarmestelederDbUsername: String = getEnvVar("NAIS_DATABASE_ISNARMESTELEDER_ISNARMESTELEDER_DB_USERNAME"),
+    val isnarmestelederDbPassword: String = getEnvVar("NAIS_DATABASE_ISNARMESTELEDER_ISNARMESTELEDER_DB_PASSWORD"),
+) {
+    fun jdbcUrl(): String {
+        return "jdbc:postgresql://$isnarmestelederDbHost:$isnarmestelederDbPort/$isnarmestelederDbName"
+    }
+}
 
 fun getEnvVar(varName: String, defaultValue: String? = null) =
     System.getenv(varName) ?: defaultValue ?: throw RuntimeException("Missing required variable \"$varName\"")
