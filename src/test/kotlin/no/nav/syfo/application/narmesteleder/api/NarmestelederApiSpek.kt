@@ -5,6 +5,7 @@ import com.fasterxml.jackson.module.kotlin.readValue
 import io.ktor.http.*
 import io.ktor.server.testing.*
 import no.nav.syfo.narmestelederrelasjon.api.*
+import no.nav.syfo.narmestelederrelasjon.database.createNarmesteLederRelasjon
 import no.nav.syfo.util.*
 import org.amshove.kluent.shouldBeEqualTo
 import org.spekframework.spek2.Spek
@@ -12,6 +13,7 @@ import org.spekframework.spek2.style.specification.describe
 import testhelper.*
 import testhelper.UserConstants.ARBEIDSTAKER_FNR
 import testhelper.UserConstants.VEILEDER_IDENT
+import testhelper.generator.generateNarmesteLederLeesah
 
 class NarmestelederApiSpek : Spek({
     val objectMapper: ObjectMapper = configuredJacksonMapper()
@@ -20,10 +22,15 @@ class NarmestelederApiSpek : Spek({
         start()
 
         val externalMockEnvironment = ExternalMockEnvironment()
+        val database = externalMockEnvironment.database
 
         application.testApiModule(
             externalMockEnvironment = externalMockEnvironment,
         )
+
+        afterEachTest {
+            database.dropData()
+        }
 
         afterGroup {
             externalMockEnvironment.stopExternalMocks()
@@ -32,6 +39,13 @@ class NarmestelederApiSpek : Spek({
         describe(NarmestelederApiSpek::class.java.simpleName) {
 
             describe("Get list of NarmestelederRelasjon for PersonIdent") {
+                val narmesteLederLeesah = generateNarmesteLederLeesah()
+                database.connection.use { connection ->
+                    connection.createNarmesteLederRelasjon(
+                        narmesteLederLeesah = narmesteLederLeesah,
+                    )
+                }
+
                 val url = "$narmesteLederApiV1Path$narmesteLederApiV1PersonIdentPath"
                 val validToken = generateJWT(
                     externalMockEnvironment.environment.azureAppClientId,
@@ -50,7 +64,16 @@ class NarmestelederApiSpek : Spek({
 
                             val narmestelederRelasjonList = objectMapper.readValue<List<NarmesteLederRelasjonDTO>>(response.content!!)
 
-                            narmestelederRelasjonList.size shouldBeEqualTo 0
+                            narmestelederRelasjonList.size shouldBeEqualTo 1
+
+                            val narmesteLederRelasjon = narmestelederRelasjonList.first()
+                            narmesteLederRelasjon.arbeidstakerPersonIdentNumber shouldBeEqualTo narmesteLederLeesah.fnr
+                            narmesteLederRelasjon.virksomhetsnummer shouldBeEqualTo narmesteLederLeesah.orgnummer
+                            narmesteLederRelasjon.narmesteLederPersonIdentNumber shouldBeEqualTo narmesteLederLeesah.narmesteLederFnr
+                            narmesteLederRelasjon.narmesteLederTelefonnummer shouldBeEqualTo narmesteLederLeesah.narmesteLederTelefonnummer
+                            narmesteLederRelasjon.narmesteLederEpost shouldBeEqualTo narmesteLederLeesah.narmesteLederEpost
+                            narmesteLederRelasjon.aktivFom shouldBeEqualTo narmesteLederLeesah.aktivFom
+                            narmesteLederRelasjon.aktivTom shouldBeEqualTo narmesteLederLeesah.aktivTom
                         }
                     }
                 }
