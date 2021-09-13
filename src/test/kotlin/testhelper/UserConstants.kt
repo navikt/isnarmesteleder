@@ -5,6 +5,7 @@ import no.nav.syfo.domain.Virksomhetsnummer
 
 object UserConstants {
     val ARBEIDSTAKER_FNR = PersonIdentNumber("12345678912")
+    val ARBEIDSTAKER_VEILEDER_NO_ACCESS = PersonIdentNumber(ARBEIDSTAKER_FNR.value.replace("2", "1"))
 
     val NARMESTELEDER_PERSONIDENTNUMBER = PersonIdentNumber("98765432101")
 

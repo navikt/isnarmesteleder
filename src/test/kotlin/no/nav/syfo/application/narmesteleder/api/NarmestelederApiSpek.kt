@@ -12,6 +12,7 @@ import org.spekframework.spek2.Spek
 import org.spekframework.spek2.style.specification.describe
 import testhelper.*
 import testhelper.UserConstants.ARBEIDSTAKER_FNR
+import testhelper.UserConstants.ARBEIDSTAKER_VEILEDER_NO_ACCESS
 import testhelper.UserConstants.VEILEDER_IDENT
 import testhelper.generator.generateNarmesteLederLeesah
 
@@ -30,6 +31,10 @@ class NarmestelederApiSpek : Spek({
 
         afterEachTest {
             database.dropData()
+        }
+
+        beforeGroup {
+            externalMockEnvironment.startExternalMocks()
         }
 
         afterGroup {
@@ -105,6 +110,16 @@ class NarmestelederApiSpek : Spek({
                             }
                         ) {
                             response.status() shouldBeEqualTo HttpStatusCode.BadRequest
+                        }
+                    }
+                    it("should return status Forbidden if denied access to personident supplied in $NAV_PERSONIDENT_HEADER") {
+                        with(
+                            handleRequest(HttpMethod.Get, url) {
+                                addHeader(HttpHeaders.Authorization, bearerHeader(validToken))
+                                addHeader(NAV_PERSONIDENT_HEADER, ARBEIDSTAKER_VEILEDER_NO_ACCESS.value)
+                            }
+                        ) {
+                            response.status() shouldBeEqualTo HttpStatusCode.Forbidden
                         }
                     }
                 }
