@@ -21,7 +21,7 @@ data class PNarmesteLederRelasjon(
     val aktivFom: LocalDate,
     val aktivTom: LocalDate?,
     val arbeidsgiverForskutterer: Boolean?,
-    val timestamp: OffsetDateTime?,
+    val timestamp: OffsetDateTime,
 )
 
 fun PNarmesteLederRelasjon.toNarmesteLederRelasjon() = NarmesteLederRelasjon(

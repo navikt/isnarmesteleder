@@ -14,13 +14,31 @@ data class Environment(
     val isnarmestelederDbUsername: String = getEnvVar("NAIS_DATABASE_ISNARMESTELEDER_ISNARMESTELEDER_DB_USERNAME"),
     val isnarmestelederDbPassword: String = getEnvVar("NAIS_DATABASE_ISNARMESTELEDER_ISNARMESTELEDER_DB_PASSWORD"),
 
+    val kafka: ApplicationEnvironmentKafka = ApplicationEnvironmentKafka(
+        aivenBootstrapServers = getEnvVar("KAFKA_BROKERS"),
+        aivenCredstorePassword = getEnvVar("KAFKA_CREDSTORE_PASSWORD"),
+        aivenKeystoreLocation = getEnvVar("KAFKA_KEYSTORE_PATH"),
+        aivenSecurityProtocol = "SSL",
+        aivenTruststoreLocation = getEnvVar("KAFKA_TRUSTSTORE_PATH"),
+    ),
+
     val syfotilgangskontrollClientId: String = getEnvVar("SYFOTILGANGSKONTROLL_CLIENT_ID"),
     val syfotilgangskontrollUrl: String = getEnvVar("SYFOTILGANGSKONTROLL_URL"),
+
+    val toggleKafkaProcessingEnabled: Boolean = getEnvVar("TOGGLE_KAFKA_PROCESSING_ENABLED").toBoolean(),
 ) {
     fun jdbcUrl(): String {
         return "jdbc:postgresql://$isnarmestelederDbHost:$isnarmestelederDbPort/$isnarmestelederDbName"
     }
 }
+
+data class ApplicationEnvironmentKafka(
+    val aivenBootstrapServers: String,
+    val aivenCredstorePassword: String,
+    val aivenKeystoreLocation: String,
+    val aivenSecurityProtocol: String,
+    val aivenTruststoreLocation: String,
+)
 
 fun getEnvVar(varName: String, defaultValue: String? = null) =
     System.getenv(varName) ?: defaultValue ?: throw RuntimeException("Missing required variable \"$varName\"")

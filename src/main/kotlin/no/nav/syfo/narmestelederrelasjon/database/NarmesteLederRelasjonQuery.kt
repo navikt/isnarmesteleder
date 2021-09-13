@@ -27,11 +27,13 @@ const val queryCreateNarmesteLederRelasjon =
         aktiv_fom,
         aktiv_tom,
         timestamp
-        ) VALUES (DEFAULT, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?) RETURNING id
+        ) VALUES (DEFAULT, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+        ON CONFLICT DO NOTHING
+        RETURNING id
     """
 
 fun Connection.createNarmesteLederRelasjon(
-    commit: Boolean = true,
+    commit: Boolean,
     narmesteLederLeesah: NarmesteLederLeesah,
 ) {
     val narmesteLederRelasjonUuid = UUID.randomUUID()
@@ -54,7 +56,7 @@ fun Connection.createNarmesteLederRelasjon(
     }
 
     if (narmesteLederRelasjonIdList.size != 1) {
-        throw SQLException("Creating MoteStatusEndring failed, no rows affected.")
+        throw NoElementInsertedException("Creating NARMESTE_LEDER_RELASJON failed, no rows affected.")
     }
 
     if (commit) {
