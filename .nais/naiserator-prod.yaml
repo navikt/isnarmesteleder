@@ -39,6 +39,16 @@ spec:
       memory: 384Mi
   ingresses:
     - "https://isnarmesteleder.intern.nav.no"
+  accessPolicy:
+    inbound:
+      rules:
+        - application: syfomodiaperson
+          namespace: teamsykefravr
+          cluster: prod-fss
+    outbound:
+      external:
+        - host: "login.microsoftonline.com"
+        - host: "syfo-tilgangskontroll.prod-fss-pub.nais.io"
   azure:
     application:
       enabled: true
@@ -52,3 +62,7 @@ spec:
   env:
     - name: KTOR_ENV
       value: "production"
+    - name: SYFOTILGANGSKONTROLL_CLIENT_ID
+      value: "prod-fss.teamsykefravr.syfo-tilgangskontroll"
+    - name: SYFOTILGANGSKONTROLL_URL
+      value: "https://syfo-tilgangskontroll.prod-fss-pub.nais.io"
