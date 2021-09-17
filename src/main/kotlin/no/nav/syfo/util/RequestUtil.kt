@@ -4,6 +4,9 @@ import io.ktor.application.*
 import io.ktor.http.HttpHeaders.Authorization
 import io.ktor.util.pipeline.*
 import net.logstash.logback.argument.StructuredArguments
+import java.time.LocalDateTime
+import java.time.format.DateTimeFormatter
+import java.util.concurrent.atomic.AtomicInteger
 
 const val NAV_PERSONIDENT_HEADER = "nav-personident"
 
@@ -25,3 +28,7 @@ fun PipelineContext<out Unit, ApplicationCall>.getBearerHeader(): String? {
 fun PipelineContext<out Unit, ApplicationCall>.getPersonIdentHeader(): String? {
     return this.call.request.headers[NAV_PERSONIDENT_HEADER]
 }
+
+private val kafkaCounter = AtomicInteger(0)
+
+fun kafkaCallId(): String = "${LocalDateTime.now().format(DateTimeFormatter.ofPattern("dd-MM-HHmm"))}-isnarmesteleder-kafka-${kafkaCounter.incrementAndGet()}"

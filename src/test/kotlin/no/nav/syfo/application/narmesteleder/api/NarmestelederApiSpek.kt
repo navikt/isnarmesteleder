@@ -4,10 +4,15 @@ import com.fasterxml.jackson.databind.ObjectMapper
 import com.fasterxml.jackson.module.kotlin.readValue
 import io.ktor.http.*
 import io.ktor.server.testing.*
+import io.mockk.*
+import kotlinx.coroutines.runBlocking
 import no.nav.syfo.narmestelederrelasjon.api.*
-import no.nav.syfo.narmestelederrelasjon.database.createNarmesteLederRelasjon
+import no.nav.syfo.narmestelederrelasjon.kafka.NARMESTE_LEDER_RELASJON_TOPIC
+import no.nav.syfo.narmestelederrelasjon.kafka.pollAndProcessNarmesteLederRelasjon
 import no.nav.syfo.util.*
 import org.amshove.kluent.shouldBeEqualTo
+import org.apache.kafka.clients.consumer.*
+import org.apache.kafka.common.TopicPartition
 import org.spekframework.spek2.Spek
 import org.spekframework.spek2.style.specification.describe
 import testhelper.*
@@ -15,6 +20,7 @@ import testhelper.UserConstants.ARBEIDSTAKER_FNR
 import testhelper.UserConstants.ARBEIDSTAKER_VEILEDER_NO_ACCESS
 import testhelper.UserConstants.VEILEDER_IDENT
 import testhelper.generator.generateNarmesteLederLeesah
+import java.time.Duration
 
 class NarmestelederApiSpek : Spek({
     val objectMapper: ObjectMapper = configuredJacksonMapper()
@@ -44,13 +50,6 @@ class NarmestelederApiSpek : Spek({
         describe(NarmestelederApiSpek::class.java.simpleName) {
 
             describe("Get list of NarmestelederRelasjon for PersonIdent") {
-                val narmesteLederLeesah = generateNarmesteLederLeesah()
-                database.connection.use { connection ->
-                    connection.createNarmesteLederRelasjon(
-                        narmesteLederLeesah = narmesteLederLeesah,
-                    )
-                }
-
                 val url = "$narmesteLederApiV1Path$narmesteLederApiV1PersonIdentPath"
                 val validToken = generateJWT(
                     externalMockEnvironment.environment.azureAppClientId,
@@ -58,7 +57,47 @@ class NarmestelederApiSpek : Spek({
                     VEILEDER_IDENT,
                 )
                 describe("Happy path") {
+                    val partition = 0
+                    val narmesteLederRelasjonTopicPartition = TopicPartition(
+                        NARMESTE_LEDER_RELASJON_TOPIC,
+                        partition,
+                    )
+                    val narmesteLederLeesah = generateNarmesteLederLeesah()
+                    val narmesteLederLeesahRecord = ConsumerRecord(
+                        NARMESTE_LEDER_RELASJON_TOPIC,
+                        partition,
+                        1,
+                        "something",
+                        objectMapper.writeValueAsString(narmesteLederLeesah),
+                    )
+                    val narmesteLederLeesahRecordDuplicate = ConsumerRecord(
+                        NARMESTE_LEDER_RELASJON_TOPIC,
+                        partition,
+                        1,
+                        "something",
+                        objectMapper.writeValueAsString(narmesteLederLeesah),
+                    )
+                    val mockConsumer = mockk<KafkaConsumer<String, String>>()
+                    every { mockConsumer.poll(any<Duration>()) } returns ConsumerRecords(
+                        mapOf(
+                            narmesteLederRelasjonTopicPartition to listOf(
+                                narmesteLederLeesahRecord,
+                                narmesteLederLeesahRecordDuplicate,
+                            )
+                        )
+                    )
+                    every { mockConsumer.commitSync() } returns Unit
+
                     it("should return list of NarmestelederRelasjon if request is successful") {
+                        runBlocking {
+                            pollAndProcessNarmesteLederRelasjon(
+                                database = database,
+                                kafkaConsumerNarmesteLederRelasjon = mockConsumer,
+                            )
+                        }
+
+                        verify(exactly = 1) { mockConsumer.commitSync() }
+
                         with(
                             handleRequest(HttpMethod.Get, url) {
                                 addHeader(HttpHeaders.Authorization, bearerHeader(validToken))

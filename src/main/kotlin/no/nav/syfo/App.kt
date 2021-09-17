@@ -11,6 +11,7 @@ import no.nav.syfo.application.api.apiModule
 import no.nav.syfo.application.database.applicationDatabase
 import no.nav.syfo.application.database.databaseModule
 import no.nav.syfo.client.wellknown.getWellKnown
+import no.nav.syfo.narmestelederrelasjon.kafka.launchKafkaTask
 import org.slf4j.LoggerFactory
 import java.util.concurrent.TimeUnit
 
@@ -18,6 +19,7 @@ const val applicationPort = 8080
 
 fun main() {
     val applicationState = ApplicationState()
+    val environment = Environment()
 
     val server = embeddedServer(
         Netty,
@@ -29,7 +31,6 @@ fun main() {
                 port = applicationPort
             }
 
-            val environment = Environment()
             val wellKnownInternalAzureAD = getWellKnown(
                 wellKnownUrl = environment.azureAppWellKnownUrl
             )
@@ -47,6 +48,7 @@ fun main() {
             }
         }
     )
+
     Runtime.getRuntime().addShutdownHook(
         Thread {
             server.stop(10, 10, TimeUnit.SECONDS)
@@ -56,6 +58,12 @@ fun main() {
     server.environment.monitor.subscribe(ApplicationStarted) { application ->
         applicationState.ready = true
         application.environment.log.info("Application is ready")
+
+        launchKafkaTask(
+            applicationState = applicationState,
+            database = applicationDatabase,
+            environment = environment,
+        )
     }
     server.start(wait = false)
 }

@@ -22,7 +22,7 @@ data class NarmesteLederRelasjon(
     val aktivFom: LocalDate,
     val aktivTom: LocalDate?,
     val arbeidsgiverForskutterer: Boolean?,
-    val timestamp: OffsetDateTime?,
+    val timestamp: OffsetDateTime,
 )
 
 fun NarmesteLederRelasjon.toNarmesteLederRelasjonDTO() = NarmesteLederRelasjonDTO(
@@ -35,5 +35,5 @@ fun NarmesteLederRelasjon.toNarmesteLederRelasjonDTO() = NarmesteLederRelasjonDT
     arbeidsgiverForskutterer = this.arbeidsgiverForskutterer,
     aktivFom = this.aktivFom,
     aktivTom = this.aktivTom,
-    timestamp = this.timestamp?.toLocalDateTimeOslo(),
+    timestamp = this.timestamp.toLocalDateTimeOslo(),
 )

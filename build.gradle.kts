@@ -8,6 +8,8 @@ object Versions {
     const val flyway = "7.15.0"
     const val hikari = "5.0.0"
     const val jackson = "2.11.4"
+    const val kafka = "2.7.0"
+    const val kafkaEmbedded = "2.5.0"
     const val ktor = "1.6.3"
     const val kluent = "1.68"
     const val logback = "1.2.3"
@@ -61,6 +63,10 @@ dependencies {
     implementation("com.zaxxer:HikariCP:${Versions.hikari}")
     implementation("org.postgresql:postgresql:${Versions.postgres}")
     testImplementation("com.opentable.components:otj-pg-embedded:${Versions.postgresEmbedded}")
+
+    // Kafka
+    implementation("org.apache.kafka:kafka_2.12:${Versions.kafka}")
+    testImplementation("no.nav:kafka-embedded-env:${Versions.kafkaEmbedded}")
 
     testImplementation("com.nimbusds:nimbus-jose-jwt:${Versions.nimbusJoseJwt}")
     testImplementation("io.ktor:ktor-server-test-host:${Versions.ktor}")
