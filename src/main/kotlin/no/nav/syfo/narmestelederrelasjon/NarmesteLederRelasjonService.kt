@@ -2,7 +2,7 @@ package no.nav.syfo.narmestelederrelasjon
 
 import no.nav.syfo.application.database.DatabaseInterface
 import no.nav.syfo.domain.PersonIdentNumber
-import no.nav.syfo.narmestelederrelasjon.database.domain.toNarmesteLederRelasjon
+import no.nav.syfo.narmestelederrelasjon.database.domain.toNarmesteLederRelasjonList
 import no.nav.syfo.narmestelederrelasjon.database.getNarmesteLederRelasjonList
 import no.nav.syfo.narmestelederrelasjon.domain.NarmesteLederRelasjon
 
@@ -12,10 +12,9 @@ class NarmesteLederRelasjonService(
     fun getRelasjonerForPersonIdent(
         personIdentNumber: PersonIdentNumber
     ): List<NarmesteLederRelasjon> {
-        return database.getNarmesteLederRelasjonList(
+        val pNarmesteLederRelasjonList = database.getNarmesteLederRelasjonList(
             personIdentNumber = personIdentNumber,
-        ).map {
-            it.toNarmesteLederRelasjon()
-        }
+        )
+        return pNarmesteLederRelasjonList.toNarmesteLederRelasjonList()
     }
 }
