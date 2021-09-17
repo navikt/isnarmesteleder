@@ -1,6 +1,7 @@
 package no.nav.syfo.narmestelederrelasjon.api
 
-import java.time.*
+import java.time.LocalDate
+import java.time.LocalDateTime
 
 data class NarmesteLederRelasjonDTO(
     val uuid: String,
@@ -12,5 +13,6 @@ data class NarmesteLederRelasjonDTO(
     val aktivFom: LocalDate,
     val aktivTom: LocalDate?,
     val arbeidsgiverForskutterer: Boolean?,
-    val timestamp: LocalDateTime?,
+    val timestamp: LocalDateTime,
+    val status: String,
 )

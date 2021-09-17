@@ -23,6 +23,7 @@ data class NarmesteLederRelasjon(
     val aktivTom: LocalDate?,
     val arbeidsgiverForskutterer: Boolean?,
     val timestamp: OffsetDateTime,
+    val status: NarmesteLederRelasjonStatus,
 )
 
 fun NarmesteLederRelasjon.toNarmesteLederRelasjonDTO() = NarmesteLederRelasjonDTO(
@@ -36,4 +37,11 @@ fun NarmesteLederRelasjon.toNarmesteLederRelasjonDTO() = NarmesteLederRelasjonDT
     aktivFom = this.aktivFom,
     aktivTom = this.aktivTom,
     timestamp = this.timestamp.toLocalDateTimeOslo(),
+    status = this.status.name,
 )
+
+enum class NarmesteLederRelasjonStatus {
+    AKTIV,
+    ERSTATTET,
+    DEAKTIVERT,
+}

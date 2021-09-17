@@ -12,10 +12,11 @@ class NarmesteLederRelasjonService(
     fun getRelasjonerForPersonIdent(
         personIdentNumber: PersonIdentNumber
     ): List<NarmesteLederRelasjon> {
-        return database.getNarmesteLederRelasjonList(
+        val pNarmesteLederRelasjonList = database.getNarmesteLederRelasjonList(
             personIdentNumber = personIdentNumber,
-        ).map {
-            it.toNarmesteLederRelasjon()
+        )
+        return pNarmesteLederRelasjonList.map {
+            it.toNarmesteLederRelasjon(pNarmesteLederRelasjonList = pNarmesteLederRelasjonList)
         }
     }
 }
