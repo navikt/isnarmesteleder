@@ -1,8 +1,8 @@
 package no.nav.syfo.narmestelederrelasjon.kafka
 
 import com.fasterxml.jackson.module.kotlin.readValue
+import no.nav.syfo.application.ApplicationEnvironmentKafka
 import no.nav.syfo.application.ApplicationState
-import no.nav.syfo.application.Environment
 import no.nav.syfo.application.database.DatabaseInterface
 import no.nav.syfo.narmestelederrelasjon.database.NoElementInsertedException
 import no.nav.syfo.narmestelederrelasjon.database.createNarmesteLederRelasjon
@@ -20,24 +20,22 @@ const val NARMESTE_LEDER_RELASJON_TOPIC = "teamsykmelding.syfo-narmesteleder-lee
 
 fun blockingApplicationLogicNarmesteLederRelasjon(
     applicationState: ApplicationState,
+    applicationEnvironmentKafka: ApplicationEnvironmentKafka,
     database: DatabaseInterface,
-    environment: Environment,
 ) {
     log.info("Setting up kafka consumer NarmesteLederLeesah")
 
-    val consumerProperties = kafkaNarmesteLederRelasjonConsumerConfig(environment.kafka)
+    val consumerProperties = kafkaNarmesteLederRelasjonConsumerConfig(applicationEnvironmentKafka)
     val kafkaConsumerNarmesteLederRelasjon = KafkaConsumer<String, String>(consumerProperties)
 
     kafkaConsumerNarmesteLederRelasjon.subscribe(
         listOf(NARMESTE_LEDER_RELASJON_TOPIC)
     )
-    if (environment.toggleKafkaProcessingEnabled) {
-        while (applicationState.ready) {
-            pollAndProcessNarmesteLederRelasjon(
-                database = database,
-                kafkaConsumerNarmesteLederRelasjon = kafkaConsumerNarmesteLederRelasjon,
-            )
-        }
+    while (applicationState.ready) {
+        pollAndProcessNarmesteLederRelasjon(
+            database = database,
+            kafkaConsumerNarmesteLederRelasjon = kafkaConsumerNarmesteLederRelasjon,
+        )
     }
 }
 

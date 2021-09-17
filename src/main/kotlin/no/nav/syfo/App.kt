@@ -58,12 +58,13 @@ fun main() {
     server.environment.monitor.subscribe(ApplicationStarted) { application ->
         applicationState.ready = true
         application.environment.log.info("Application is ready")
-
-        launchKafkaTask(
-            applicationState = applicationState,
-            database = applicationDatabase,
-            environment = environment,
-        )
+        if (environment.toggleKafkaProcessingEnabled) {
+            launchKafkaTask(
+                applicationState = applicationState,
+                applicationEnvironmentKafka = environment.kafka,
+                database = applicationDatabase,
+            )
+        }
     }
     server.start(wait = false)
 }
