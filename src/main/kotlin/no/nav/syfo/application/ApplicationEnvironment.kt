@@ -22,9 +22,13 @@ data class Environment(
         aivenTruststoreLocation = getEnvVar("KAFKA_TRUSTSTORE_PATH"),
     ),
 
+    val isproxyClientId: String = getEnvVar("ISPROXY_CLIENT_ID"),
+    val isproxyUrl: String = getEnvVar("ISPROXY_URL"),
+
     val syfotilgangskontrollClientId: String = getEnvVar("SYFOTILGANGSKONTROLL_CLIENT_ID"),
     val syfotilgangskontrollUrl: String = getEnvVar("SYFOTILGANGSKONTROLL_URL"),
 
+    val toggleCronjobVirksomhetsnavnEnabled: Boolean = getEnvVar("TOGGLE_CRONJOB_VIRKSOMHETSNAVN_ENABLED").toBoolean(),
     val toggleKafkaProcessingEnabled: Boolean = getEnvVar("TOGGLE_KAFKA_PROCESSING_ENABLED").toBoolean(),
 ) {
     fun jdbcUrl(): String {

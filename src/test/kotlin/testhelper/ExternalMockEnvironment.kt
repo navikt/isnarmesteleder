@@ -11,16 +11,19 @@ class ExternalMockEnvironment {
     val embeddedEnvironment: KafkaEnvironment = testKafka()
 
     val azureAdMock = AzureAdMock()
+    val isproxyMock = IsproxyMock()
     val tilgangskontrollMock = VeilederTilgangskontrollMock()
 
     val externalApplicationMockMap = hashMapOf(
         azureAdMock.name to azureAdMock.server,
+        isproxyMock.name to isproxyMock.server,
         tilgangskontrollMock.name to tilgangskontrollMock.server,
     )
 
     val environment = testEnvironment(
         azureOpenIdTokenEndpoint = azureAdMock.url,
         kafkaBootstrapServers = embeddedEnvironment.brokersURL,
+        isproxyUrl = isproxyMock.url,
         syfotilgangskontrollUrl = tilgangskontrollMock.url,
     )
 

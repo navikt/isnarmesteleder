@@ -48,6 +48,7 @@ spec:
     outbound:
       external:
         - host: "login.microsoftonline.com"
+        - host: "isproxy.prod-fss-pub.nais.io"
         - host: "syfo-tilgangskontroll.prod-fss-pub.nais.io"
   azure:
     application:
@@ -64,9 +65,15 @@ spec:
   env:
     - name: KTOR_ENV
       value: "production"
+    - name: ISPROXY_CLIENT_ID
+      value: "prod-fss.teamsykefravr.isproxy"
+    - name: ISPROXY_URL
+      value: "https://isproxy.prod-fss-pub.nais.io"
     - name: SYFOTILGANGSKONTROLL_CLIENT_ID
       value: "prod-fss.teamsykefravr.syfo-tilgangskontroll"
     - name: SYFOTILGANGSKONTROLL_URL
       value: "https://syfo-tilgangskontroll.prod-fss-pub.nais.io"
+    - name: TOGGLE_CRONJOB_VIRKSOMHETSNAVN_ENABLED
+      value: "false"
     - name: TOGGLE_KAFKA_PROCESSING_ENABLED
       value: "false"
