@@ -7,6 +7,7 @@ import io.ktor.server.testing.*
 import io.mockk.*
 import kotlinx.coroutines.runBlocking
 import no.nav.syfo.narmestelederrelasjon.api.*
+import no.nav.syfo.narmestelederrelasjon.domain.NarmesteLederRelasjonStatus
 import no.nav.syfo.narmestelederrelasjon.kafka.NARMESTE_LEDER_RELASJON_TOPIC
 import no.nav.syfo.narmestelederrelasjon.kafka.pollAndProcessNarmesteLederRelasjon
 import no.nav.syfo.util.*
@@ -118,6 +119,7 @@ class NarmestelederApiSpek : Spek({
                             narmesteLederRelasjon.narmesteLederEpost shouldBeEqualTo narmesteLederLeesah.narmesteLederEpost
                             narmesteLederRelasjon.aktivFom shouldBeEqualTo narmesteLederLeesah.aktivFom
                             narmesteLederRelasjon.aktivTom shouldBeEqualTo narmesteLederLeesah.aktivTom
+                            narmesteLederRelasjon.status shouldBeEqualTo NarmesteLederRelasjonStatus.INNMELDT_AKTIV.name
                         }
                     }
                 }
