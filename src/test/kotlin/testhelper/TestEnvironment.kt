@@ -6,6 +6,7 @@ import java.net.ServerSocket
 fun testEnvironment(
     azureOpenIdTokenEndpoint: String = "azureTokenEndpoint",
     kafkaBootstrapServers: String,
+    isproxyUrl: String = "isproxy",
     syfotilgangskontrollUrl: String = "tilgangskontroll",
 ) = Environment(
     azureAppClientId = "isdialogmote-client-id",
@@ -24,8 +25,11 @@ fun testEnvironment(
     isnarmestelederDbName = "isnarmesteleder_dev",
     isnarmestelederDbUsername = "username",
     isnarmestelederDbPassword = "password",
+    isproxyClientId = "dev-fss.teamsykefravr.isproxy",
+    isproxyUrl = isproxyUrl,
     syfotilgangskontrollClientId = "dev-fss.teamsykefravr.syfo-tilgangskontroll",
     syfotilgangskontrollUrl = syfotilgangskontrollUrl,
+    toggleCronjobVirksomhetsnavnEnabled = true,
     toggleKafkaProcessingEnabled = true,
 )
 

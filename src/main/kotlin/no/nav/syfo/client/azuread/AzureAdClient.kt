@@ -33,6 +33,17 @@ class AzureAdClient(
         )?.toAzureAdToken()
     }
 
+    suspend fun getSystemToken(scopeClientId: String): AzureAdToken? {
+        return getAccessToken(
+            Parameters.build {
+                append("client_id", azureAppClientId)
+                append("client_secret", azureAppClientSecret)
+                append("grant_type", "client_credentials")
+                append("scope", "api://$scopeClientId/.default")
+            }
+        )?.toAzureAdToken()
+    }
+
     private suspend fun getAccessToken(
         formParameters: Parameters,
     ): AzureAdTokenResponse? {
