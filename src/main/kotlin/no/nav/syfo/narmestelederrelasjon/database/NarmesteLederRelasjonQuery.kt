@@ -91,6 +91,7 @@ fun ResultSet.toPNarmesteLederRelasjon(): PNarmesteLederRelasjon =
         createdAt = getTimestamp("created_at").toOffsetDateTimeUTC(),
         updatedAt = getTimestamp("updated_at").toOffsetDateTimeUTC(),
         referanseUuid = UUID.fromString(getString("referanse_uuid")),
+        virksomhetsnavn = getString("virksomhetsnavn"),
         virksomhetsnummer = Virksomhetsnummer(getString("virksomhetsnummer")),
         arbeidstakerPersonIdentNumber = PersonIdentNumber(getString("arbeidstaker_personident")),
         narmesteLederPersonIdentNumber = PersonIdentNumber(getString("narmeste_leder_personident")),
