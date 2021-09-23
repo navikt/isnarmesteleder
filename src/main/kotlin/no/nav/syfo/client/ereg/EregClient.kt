@@ -19,12 +19,12 @@ class EregClient(
 ) {
     private val httpClient = httpClientDefault()
 
-    private val eregOrganisasjonUrl: String = "$baseUrl$EREG_PATH"
+    private val eregOrganisasjonUrl: String = "$baseUrl/$EREG_PATH"
 
-    suspend fun organisasjon(
+    suspend fun organisasjonVirksomhetsnavn(
         callId: String,
         virksomhetsnummer: Virksomhetsnummer,
-    ): EregOrganisasjonResponse? {
+    ): EregVirksomhetsnavn? {
         val systemToken = azureAdClient.getSystemToken(
             scopeClientId = isproxyClientId,
         )?.accessToken
@@ -38,9 +38,17 @@ class EregClient(
                 accept(ContentType.Application.Json)
             }
             COUNT_CALL_EREG_ORGANISASJON_SUCCESS.increment()
-            return response
+            return response.toEregVirksomhetsnavn()
         } catch (e: ClientRequestException) {
-            handleUnexpectedResponseException(e.response, e.message, callId)
+            if (e.isNoVirksomhetsnavn(virksomhetsnummer)) {
+                log.warn("No Organisasjon was found in Ereg: returning empty Virksomhetsnavn, message=${e.message}, callId=$callId")
+                COUNT_CALL_EREG_ORGANISASJON_NOT_FOUND.increment()
+                return EregVirksomhetsnavn(
+                    virksomhetsnavn = "",
+                )
+            } else {
+                handleUnexpectedResponseException(e.response, e.message, callId)
+            }
         } catch (e: ServerResponseException) {
             handleUnexpectedResponseException(e.response, e.message, callId)
         }
@@ -59,6 +67,15 @@ class EregClient(
             StructuredArguments.keyValue("callId", callId),
         )
         COUNT_CALL_EREG_ORGANISASJON_FAIL.increment()
+    }
+
+    private fun ClientRequestException.isNoVirksomhetsnavn(
+        virksomhetsnummer: Virksomhetsnummer,
+    ): Boolean {
+        val is404 = this.response.status == HttpStatusCode.NotFound
+        val messageNoVirksomhetsnavn = "Ingen organisasjon med organisasjonsnummer $virksomhetsnummer ble funnet"
+        val isMessageNoVirksomhetsnavn = this.message.contains(messageNoVirksomhetsnavn)
+        return is404 && isMessageNoVirksomhetsnavn
     }
 
     companion object {

@@ -9,11 +9,15 @@ data class EregOrganisasjonResponse(
     val navn: EregOrganisasjonNavn,
 )
 
-fun EregOrganisasjonResponse.virksomhetsnavn(): String =
+fun EregOrganisasjonResponse.toEregVirksomhetsnavn(): EregVirksomhetsnavn =
     this.navn.let { (navnelinje1, redigertnavn) ->
         if (redigertnavn.isNullOrBlank()) {
-            navnelinje1
+            EregVirksomhetsnavn(
+                virksomhetsnavn = navnelinje1
+            )
         } else {
-            redigertnavn
+            EregVirksomhetsnavn(
+                virksomhetsnavn = redigertnavn
+            )
         }
     }
