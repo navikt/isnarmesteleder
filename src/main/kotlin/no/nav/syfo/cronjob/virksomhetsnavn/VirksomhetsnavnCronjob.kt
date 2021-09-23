@@ -1,10 +1,9 @@
 package no.nav.syfo.cronjob.virksomhetsnavn
 
 import net.logstash.logback.argument.StructuredArguments
+import no.nav.syfo.client.ereg.EregClient
 import no.nav.syfo.cronjob.Cronjob
 import no.nav.syfo.cronjob.CronjobResult
-import no.nav.syfo.client.ereg.EregClient
-import no.nav.syfo.client.ereg.virksomhetsnavn
 import org.slf4j.LoggerFactory
 import java.util.*
 
@@ -25,15 +24,14 @@ class VirksomhetsnavnCronjob(
         val narmesteLederRelasjonList = virksomhetsnavnService.getNarmesteLederRelasjonWithoutVirksomhetsnavnList()
         narmesteLederRelasjonList.forEach { narmesteLederRelasjon ->
             try {
-                eregClient.organisasjon(
+                eregClient.organisasjonVirksomhetsnavn(
                     callId = UUID.randomUUID().toString(),
                     virksomhetsnummer = narmesteLederRelasjon.virksomhetsnummer,
                 )
-                    ?.virksomhetsnavn()
-                    ?.let { virksomhetsnavn ->
+                    ?.let { eregOrganisasjonVirksomhetsnavn ->
                         virksomhetsnavnService.updateVirksomhetsnavn(
                             narmesteLederRelasjonId = narmesteLederRelasjon.id,
-                            virksomhetsnavn = virksomhetsnavn,
+                            virksomhetsnavn = eregOrganisasjonVirksomhetsnavn.virksomhetsnavn,
                         )
                         virksomhetsnavnResult.updated++
                         COUNT_CRONJOB_VIRKSOMHETSNAVN_UPDATE.increment()
