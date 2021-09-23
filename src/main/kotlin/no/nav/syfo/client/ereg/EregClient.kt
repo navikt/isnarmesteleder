@@ -7,6 +7,7 @@ import io.ktor.http.*
 import net.logstash.logback.argument.StructuredArguments
 import no.nav.syfo.client.azuread.AzureAdClient
 import no.nav.syfo.client.httpClientDefault
+import no.nav.syfo.util.NAV_CALL_ID_HEADER
 import no.nav.syfo.util.bearerHeader
 import org.slf4j.LoggerFactory
 
@@ -32,6 +33,7 @@ class EregClient(
             val url = "$eregOrganisasjonUrl/$orgNr"
             val response: EregOrganisasjonResponse = httpClient.get(url) {
                 header(HttpHeaders.Authorization, bearerHeader(systemToken))
+                header(NAV_CALL_ID_HEADER, callId)
                 accept(ContentType.Application.Json)
             }
             COUNT_CALL_EREG_ORGANISASJON_SUCCESS.increment()
