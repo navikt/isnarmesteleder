@@ -6,21 +6,27 @@ import io.ktor.http.*
 import io.ktor.server.testing.*
 import io.mockk.*
 import kotlinx.coroutines.runBlocking
+import no.nav.syfo.client.azuread.AzureAdClient
+import no.nav.syfo.client.ereg.EregClient
+import no.nav.syfo.client.ereg.virksomhetsnavn
+import no.nav.syfo.cronjob.virksomhetsnavn.VirksomhetsnavnService
+import no.nav.syfo.cronjob.virksomhetsnavn.VirksomhetsnavnCronjob
 import no.nav.syfo.narmestelederrelasjon.api.*
 import no.nav.syfo.narmestelederrelasjon.domain.NarmesteLederRelasjonStatus
 import no.nav.syfo.narmestelederrelasjon.kafka.NARMESTE_LEDER_RELASJON_TOPIC
 import no.nav.syfo.narmestelederrelasjon.kafka.pollAndProcessNarmesteLederRelasjon
 import no.nav.syfo.util.*
 import org.amshove.kluent.shouldBeEqualTo
-import org.amshove.kluent.shouldBeNull
 import org.apache.kafka.clients.consumer.*
 import org.apache.kafka.common.TopicPartition
 import org.spekframework.spek2.Spek
 import org.spekframework.spek2.style.specification.describe
 import testhelper.*
 import testhelper.UserConstants.ARBEIDSTAKER_FNR
+import testhelper.UserConstants.ARBEIDSTAKER_NO_VIRKSOMHETNAVN
 import testhelper.UserConstants.ARBEIDSTAKER_VEILEDER_NO_ACCESS
 import testhelper.UserConstants.VEILEDER_IDENT
+import testhelper.UserConstants.VIRKSOMHETSNUMMER_NO_VIRKSOMHETSNAVN
 import testhelper.generator.generateNarmesteLederLeesah
 import java.time.Duration
 
@@ -35,6 +41,25 @@ class NarmestelederApiSpek : Spek({
 
         application.testApiModule(
             externalMockEnvironment = externalMockEnvironment,
+        )
+
+        val azureAdClient = AzureAdClient(
+            azureAppClientId = externalMockEnvironment.environment.azureAppClientId,
+            azureAppClientSecret = externalMockEnvironment.environment.azureAppClientSecret,
+            azureOpenidConfigTokenEndpoint = externalMockEnvironment.environment.azureOpenidConfigTokenEndpoint,
+        )
+
+        val eregClient = EregClient(
+            azureAdClient = azureAdClient,
+            isproxyClientId = externalMockEnvironment.environment.isproxyClientId,
+            baseUrl = externalMockEnvironment.environment.isproxyUrl,
+        )
+
+        val virksomhetsnavnCronjob = VirksomhetsnavnCronjob(
+            eregClient = eregClient,
+            virksomhetsnavnService = VirksomhetsnavnService(
+                database = database,
+            ),
         )
 
         afterEachTest {
@@ -79,12 +104,24 @@ class NarmestelederApiSpek : Spek({
                         "something",
                         objectMapper.writeValueAsString(narmesteLederLeesah),
                     )
+                    val narmesteLederLeesahNoVirksomhetsnavn = generateNarmesteLederLeesah(
+                        arbeidstakerPersonIdentNumber = ARBEIDSTAKER_NO_VIRKSOMHETNAVN,
+                        virksomhetsnummer = VIRKSOMHETSNUMMER_NO_VIRKSOMHETSNAVN,
+                    )
+                    val narmesteLederLeesahRecordNoVirksomhetsnavn = ConsumerRecord(
+                        NARMESTE_LEDER_RELASJON_TOPIC,
+                        partition,
+                        2,
+                        "something",
+                        objectMapper.writeValueAsString(narmesteLederLeesahNoVirksomhetsnavn),
+                    )
                     val mockConsumer = mockk<KafkaConsumer<String, String>>()
                     every { mockConsumer.poll(any<Duration>()) } returns ConsumerRecords(
                         mapOf(
                             narmesteLederRelasjonTopicPartition to listOf(
                                 narmesteLederLeesahRecord,
                                 narmesteLederLeesahRecordDuplicate,
+                                narmesteLederLeesahRecordNoVirksomhetsnavn,
                             )
                         )
                     )
@@ -100,6 +137,20 @@ class NarmestelederApiSpek : Spek({
 
                         verify(exactly = 1) { mockConsumer.commitSync() }
 
+                        runBlocking {
+                            val result = virksomhetsnavnCronjob.virksomhetsnavnJob()
+
+                            result.failed shouldBeEqualTo 1
+                            result.updated shouldBeEqualTo 1
+                        }
+
+                        runBlocking {
+                            val result = virksomhetsnavnCronjob.virksomhetsnavnJob()
+
+                            result.failed shouldBeEqualTo 1
+                            result.updated shouldBeEqualTo 0
+                        }
+
                         with(
                             handleRequest(HttpMethod.Get, url) {
                                 addHeader(HttpHeaders.Authorization, bearerHeader(validToken))
@@ -114,7 +165,7 @@ class NarmestelederApiSpek : Spek({
 
                             val narmesteLederRelasjon = narmestelederRelasjonList.first()
                             narmesteLederRelasjon.arbeidstakerPersonIdentNumber shouldBeEqualTo narmesteLederLeesah.fnr
-                            narmesteLederRelasjon.virksomhetsnavn.shouldBeNull()
+                            narmesteLederRelasjon.virksomhetsnavn shouldBeEqualTo externalMockEnvironment.isproxyMock.eregOrganisasjonResponse.virksomhetsnavn()
                             narmesteLederRelasjon.virksomhetsnummer shouldBeEqualTo narmesteLederLeesah.orgnummer
                             narmesteLederRelasjon.narmesteLederPersonIdentNumber shouldBeEqualTo narmesteLederLeesah.narmesteLederFnr
                             narmesteLederRelasjon.narmesteLederTelefonnummer shouldBeEqualTo narmesteLederLeesah.narmesteLederTelefonnummer
