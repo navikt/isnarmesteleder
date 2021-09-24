@@ -15,6 +15,7 @@ data class NarmesteLederRelasjon(
     val updatedAt: OffsetDateTime,
     val referanseUuid: UUID,
     val arbeidstakerPersonIdentNumber: PersonIdentNumber,
+    val virksomhetsnavn: String?,
     val virksomhetsnummer: Virksomhetsnummer,
     val narmesteLederPersonIdentNumber: PersonIdentNumber,
     val narmesteLederTelefonnummer: String,
@@ -28,6 +29,7 @@ data class NarmesteLederRelasjon(
 
 fun NarmesteLederRelasjon.toNarmesteLederRelasjonDTO() = NarmesteLederRelasjonDTO(
     uuid = this.uuid.toString(),
+    virksomhetsnavn = this.virksomhetsnavn,
     virksomhetsnummer = this.virksomhetsnummer.value,
     arbeidstakerPersonIdentNumber = this.arbeidstakerPersonIdentNumber.value,
     narmesteLederPersonIdentNumber = this.narmesteLederPersonIdentNumber.value,

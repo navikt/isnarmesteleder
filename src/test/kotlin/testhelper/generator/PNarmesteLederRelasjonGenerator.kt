@@ -15,6 +15,7 @@ fun generatePNarmesteLederRelasjon() = PNarmesteLederRelasjon(
     updatedAt = OffsetDateTime.now(),
     referanseUuid = UUID.randomUUID(),
     arbeidstakerPersonIdentNumber = ARBEIDSTAKER_FNR,
+    virksomhetsnavn = null,
     virksomhetsnummer = VIRKSOMHETSNUMMER_DEFAULT,
     narmesteLederPersonIdentNumber = NARMESTELEDER_PERSONIDENTNUMBER,
     narmesteLederTelefonnummer = "99119911",

@@ -6,6 +6,7 @@ import java.time.LocalDateTime
 data class NarmesteLederRelasjonDTO(
     val uuid: String,
     val arbeidstakerPersonIdentNumber: String,
+    val virksomhetsnavn: String?,
     val virksomhetsnummer: String,
     val narmesteLederPersonIdentNumber: String,
     val narmesteLederTelefonnummer: String,
