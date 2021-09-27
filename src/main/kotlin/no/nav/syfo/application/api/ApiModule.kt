@@ -8,6 +8,7 @@ import no.nav.syfo.application.Environment
 import no.nav.syfo.application.api.authentication.*
 import no.nav.syfo.application.database.DatabaseInterface
 import no.nav.syfo.client.azuread.AzureAdClient
+import no.nav.syfo.client.pdl.PdlClient
 import no.nav.syfo.client.veiledertilgang.VeilederTilgangskontrollClient
 import no.nav.syfo.client.wellknown.WellKnown
 import no.nav.syfo.narmestelederrelasjon.NarmesteLederRelasjonService
@@ -39,6 +40,12 @@ fun Application.apiModule(
         azureOpenidConfigTokenEndpoint = environment.azureOpenidConfigTokenEndpoint,
     )
 
+    val pdlClient = PdlClient(
+        azureAdClient = azureAdClient,
+        pdlClientId = environment.pdlClientId,
+        pdlBaseUrl = environment.pdlUrl
+    )
+
     val veilederTilgangskontrollClient = VeilederTilgangskontrollClient(
         azureAdClient = azureAdClient,
         syfotilgangskontrollClientId = environment.syfotilgangskontrollClientId,
@@ -47,6 +54,7 @@ fun Application.apiModule(
 
     val narmesteLederRelasjonService = NarmesteLederRelasjonService(
         database = database,
+        pdlClient = pdlClient,
     )
 
     routing {

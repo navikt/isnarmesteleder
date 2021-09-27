@@ -50,6 +50,7 @@ spec:
       external:
         - host: "login.microsoftonline.com"
         - host: "isproxy.prod-fss-pub.nais.io"
+        - host: "pdl-api.prod-fss-pub.nais.io"
         - host: "syfo-tilgangskontroll.prod-fss-pub.nais.io"
   azure:
     application:
@@ -70,6 +71,10 @@ spec:
       value: "prod-fss.teamsykefravr.isproxy"
     - name: ISPROXY_URL
       value: "https://isproxy.prod-fss-pub.nais.io"
+    - name: PDL_CLIENT_ID
+      value: "prod-fss.pdl.pdl-api"
+    - name: PDL_URL
+      value: "https://pdl-api.prod-fss-pub.nais.io/graphql"
     - name: SYFOTILGANGSKONTROLL_CLIENT_ID
       value: "prod-fss.teamsykefravr.syfo-tilgangskontroll"
     - name: SYFOTILGANGSKONTROLL_URL
