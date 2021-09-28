@@ -1,6 +1,7 @@
 package testhelper.mock
 
 import io.ktor.application.*
+import io.ktor.http.*
 import io.ktor.response.*
 import io.ktor.routing.*
 import io.ktor.server.engine.*
@@ -10,6 +11,7 @@ import no.nav.syfo.client.ereg.EregClient.Companion.EREG_PATH
 import no.nav.syfo.client.ereg.EregOrganisasjonNavn
 import no.nav.syfo.client.ereg.EregOrganisasjonResponse
 import testhelper.UserConstants.VIRKSOMHETSNUMMER_DEFAULT
+import testhelper.UserConstants.VIRKSOMHETSNUMMER_NO_VIRKSOMHETSNAVN
 import testhelper.getRandomPort
 
 class IsproxyMock {
@@ -35,8 +37,11 @@ class IsproxyMock {
         ) {
             installContentNegotiation()
             routing {
-                get("$EREG_PATH/$VIRKSOMHETSNUMMER_DEFAULT") {
+                get("$EREG_PATH/${VIRKSOMHETSNUMMER_DEFAULT.value}") {
                     call.respond(eregOrganisasjonResponse)
+                }
+                get("$EREG_PATH/${VIRKSOMHETSNUMMER_NO_VIRKSOMHETSNAVN.value}") {
+                    call.respond(HttpStatusCode.InternalServerError, "")
                 }
             }
         }

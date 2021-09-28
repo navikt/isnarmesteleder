@@ -8,3 +8,12 @@ data class EregOrganisasjonNavn(
 data class EregOrganisasjonResponse(
     val navn: EregOrganisasjonNavn,
 )
+
+fun EregOrganisasjonResponse.virksomhetsnavn(): String =
+    this.navn.let { (navnelinje1, redigertnavn) ->
+        if (redigertnavn.isNullOrBlank()) {
+            navnelinje1
+        } else {
+            redigertnavn
+        }
+    }

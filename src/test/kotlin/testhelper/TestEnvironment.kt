@@ -13,6 +13,7 @@ fun testEnvironment(
     azureAppClientSecret = "isdialogmote-secret",
     azureAppWellKnownUrl = "wellknown",
     azureOpenidConfigTokenEndpoint = azureOpenIdTokenEndpoint,
+    electorPath = "electorPath",
     kafka = ApplicationEnvironmentKafka(
         aivenBootstrapServers = kafkaBootstrapServers,
         aivenCredstorePassword = "credstorepassord",

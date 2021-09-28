@@ -8,6 +8,8 @@ data class Environment(
     val azureAppWellKnownUrl: String = getEnvVar("AZURE_APP_WELL_KNOWN_URL"),
     val azureOpenidConfigTokenEndpoint: String = getEnvVar("AZURE_OPENID_CONFIG_TOKEN_ENDPOINT"),
 
+    val electorPath: String = getEnvVar("ELECTOR_PATH"),
+
     val isnarmestelederDbHost: String = getEnvVar("NAIS_DATABASE_ISNARMESTELEDER_ISNARMESTELEDER_DB_HOST"),
     val isnarmestelederDbPort: String = getEnvVar("NAIS_DATABASE_ISNARMESTELEDER_ISNARMESTELEDER_DB_PORT"),
     val isnarmestelederDbName: String = getEnvVar("NAIS_DATABASE_ISNARMESTELEDER_ISNARMESTELEDER_DB_DATABASE"),

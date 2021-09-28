@@ -6,7 +6,8 @@ import no.nav.syfo.domain.PersonIdentNumber
 import no.nav.syfo.domain.Virksomhetsnummer
 import no.nav.syfo.narmestelederrelasjon.database.domain.PNarmesteLederRelasjon
 import no.nav.syfo.narmestelederrelasjon.kafka.domain.NarmesteLederLeesah
-import no.nav.syfo.util.*
+import no.nav.syfo.util.nowTimestampUTC
+import no.nav.syfo.util.toOffsetDateTimeUTC
 import java.sql.*
 import java.util.*
 
@@ -61,6 +62,44 @@ fun Connection.createNarmesteLederRelasjon(
 
     if (commit) {
         this.commit()
+    }
+}
+
+const val queryGetNarmesteLederRelasjonWithoutVirksomhetsnavn =
+    """
+    SELECT *
+    FROM NARMESTE_LEDER_RELASJON
+    WHERE virksomhetsnavn IS NULL
+    """
+
+fun DatabaseInterface.getNarmesteLederRelasjonWithoutVirksomhetsnavn(): List<PNarmesteLederRelasjon> {
+    return this.connection.use { connection ->
+        connection.prepareStatement(queryGetNarmesteLederRelasjonWithoutVirksomhetsnavn).use {
+            it.executeQuery().toList {
+                toPNarmesteLederRelasjon()
+            }
+        }
+    }
+}
+
+const val queryUpdateNarmesteLederRelasjonVirksomhetsnavn =
+    """
+    UPDATE NARMESTE_LEDER_RELASJON
+    SET virksomhetsnavn = ?
+    WHERE id = ?
+    """
+
+fun DatabaseInterface.updateNarmesteLederRelasjonVirksomhetsnavn(
+    narmesteLederRelasjonId: Int,
+    virksomhetsnavn: String,
+) {
+    this.connection.use { connection ->
+        connection.prepareStatement(queryUpdateNarmesteLederRelasjonVirksomhetsnavn).use {
+            it.setString(1, virksomhetsnavn)
+            it.setInt(2, narmesteLederRelasjonId)
+            it.execute()
+        }
+        connection.commit()
     }
 }
 
