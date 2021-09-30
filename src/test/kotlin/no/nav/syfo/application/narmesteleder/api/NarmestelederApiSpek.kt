@@ -9,6 +9,7 @@ import kotlinx.coroutines.runBlocking
 import no.nav.syfo.client.azuread.AzureAdClient
 import no.nav.syfo.client.ereg.EregClient
 import no.nav.syfo.client.ereg.virksomhetsnavn
+import no.nav.syfo.client.pdl.fullName
 import no.nav.syfo.cronjob.virksomhetsnavn.VirksomhetsnavnService
 import no.nav.syfo.cronjob.virksomhetsnavn.VirksomhetsnavnCronjob
 import no.nav.syfo.narmestelederrelasjon.api.*
@@ -170,6 +171,7 @@ class NarmestelederApiSpek : Spek({
                             narmesteLederRelasjon.narmesteLederPersonIdentNumber shouldBeEqualTo narmesteLederLeesah.narmesteLederFnr
                             narmesteLederRelasjon.narmesteLederTelefonnummer shouldBeEqualTo narmesteLederLeesah.narmesteLederTelefonnummer
                             narmesteLederRelasjon.narmesteLederEpost shouldBeEqualTo narmesteLederLeesah.narmesteLederEpost
+                            narmesteLederRelasjon.narmesteLederNavn shouldBeEqualTo externalMockEnvironment.pdlMock.respons.data.hentPersonBolk?.get(0)?.person?.fullName()
                             narmesteLederRelasjon.aktivFom shouldBeEqualTo narmesteLederLeesah.aktivFom
                             narmesteLederRelasjon.aktivTom shouldBeEqualTo narmesteLederLeesah.aktivTom
                             narmesteLederRelasjon.status shouldBeEqualTo NarmesteLederRelasjonStatus.INNMELDT_AKTIV.name

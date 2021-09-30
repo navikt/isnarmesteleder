@@ -27,6 +27,9 @@ data class Environment(
     val isproxyClientId: String = getEnvVar("ISPROXY_CLIENT_ID"),
     val isproxyUrl: String = getEnvVar("ISPROXY_URL"),
 
+    val pdlClientId: String = getEnvVar("PDL_CLIENT_ID"),
+    val pdlUrl: String = getEnvVar("PDL_URL"),
+
     val syfotilgangskontrollClientId: String = getEnvVar("SYFOTILGANGSKONTROLL_CLIENT_ID"),
     val syfotilgangskontrollUrl: String = getEnvVar("SYFOTILGANGSKONTROLL_URL"),
 

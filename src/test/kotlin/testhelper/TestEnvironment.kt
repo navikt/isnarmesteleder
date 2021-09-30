@@ -7,6 +7,7 @@ fun testEnvironment(
     azureOpenIdTokenEndpoint: String = "azureTokenEndpoint",
     kafkaBootstrapServers: String,
     isproxyUrl: String = "isproxy",
+    pdlUrl: String = "pdl",
     syfotilgangskontrollUrl: String = "tilgangskontroll",
 ) = Environment(
     azureAppClientId = "isdialogmote-client-id",
@@ -28,6 +29,8 @@ fun testEnvironment(
     isnarmestelederDbPassword = "password",
     isproxyClientId = "dev-fss.teamsykefravr.isproxy",
     isproxyUrl = isproxyUrl,
+    pdlClientId = "dev-fss.pdl.pdl-api",
+    pdlUrl = pdlUrl,
     syfotilgangskontrollClientId = "dev-fss.teamsykefravr.syfo-tilgangskontroll",
     syfotilgangskontrollUrl = syfotilgangskontrollUrl,
     toggleCronjobVirksomhetsnavnEnabled = true,

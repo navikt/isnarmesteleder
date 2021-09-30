@@ -11,6 +11,7 @@ data class NarmesteLederRelasjonDTO(
     val narmesteLederPersonIdentNumber: String,
     val narmesteLederTelefonnummer: String,
     val narmesteLederEpost: String,
+    val narmesteLederNavn: String?,
     val aktivFom: LocalDate,
     val aktivTom: LocalDate?,
     val arbeidsgiverForskutterer: Boolean?,

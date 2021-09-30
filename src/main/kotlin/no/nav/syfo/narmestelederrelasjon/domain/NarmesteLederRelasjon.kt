@@ -20,6 +20,7 @@ data class NarmesteLederRelasjon(
     val narmesteLederPersonIdentNumber: PersonIdentNumber,
     val narmesteLederTelefonnummer: String,
     val narmesteLederEpost: String,
+    val narmesteLederNavn: String? = null,
     val aktivFom: LocalDate,
     val aktivTom: LocalDate?,
     val arbeidsgiverForskutterer: Boolean?,
@@ -35,12 +36,27 @@ fun NarmesteLederRelasjon.toNarmesteLederRelasjonDTO() = NarmesteLederRelasjonDT
     narmesteLederPersonIdentNumber = this.narmesteLederPersonIdentNumber.value,
     narmesteLederTelefonnummer = this.narmesteLederTelefonnummer,
     narmesteLederEpost = this.narmesteLederEpost,
+    narmesteLederNavn = this.narmesteLederNavn,
     arbeidsgiverForskutterer = this.arbeidsgiverForskutterer,
     aktivFom = this.aktivFom,
     aktivTom = this.aktivTom,
     timestamp = this.timestamp.toLocalDateTimeOslo(),
     status = this.status.name,
 )
+
+fun List<NarmesteLederRelasjon>.addNarmesteLederName(
+    maybePersonIdentNumberNameMap: Map<String, String>?,
+): List<NarmesteLederRelasjon> {
+    if (maybePersonIdentNumberNameMap == null) {
+        return this
+    }
+    return this.map { narmesteLederRelasjon ->
+        val narmesteLederPersonIdentNumber = narmesteLederRelasjon.narmesteLederPersonIdentNumber.value
+        narmesteLederRelasjon.copy(
+            narmesteLederNavn = maybePersonIdentNumberNameMap[narmesteLederPersonIdentNumber]
+        )
+    }
+}
 
 enum class NarmesteLederRelasjonStatus {
     INNMELDT_AKTIV,

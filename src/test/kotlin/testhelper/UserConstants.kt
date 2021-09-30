@@ -16,4 +16,8 @@ object UserConstants {
     val VIRKSOMHETSNUMMER_NO_VIRKSOMHETSNAVN = Virksomhetsnummer(VIRKSOMHETSNUMMER_DEFAULT.value.replace("1", "3"))
 
     const val VEILEDER_IDENT = "Z999999"
+
+    const val NARMESTELEDER_FORNAVN = "Leder"
+    const val NARMESTELEDER_MELLOMNAVN = "Mellomleder"
+    const val NARMESTELEDER_ETTERNAVN = "Ledersen"
 }
