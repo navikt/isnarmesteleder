@@ -8,8 +8,8 @@ import io.mockk.*
 import kotlinx.coroutines.runBlocking
 import no.nav.syfo.client.azuread.AzureAdClient
 import no.nav.syfo.client.ereg.EregClient
-import no.nav.syfo.client.ereg.virksomhetsnavn
 import no.nav.syfo.client.pdl.fullName
+import no.nav.syfo.client.ereg.toEregVirksomhetsnavn
 import no.nav.syfo.cronjob.virksomhetsnavn.VirksomhetsnavnService
 import no.nav.syfo.cronjob.virksomhetsnavn.VirksomhetsnavnCronjob
 import no.nav.syfo.narmestelederrelasjon.api.*
@@ -166,7 +166,7 @@ class NarmestelederApiSpek : Spek({
 
                             val narmesteLederRelasjon = narmestelederRelasjonList.first()
                             narmesteLederRelasjon.arbeidstakerPersonIdentNumber shouldBeEqualTo narmesteLederLeesah.fnr
-                            narmesteLederRelasjon.virksomhetsnavn shouldBeEqualTo externalMockEnvironment.isproxyMock.eregOrganisasjonResponse.virksomhetsnavn()
+                            narmesteLederRelasjon.virksomhetsnavn shouldBeEqualTo externalMockEnvironment.isproxyMock.eregOrganisasjonResponse.toEregVirksomhetsnavn().virksomhetsnavn
                             narmesteLederRelasjon.virksomhetsnummer shouldBeEqualTo narmesteLederLeesah.orgnummer
                             narmesteLederRelasjon.narmesteLederPersonIdentNumber shouldBeEqualTo narmesteLederLeesah.narmesteLederFnr
                             narmesteLederRelasjon.narmesteLederTelefonnummer shouldBeEqualTo narmesteLederLeesah.narmesteLederTelefonnummer
