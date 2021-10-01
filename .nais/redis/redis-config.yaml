@@ -6,7 +6,7 @@ metadata:
   namespace: teamsykefravr
   name: isnarmesteleder-redis
 spec:
-  image: bitnami/redis:6.0.12
+  image: redis:6-alpine
   port: 6379
   replicas:
     min: 1
