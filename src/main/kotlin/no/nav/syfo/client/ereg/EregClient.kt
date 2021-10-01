@@ -2,7 +2,6 @@ package no.nav.syfo.client.ereg
 
 import io.ktor.client.features.*
 import io.ktor.client.request.*
-import io.ktor.client.statement.*
 import io.ktor.http.*
 import net.logstash.logback.argument.StructuredArguments
 import no.nav.syfo.client.azuread.AzureAdClient
@@ -39,7 +38,7 @@ class EregClient(
             }
             COUNT_CALL_EREG_ORGANISASJON_SUCCESS.increment()
             return response.toEregVirksomhetsnavn()
-        } catch (e: ClientRequestException) {
+        } catch (e: ResponseException) {
             if (e.isOrganisasjonNotFound(virksomhetsnummer)) {
                 log.warn("No Organisasjon was found in Ereg: returning empty Virksomhetsnavn, message=${e.message}, callId=$callId")
                 COUNT_CALL_EREG_ORGANISASJON_NOT_FOUND.increment()
@@ -47,34 +46,25 @@ class EregClient(
                     virksomhetsnavn = "",
                 )
             } else {
-                handleUnexpectedResponseException(e.response, e.message, callId)
+                log.error(
+                    "Error while requesting Response from Ereg {}, {}, {}",
+                    StructuredArguments.keyValue("statusCode", e.response.status.value.toString()),
+                    StructuredArguments.keyValue("message", e.message),
+                    StructuredArguments.keyValue("callId", callId),
+                )
+                COUNT_CALL_EREG_ORGANISASJON_FAIL.increment()
             }
-        } catch (e: ServerResponseException) {
-            handleUnexpectedResponseException(e.response, e.message, callId)
         }
         return null
     }
 
-    private fun handleUnexpectedResponseException(
-        response: HttpResponse,
-        message: String?,
-        callId: String,
-    ) {
-        log.error(
-            "Error while requesting Response from Ereg {}, {}, {}",
-            StructuredArguments.keyValue("statusCode", response.status.value.toString()),
-            StructuredArguments.keyValue("message", message),
-            StructuredArguments.keyValue("callId", callId),
-        )
-        COUNT_CALL_EREG_ORGANISASJON_FAIL.increment()
-    }
-
-    private fun ClientRequestException.isOrganisasjonNotFound(
+    private fun ResponseException.isOrganisasjonNotFound(
         virksomhetsnummer: Virksomhetsnummer,
     ): Boolean {
         val is404 = this.response.status == HttpStatusCode.NotFound
-        val messageNoVirksomhetsnavn = "Ingen organisasjon med organisasjonsnummer $virksomhetsnummer ble funnet"
-        val isMessageNoVirksomhetsnavn = this.message.contains(messageNoVirksomhetsnavn)
+        val messageNoVirksomhetsnavn =
+            "Ingen organisasjon med organisasjonsnummer ${virksomhetsnummer.value} ble funnet"
+        val isMessageNoVirksomhetsnavn = this.message?.contains(messageNoVirksomhetsnavn) ?: false
         return is404 && isMessageNoVirksomhetsnavn
     }
 
