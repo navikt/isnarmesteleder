@@ -82,4 +82,4 @@ spec:
     - name: TOGGLE_CRONJOB_VIRKSOMHETSNAVN_ENABLED
       value: "false"
     - name: TOGGLE_KAFKA_PROCESSING_ENABLED
-      value: "false"
+      value: "true"
