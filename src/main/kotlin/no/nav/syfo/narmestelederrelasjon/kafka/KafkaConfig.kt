@@ -14,7 +14,7 @@ fun kafkaNarmesteLederRelasjonConsumerConfig(
     return Properties().apply {
         putAll(commonKafkaAivenConfig(applicationEnvironmentKafka))
 
-        this[ConsumerConfig.GROUP_ID_CONFIG] = "isnarmesteleder-v1"
+        this[ConsumerConfig.GROUP_ID_CONFIG] = "isnarmesteleder-v2"
         this[ConsumerConfig.KEY_DESERIALIZER_CLASS_CONFIG] = StringDeserializer::class.java.canonicalName
         this[ConsumerConfig.VALUE_DESERIALIZER_CLASS_CONFIG] = StringDeserializer::class.java.canonicalName
         this[ConsumerConfig.AUTO_OFFSET_RESET_CONFIG] = "earliest"
