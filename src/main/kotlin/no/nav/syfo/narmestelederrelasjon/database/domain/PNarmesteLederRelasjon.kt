@@ -27,29 +27,28 @@ data class PNarmesteLederRelasjon(
 )
 
 fun List<PNarmesteLederRelasjon>.toNarmesteLederRelasjonList(): List<NarmesteLederRelasjon> {
-    val narmesteLederRelasjonVirksomhetsnummerMap = this.groupBy {
-        it.virksomhetsnummer
-    }
     val returnList = mutableListOf<NarmesteLederRelasjon>()
 
-    narmesteLederRelasjonVirksomhetsnummerMap.entries.forEach { narmesteLederRelasjonVirksomhetsnummer ->
-        val pNarmesteLederRelasjonListByVirksomhetsnummer = narmesteLederRelasjonVirksomhetsnummer.value
-        returnList.addAll(
-            pNarmesteLederRelasjonListByVirksomhetsnummer.map { pNarmesteLederRelasjon ->
-                pNarmesteLederRelasjon.toNarmesteLederRelasjon(
-                    pNarmesteLederRelasjonList = pNarmesteLederRelasjonListByVirksomhetsnummer
-                )
-            }.sortedByDescending {
-                it.timestamp
-            }
-        )
+    val narmesteLederRelasjonReferanseMap = this.groupBy {
+        it.referanseUuid
     }
-    return returnList
+    narmesteLederRelasjonReferanseMap.entries.map { narmesteLederRelasjonReferanseEntry ->
+        val newestnarmesteLederRelasjonForReferanse =
+            narmesteLederRelasjonReferanseEntry.value.maxByOrNull { pNarmesteLederRelasjon ->
+                pNarmesteLederRelasjon.timestamp
+            }
+        newestnarmesteLederRelasjonForReferanse
+            ?.toNarmesteLederRelasjon()
+            ?.let { narmesteLederRelasjon ->
+                returnList.add(narmesteLederRelasjon)
+            }
+    }
+    return returnList.sortedByDescending {
+        it.timestamp
+    }
 }
 
-fun PNarmesteLederRelasjon.toNarmesteLederRelasjon(
-    pNarmesteLederRelasjonList: List<PNarmesteLederRelasjon>,
-) = NarmesteLederRelasjon(
+fun PNarmesteLederRelasjon.toNarmesteLederRelasjon() = NarmesteLederRelasjon(
     id = this.id,
     uuid = this.uuid,
     createdAt = this.createdAt,
@@ -65,25 +64,14 @@ fun PNarmesteLederRelasjon.toNarmesteLederRelasjon(
     aktivFom = this.aktivFom,
     aktivTom = this.aktivTom,
     timestamp = this.timestamp,
-    status = this.findStatus(pNarmesteLederRelasjonList = pNarmesteLederRelasjonList),
+    status = this.findStatus(),
 )
 
-fun PNarmesteLederRelasjon.findStatus(
-    pNarmesteLederRelasjonList: List<PNarmesteLederRelasjon>,
-): NarmesteLederRelasjonStatus {
+fun PNarmesteLederRelasjon.findStatus(): NarmesteLederRelasjonStatus {
     val isNarmesteLederRelasjonDeaktivert = this.aktivTom != null
     return if (isNarmesteLederRelasjonDeaktivert) {
         NarmesteLederRelasjonStatus.DEAKTIVERT
     } else {
-        val narmesteLederRelasjonNewest = pNarmesteLederRelasjonList.maxByOrNull { narmesteLederRelasjon ->
-            narmesteLederRelasjon.timestamp
-        } ?: throw Exception("Cannot find type of NarmesteLederRelasjon: Empty narmesteLederRelasjonList was supplied")
-
-        val isThisAktiv = narmesteLederRelasjonNewest.aktivTom == null && this.referanseUuid === narmesteLederRelasjonNewest.referanseUuid
-        if (isThisAktiv) {
-            NarmesteLederRelasjonStatus.INNMELDT_AKTIV
-        } else {
-            NarmesteLederRelasjonStatus.INNMELDT_INAKTIV
-        }
+        NarmesteLederRelasjonStatus.INNMELDT_AKTIV
     }
 }

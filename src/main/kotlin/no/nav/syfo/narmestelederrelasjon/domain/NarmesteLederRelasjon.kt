@@ -60,6 +60,5 @@ fun List<NarmesteLederRelasjon>.addNarmesteLederName(
 
 enum class NarmesteLederRelasjonStatus {
     INNMELDT_AKTIV,
-    INNMELDT_INAKTIV,
     DEAKTIVERT,
 }
