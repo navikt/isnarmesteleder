@@ -70,7 +70,7 @@ const val queryGetNarmesteLederRelasjonWithoutVirksomhetsnavn =
     SELECT *
     FROM NARMESTE_LEDER_RELASJON
     WHERE virksomhetsnavn IS NULL
-    LIMIT 10000
+    LIMIT 1000
     """
 
 fun DatabaseInterface.getNarmesteLederRelasjonWithoutVirksomhetsnavn(): List<PNarmesteLederRelasjon> {
