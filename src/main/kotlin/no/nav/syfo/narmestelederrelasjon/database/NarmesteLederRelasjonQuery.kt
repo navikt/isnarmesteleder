@@ -70,6 +70,7 @@ const val queryGetNarmesteLederRelasjonWithoutVirksomhetsnavn =
     SELECT *
     FROM NARMESTE_LEDER_RELASJON
     WHERE virksomhetsnavn IS NULL
+    ORDER BY timestamp DESC
     LIMIT 5000
     """
 
