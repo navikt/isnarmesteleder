@@ -12,7 +12,7 @@ class VirksomhetsnavnCronjob(
     private val virksomhetsnavnService: VirksomhetsnavnService,
 ) : Cronjob {
     override val initialDelayMinutes: Long = 2
-    override val intervalDelayMinutes: Long = 25
+    override val intervalDelayMinutes: Long = 20
 
     override suspend fun run() {
         virksomhetsnavnJob()
