@@ -8,6 +8,7 @@ object Versions {
     const val flyway = "7.15.0"
     const val hikari = "5.0.0"
     const val jackson = "2.11.4"
+    const val jedis = "3.7.0"
     const val kafka = "2.7.0"
     const val kafkaEmbedded = "2.5.0"
     const val ktor = "1.6.3"
@@ -19,6 +20,7 @@ object Versions {
     const val micrometerRegistry = "1.7.1"
     const val postgres = "42.2.23"
     const val postgresEmbedded = "0.13.4"
+    const val redisEmbedded = "0.7.3"
     const val spek = "2.0.15"
 }
 
@@ -54,6 +56,10 @@ dependencies {
     // Metrics and Prometheus
     implementation("io.ktor:ktor-metrics-micrometer:${Versions.ktor}")
     implementation("io.micrometer:micrometer-registry-prometheus:${Versions.micrometerRegistry}")
+
+    // Cache
+    implementation("redis.clients:jedis:${Versions.jedis}")
+    testImplementation("it.ozimov:embedded-redis:${Versions.redisEmbedded}")
 
     // (De-)serialization
     implementation("com.fasterxml.jackson.datatype:jackson-datatype-jsr310:${Versions.jackson}")

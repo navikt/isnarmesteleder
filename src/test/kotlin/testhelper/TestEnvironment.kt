@@ -22,6 +22,8 @@ fun testEnvironment(
         aivenSecurityProtocol = "SSL",
         aivenTruststoreLocation = "truststore",
     ),
+    redisHost = "localhost",
+    redisSecret = "password",
     isnarmestelederDbHost = "localhost",
     isnarmestelederDbPort = "5432",
     isnarmestelederDbName = "isnarmesteleder_dev",

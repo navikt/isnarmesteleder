@@ -52,10 +52,14 @@ spec:
         - host: "isproxy.dev-fss-pub.nais.io"
         - host: "pdl-api.dev-fss-pub.nais.io"
         - host: "syfo-tilgangskontroll.dev-fss-pub.nais.io"
+      rules:
+        - application: isnarmesteleder-redis
   azure:
     application:
       enabled: true
       tenant: trygdeetaten.no
+  envFrom:
+    - secret: isnarmesteleder-redis-password
   gcp:
     sqlInstances:
       - type: POSTGRES_12
@@ -79,6 +83,8 @@ spec:
       value: "dev-fss.teamsykefravr.syfo-tilgangskontroll"
     - name: SYFOTILGANGSKONTROLL_URL
       value: "https://syfo-tilgangskontroll.dev-fss-pub.nais.io"
+    - name: REDIS_HOST
+      value: "isnarmesteleder-redis.teamsykefravr.svc.cluster.local"
     - name: TOGGLE_CRONJOB_VIRKSOMHETSNAVN_ENABLED
       value: "true"
     - name: TOGGLE_KAFKA_PROCESSING_ENABLED
