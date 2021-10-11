@@ -29,6 +29,10 @@ class ExternalMockEnvironment {
         pdlUrl = pdlMock.url,
         syfotilgangskontrollUrl = tilgangskontrollMock.url,
     )
+    val redisServer = testRedis(
+        port = environment.redisPort,
+        secret = environment.redisSecret,
+    )
 
     val wellKnownInternalAzureAD = wellKnownInternalAzureAD()
 }
@@ -36,12 +40,14 @@ class ExternalMockEnvironment {
 fun ExternalMockEnvironment.startExternalMocks() {
     this.embeddedEnvironment.start()
     this.externalApplicationMockMap.start()
+    this.redisServer.start()
 }
 
 fun ExternalMockEnvironment.stopExternalMocks() {
     this.externalApplicationMockMap.stop()
     this.database.stop()
     this.embeddedEnvironment.tearDown()
+    this.redisServer.stop()
 }
 
 fun HashMap<String, NettyApplicationEngine>.start() {

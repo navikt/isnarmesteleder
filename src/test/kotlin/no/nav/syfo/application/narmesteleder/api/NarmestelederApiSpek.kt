@@ -6,12 +6,13 @@ import io.ktor.http.*
 import io.ktor.server.testing.*
 import io.mockk.*
 import kotlinx.coroutines.runBlocking
+import no.nav.syfo.application.cache.RedisStore
 import no.nav.syfo.client.azuread.AzureAdClient
 import no.nav.syfo.client.ereg.EregClient
-import no.nav.syfo.client.pdl.fullName
 import no.nav.syfo.client.ereg.toEregVirksomhetsnavn
-import no.nav.syfo.cronjob.virksomhetsnavn.VirksomhetsnavnService
+import no.nav.syfo.client.pdl.fullName
 import no.nav.syfo.cronjob.virksomhetsnavn.VirksomhetsnavnCronjob
+import no.nav.syfo.cronjob.virksomhetsnavn.VirksomhetsnavnService
 import no.nav.syfo.narmestelederrelasjon.api.*
 import no.nav.syfo.narmestelederrelasjon.domain.NarmesteLederRelasjonStatus
 import no.nav.syfo.narmestelederrelasjon.kafka.NARMESTE_LEDER_RELASJON_TOPIC
@@ -22,6 +23,7 @@ import org.apache.kafka.clients.consumer.*
 import org.apache.kafka.common.TopicPartition
 import org.spekframework.spek2.Spek
 import org.spekframework.spek2.style.specification.describe
+import redis.clients.jedis.*
 import testhelper.*
 import testhelper.UserConstants.ARBEIDSTAKER_FNR
 import testhelper.UserConstants.ARBEIDSTAKER_NO_VIRKSOMHETNAVN
@@ -44,10 +46,21 @@ class NarmestelederApiSpek : Spek({
             externalMockEnvironment = externalMockEnvironment,
         )
 
+        val redisStore = RedisStore(
+            jedisPool = JedisPool(
+                JedisPoolConfig(),
+                externalMockEnvironment.environment.redisHost,
+                externalMockEnvironment.environment.redisPort,
+                Protocol.DEFAULT_TIMEOUT,
+                externalMockEnvironment.environment.redisSecret,
+            ),
+        )
+
         val azureAdClient = AzureAdClient(
             azureAppClientId = externalMockEnvironment.environment.azureAppClientId,
             azureAppClientSecret = externalMockEnvironment.environment.azureAppClientSecret,
             azureOpenidConfigTokenEndpoint = externalMockEnvironment.environment.azureOpenidConfigTokenEndpoint,
+            redisStore = redisStore,
         )
 
         val eregClient = EregClient(
@@ -160,7 +173,8 @@ class NarmestelederApiSpek : Spek({
                         ) {
                             response.status() shouldBeEqualTo HttpStatusCode.OK
 
-                            val narmestelederRelasjonList = objectMapper.readValue<List<NarmesteLederRelasjonDTO>>(response.content!!)
+                            val narmestelederRelasjonList =
+                                objectMapper.readValue<List<NarmesteLederRelasjonDTO>>(response.content!!)
 
                             narmestelederRelasjonList.size shouldBeEqualTo 1
 
@@ -171,7 +185,9 @@ class NarmestelederApiSpek : Spek({
                             narmesteLederRelasjon.narmesteLederPersonIdentNumber shouldBeEqualTo narmesteLederLeesah.narmesteLederFnr
                             narmesteLederRelasjon.narmesteLederTelefonnummer shouldBeEqualTo narmesteLederLeesah.narmesteLederTelefonnummer
                             narmesteLederRelasjon.narmesteLederEpost shouldBeEqualTo narmesteLederLeesah.narmesteLederEpost
-                            narmesteLederRelasjon.narmesteLederNavn shouldBeEqualTo externalMockEnvironment.pdlMock.respons.data.hentPersonBolk?.get(0)?.person?.fullName()
+                            narmesteLederRelasjon.narmesteLederNavn shouldBeEqualTo externalMockEnvironment.pdlMock.respons.data.hentPersonBolk?.get(
+                                0
+                            )?.person?.fullName()
                             narmesteLederRelasjon.aktivFom shouldBeEqualTo narmesteLederLeesah.aktivFom
                             narmesteLederRelasjon.aktivTom shouldBeEqualTo narmesteLederLeesah.aktivTom
                             narmesteLederRelasjon.status shouldBeEqualTo NarmesteLederRelasjonStatus.INNMELDT_AKTIV.name

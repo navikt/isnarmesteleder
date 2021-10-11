@@ -6,6 +6,7 @@ import io.ktor.routing.*
 import no.nav.syfo.application.ApplicationState
 import no.nav.syfo.application.Environment
 import no.nav.syfo.application.api.authentication.*
+import no.nav.syfo.application.cache.RedisStore
 import no.nav.syfo.application.database.DatabaseInterface
 import no.nav.syfo.client.azuread.AzureAdClient
 import no.nav.syfo.client.pdl.PdlClient
@@ -13,6 +14,7 @@ import no.nav.syfo.client.veiledertilgang.VeilederTilgangskontrollClient
 import no.nav.syfo.client.wellknown.WellKnown
 import no.nav.syfo.narmestelederrelasjon.NarmesteLederRelasjonService
 import no.nav.syfo.narmestelederrelasjon.api.registrerNarmesteLederRelasjonApi
+import redis.clients.jedis.*
 
 fun Application.apiModule(
     applicationState: ApplicationState,
@@ -34,10 +36,21 @@ fun Application.apiModule(
     )
     installStatusPages()
 
+    val redisStore = RedisStore(
+        jedisPool = JedisPool(
+            JedisPoolConfig(),
+            environment.redisHost,
+            environment.redisPort,
+            Protocol.DEFAULT_TIMEOUT,
+            environment.redisSecret,
+        ),
+    )
+
     val azureAdClient = AzureAdClient(
         azureAppClientId = environment.azureAppClientId,
         azureAppClientSecret = environment.azureAppClientSecret,
         azureOpenidConfigTokenEndpoint = environment.azureOpenidConfigTokenEndpoint,
+        redisStore = redisStore,
     )
 
     val pdlClient = PdlClient(

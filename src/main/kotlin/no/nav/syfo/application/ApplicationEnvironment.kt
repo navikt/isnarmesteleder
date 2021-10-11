@@ -24,6 +24,10 @@ data class Environment(
         aivenTruststoreLocation = getEnvVar("KAFKA_TRUSTSTORE_PATH"),
     ),
 
+    val redisHost: String = getEnvVar("REDIS_HOST"),
+    val redisPort: Int = getEnvVar("REDIS_PORT", "6379").toInt(),
+    val redisSecret: String = getEnvVar("REDIS_PASSWORD"),
+
     val isproxyClientId: String = getEnvVar("ISPROXY_CLIENT_ID"),
     val isproxyUrl: String = getEnvVar("ISPROXY_URL"),
 
