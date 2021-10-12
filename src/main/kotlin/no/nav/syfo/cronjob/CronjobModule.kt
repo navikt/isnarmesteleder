@@ -38,6 +38,7 @@ fun cronjobModule(
         azureAdClient = azureAdClient,
         isproxyClientId = environment.isproxyClientId,
         baseUrl = environment.isproxyUrl,
+        redisStore = redisStore,
     )
 
     val leaderPodClient = LeaderPodClient(

@@ -67,6 +67,7 @@ class NarmestelederApiSpek : Spek({
             azureAdClient = azureAdClient,
             isproxyClientId = externalMockEnvironment.environment.isproxyClientId,
             baseUrl = externalMockEnvironment.environment.isproxyUrl,
+            redisStore = redisStore,
         )
 
         val virksomhetsnavnCronjob = VirksomhetsnavnCronjob(
