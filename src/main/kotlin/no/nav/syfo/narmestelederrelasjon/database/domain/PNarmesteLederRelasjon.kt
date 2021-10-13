@@ -24,6 +24,7 @@ data class PNarmesteLederRelasjon(
     val aktivTom: LocalDate?,
     val arbeidsgiverForskutterer: Boolean?,
     val timestamp: OffsetDateTime,
+    val status: String?,
 )
 
 fun List<PNarmesteLederRelasjon>.toNarmesteLederRelasjonList(): List<NarmesteLederRelasjon> {

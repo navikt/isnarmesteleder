@@ -24,4 +24,5 @@ fun generatePNarmesteLederRelasjon() = PNarmesteLederRelasjon(
     aktivTom = null,
     arbeidsgiverForskutterer = null,
     timestamp = OffsetDateTime.now().minusDays(5),
+    status = null
 )

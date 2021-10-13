@@ -27,8 +27,9 @@ const val queryCreateNarmesteLederRelasjon =
         arbeidsgiver_forskutterer,
         aktiv_fom,
         aktiv_tom,
-        timestamp
-        ) VALUES (DEFAULT, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+        timestamp,
+        status
+        ) VALUES (DEFAULT, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
         ON CONFLICT DO NOTHING
         RETURNING id
     """
@@ -53,6 +54,7 @@ fun Connection.createNarmesteLederRelasjon(
         it.setTimestamp(11, Timestamp.valueOf(narmesteLederLeesah.aktivFom.atStartOfDay()))
         it.setTimestamp(12, narmesteLederLeesah.aktivTom?.let { aktivTom -> Timestamp.valueOf(aktivTom.atStartOfDay()) })
         it.setTimestamp(13, Timestamp.from(narmesteLederLeesah.timestamp.toInstant()))
+        it.setString(14, narmesteLederLeesah.status)
         it.executeQuery().toList { getInt("id") }
     }
 
@@ -142,4 +144,5 @@ fun ResultSet.toPNarmesteLederRelasjon(): PNarmesteLederRelasjon =
         aktivFom = getDate("aktiv_fom").toLocalDate(),
         aktivTom = getDate("aktiv_tom")?.toLocalDate(),
         timestamp = getTimestamp("timestamp").toOffsetDateTimeUTC(),
+        status = getString("status"),
     )

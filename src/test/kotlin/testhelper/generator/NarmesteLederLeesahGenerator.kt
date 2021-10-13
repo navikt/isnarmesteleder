@@ -2,6 +2,7 @@ package testhelper.generator
 
 import no.nav.syfo.domain.PersonIdentNumber
 import no.nav.syfo.domain.Virksomhetsnummer
+import no.nav.syfo.narmestelederrelasjon.kafka.domain.NY_LEDER
 import no.nav.syfo.narmestelederrelasjon.kafka.domain.NarmesteLederLeesah
 import testhelper.UserConstants
 import testhelper.UserConstants.ARBEIDSTAKER_FNR
@@ -13,6 +14,7 @@ import java.util.*
 
 fun generateNarmesteLederLeesah(
     arbeidstakerPersonIdentNumber: PersonIdentNumber = ARBEIDSTAKER_FNR,
+    status: String? = NY_LEDER,
     virksomhetsnummer: Virksomhetsnummer = UserConstants.VIRKSOMHETSNUMMER_DEFAULT,
 ) = NarmesteLederLeesah(
     narmesteLederId = UUID.randomUUID(),
@@ -25,4 +27,5 @@ fun generateNarmesteLederLeesah(
     aktivTom = null,
     arbeidsgiverForskutterer = null,
     timestamp = OffsetDateTime.now().minusDays(5),
+    status = status,
 )

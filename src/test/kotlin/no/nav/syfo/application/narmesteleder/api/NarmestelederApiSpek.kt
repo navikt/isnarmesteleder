@@ -16,6 +16,7 @@ import no.nav.syfo.cronjob.virksomhetsnavn.VirksomhetsnavnService
 import no.nav.syfo.narmestelederrelasjon.api.*
 import no.nav.syfo.narmestelederrelasjon.domain.NarmesteLederRelasjonStatus
 import no.nav.syfo.narmestelederrelasjon.kafka.NARMESTE_LEDER_RELASJON_TOPIC
+import no.nav.syfo.narmestelederrelasjon.kafka.domain.NY_LEDER
 import no.nav.syfo.narmestelederrelasjon.kafka.pollAndProcessNarmesteLederRelasjon
 import no.nav.syfo.util.*
 import org.amshove.kluent.shouldBeEqualTo
@@ -104,7 +105,9 @@ class NarmestelederApiSpek : Spek({
                         NARMESTE_LEDER_RELASJON_TOPIC,
                         partition,
                     )
-                    val narmesteLederLeesah = generateNarmesteLederLeesah()
+                    val narmesteLederLeesah = generateNarmesteLederLeesah(
+                        status = null,
+                    )
                     val narmesteLederLeesahRecord = ConsumerRecord(
                         NARMESTE_LEDER_RELASJON_TOPIC,
                         partition,
@@ -122,6 +125,7 @@ class NarmestelederApiSpek : Spek({
                     val narmesteLederLeesahNoVirksomhetsnavn = generateNarmesteLederLeesah(
                         arbeidstakerPersonIdentNumber = ARBEIDSTAKER_NO_VIRKSOMHETNAVN,
                         virksomhetsnummer = VIRKSOMHETSNUMMER_NO_VIRKSOMHETSNAVN,
+                        status = NY_LEDER,
                     )
                     val narmesteLederLeesahRecordNoVirksomhetsnavn = ConsumerRecord(
                         NARMESTE_LEDER_RELASJON_TOPIC,
@@ -129,6 +133,7 @@ class NarmestelederApiSpek : Spek({
                         2,
                         "something",
                         objectMapper.writeValueAsString(narmesteLederLeesahNoVirksomhetsnavn),
+
                     )
                     val mockConsumer = mockk<KafkaConsumer<String, String>>()
                     every { mockConsumer.poll(any<Duration>()) } returns ConsumerRecords(
