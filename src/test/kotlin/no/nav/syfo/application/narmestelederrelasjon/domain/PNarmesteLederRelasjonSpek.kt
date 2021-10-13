@@ -2,6 +2,7 @@ package no.nav.syfo.application.narmestelederrelasjon.domain
 
 import no.nav.syfo.narmestelederrelasjon.database.domain.toNarmesteLederRelasjonList
 import no.nav.syfo.narmestelederrelasjon.domain.NarmesteLederRelasjonStatus
+import no.nav.syfo.narmestelederrelasjon.kafka.domain.*
 import org.amshove.kluent.shouldBeEqualTo
 import org.spekframework.spek2.Spek
 import org.spekframework.spek2.style.specification.describe
@@ -29,6 +30,8 @@ class PNarmesteLederRelasjonSpek : Spek({
                     narmesteLederPersonIdentNumber = NARMESTELEDER_PERSONIDENTNUMBER,
                     virksomhetsnummer = VIRKSOMHETSNUMMER_DEFAULT,
                     timestamp = OffsetDateTime.now().minusDays(5),
+                    status = NY_LEDER,
+
                 )
                 val firstDeaktivertVirksomhetsnummer1 = basePNarmesteLederRelasjon.copy(
                     id = firstInnmeldtVirksomhetsnummer1.id + 1,
@@ -37,6 +40,7 @@ class PNarmesteLederRelasjonSpek : Spek({
                     narmesteLederPersonIdentNumber = NARMESTELEDER_PERSONIDENTNUMBER,
                     virksomhetsnummer = VIRKSOMHETSNUMMER_DEFAULT,
                     timestamp = firstInnmeldtVirksomhetsnummer1.timestamp.plusDays(1),
+                    status = DEAKTIVERT_NY_LEDER,
                 )
                 val secondInnmeldtVirksomhetsnummer1ReferanseUUid = UUID.randomUUID()
                 val secondInnmeldtVirksomhetsnummer1 = basePNarmesteLederRelasjon.copy(
@@ -46,6 +50,7 @@ class PNarmesteLederRelasjonSpek : Spek({
                     narmesteLederPersonIdentNumber = NARMESTELEDER_PERSONIDENTNUMBER_ALTERNATIVE,
                     virksomhetsnummer = VIRKSOMHETSNUMMER_DEFAULT,
                     timestamp = firstDeaktivertVirksomhetsnummer1.timestamp.plusDays(1),
+                    status = NY_LEDER,
                 )
                 val secondDeaktivertVirksomhetsnummer1 = basePNarmesteLederRelasjon.copy(
                     id = secondInnmeldtVirksomhetsnummer1.id + 1,
@@ -54,6 +59,7 @@ class PNarmesteLederRelasjonSpek : Spek({
                     narmesteLederPersonIdentNumber = NARMESTELEDER_PERSONIDENTNUMBER_ALTERNATIVE,
                     virksomhetsnummer = VIRKSOMHETSNUMMER_DEFAULT,
                     timestamp = secondInnmeldtVirksomhetsnummer1.timestamp.plusDays(1),
+                    status = DEAKTIVERT_ARBEIDSTAKER,
                 )
                 val lastInnmeldtVirksomhetsnummer1ReferanseUUid = UUID.randomUUID()
                 val lastInnmeldtVirksomhetsnummer1 = basePNarmesteLederRelasjon.copy(
@@ -63,6 +69,7 @@ class PNarmesteLederRelasjonSpek : Spek({
                     narmesteLederPersonIdentNumber = NARMESTELEDER_PERSONIDENTNUMBER,
                     virksomhetsnummer = VIRKSOMHETSNUMMER_DEFAULT,
                     timestamp = secondDeaktivertVirksomhetsnummer1.timestamp.plusDays(1),
+                    status = NY_LEDER,
                 )
                 val inputListVirksomhetsnummer1 = listOf(
                     firstInnmeldtVirksomhetsnummer1,
@@ -79,6 +86,7 @@ class PNarmesteLederRelasjonSpek : Spek({
                     aktivTom = null,
                     virksomhetsnummer = VIRKSOMHETSNUMMER_ALTERNATIVE,
                     timestamp = OffsetDateTime.now().minusDays(5),
+                    status = NY_LEDER,
                 )
                 val firstDeaktivertVirksomhetsnummer2 = basePNarmesteLederRelasjon.copy(
                     id = firstInnmeldtVirksomhetsnummer2.id + 1,
@@ -86,6 +94,7 @@ class PNarmesteLederRelasjonSpek : Spek({
                     aktivTom = LocalDate.now().minusDays(10),
                     virksomhetsnummer = VIRKSOMHETSNUMMER_ALTERNATIVE,
                     timestamp = firstInnmeldtVirksomhetsnummer2.timestamp.plusDays(1),
+                    status = DEAKTIVERT_LEDER,
                 )
                 val secondInnmeldtVirksomhetsnummer2ReferanseUUid = UUID.randomUUID()
                 val secondInnmeldtVirksomhetsnummer2 = basePNarmesteLederRelasjon.copy(
@@ -94,6 +103,7 @@ class PNarmesteLederRelasjonSpek : Spek({
                     aktivTom = null,
                     virksomhetsnummer = VIRKSOMHETSNUMMER_ALTERNATIVE,
                     timestamp = firstDeaktivertVirksomhetsnummer2.timestamp.plusDays(1),
+                    status = NY_LEDER,
                 )
                 val secondDeaktivertVirksomhetsnummer2 = basePNarmesteLederRelasjon.copy(
                     id = secondInnmeldtVirksomhetsnummer2.id + 1,
@@ -101,6 +111,7 @@ class PNarmesteLederRelasjonSpek : Spek({
                     aktivTom = LocalDate.now().minusDays(10),
                     virksomhetsnummer = VIRKSOMHETSNUMMER_ALTERNATIVE,
                     timestamp = secondInnmeldtVirksomhetsnummer2.timestamp.plusDays(1),
+                    status = DEAKTIVERT_ARBEIDSFORHOLD,
                 )
                 val lastInnmeldtVirksomhetsnummer2ReferanseUUid = UUID.randomUUID()
                 val lastInnmeldtVirksomhetsnummer2 = basePNarmesteLederRelasjon.copy(
@@ -109,6 +120,7 @@ class PNarmesteLederRelasjonSpek : Spek({
                     aktivTom = null,
                     virksomhetsnummer = VIRKSOMHETSNUMMER_ALTERNATIVE,
                     timestamp = secondDeaktivertVirksomhetsnummer2.timestamp.plusDays(1),
+                    status = NY_LEDER,
                 )
                 val inputListVirksomhetsnummer2 = listOf(
                     firstInnmeldtVirksomhetsnummer2,
@@ -128,10 +140,10 @@ class PNarmesteLederRelasjonSpek : Spek({
                 outputListVirksomhetsnummer1[0].status shouldBeEqualTo NarmesteLederRelasjonStatus.INNMELDT_AKTIV
 
                 outputListVirksomhetsnummer1[1].id shouldBeEqualTo secondDeaktivertVirksomhetsnummer1.id
-                outputListVirksomhetsnummer1[1].status shouldBeEqualTo NarmesteLederRelasjonStatus.DEAKTIVERT
+                outputListVirksomhetsnummer1[1].status shouldBeEqualTo NarmesteLederRelasjonStatus.DEAKTIVERT_ARBEIDSTAKER
 
                 outputListVirksomhetsnummer1[2].id shouldBeEqualTo firstDeaktivertVirksomhetsnummer1.id
-                outputListVirksomhetsnummer1[2].status shouldBeEqualTo NarmesteLederRelasjonStatus.DEAKTIVERT
+                outputListVirksomhetsnummer1[2].status shouldBeEqualTo NarmesteLederRelasjonStatus.DEAKTIVERT_NY_LEDER
 
                 val outputListVirksomhetsnummer2 = outputList.filter {
                     it.virksomhetsnummer.value == VIRKSOMHETSNUMMER_ALTERNATIVE.value
@@ -142,10 +154,10 @@ class PNarmesteLederRelasjonSpek : Spek({
                 outputListVirksomhetsnummer2[0].status shouldBeEqualTo NarmesteLederRelasjonStatus.INNMELDT_AKTIV
 
                 outputListVirksomhetsnummer2[1].id shouldBeEqualTo secondDeaktivertVirksomhetsnummer2.id
-                outputListVirksomhetsnummer2[1].status shouldBeEqualTo NarmesteLederRelasjonStatus.DEAKTIVERT
+                outputListVirksomhetsnummer2[1].status shouldBeEqualTo NarmesteLederRelasjonStatus.DEAKTIVERT_ARBEIDSFORHOLD
 
                 outputListVirksomhetsnummer2[2].id shouldBeEqualTo firstDeaktivertVirksomhetsnummer2.id
-                outputListVirksomhetsnummer2[2].status shouldBeEqualTo NarmesteLederRelasjonStatus.DEAKTIVERT
+                outputListVirksomhetsnummer2[2].status shouldBeEqualTo NarmesteLederRelasjonStatus.DEAKTIVERT_LEDER
             }
 
             it("with 2 Innmeldt and 1 Deaktivert should return list without ${NarmesteLederRelasjonStatus.INNMELDT_AKTIV}") {
@@ -157,6 +169,7 @@ class PNarmesteLederRelasjonSpek : Spek({
                     narmesteLederPersonIdentNumber = NARMESTELEDER_PERSONIDENTNUMBER,
                     virksomhetsnummer = VIRKSOMHETSNUMMER_DEFAULT,
                     timestamp = OffsetDateTime.now().minusDays(5),
+                    status = NY_LEDER,
                 )
                 val firstDeaktivertVirksomhetsnummer1 = basePNarmesteLederRelasjon.copy(
                     id = firstInnmeldtVirksomhetsnummer1.id + 1,
@@ -165,6 +178,7 @@ class PNarmesteLederRelasjonSpek : Spek({
                     narmesteLederPersonIdentNumber = NARMESTELEDER_PERSONIDENTNUMBER,
                     virksomhetsnummer = VIRKSOMHETSNUMMER_DEFAULT,
                     timestamp = firstInnmeldtVirksomhetsnummer1.timestamp.plusDays(1),
+                    status = null,
                 )
                 val secondInnmeldtVirksomhetsnummer1ReferanseUUid = UUID.randomUUID()
                 val secondInnmeldtVirksomhetsnummer1 = basePNarmesteLederRelasjon.copy(
@@ -174,6 +188,7 @@ class PNarmesteLederRelasjonSpek : Spek({
                     narmesteLederPersonIdentNumber = NARMESTELEDER_PERSONIDENTNUMBER_ALTERNATIVE,
                     virksomhetsnummer = VIRKSOMHETSNUMMER_DEFAULT,
                     timestamp = firstDeaktivertVirksomhetsnummer1.timestamp.plusDays(1),
+                    status = NY_LEDER,
                 )
                 val secondDeaktivertVirksomhetsnummer1 = basePNarmesteLederRelasjon.copy(
                     id = secondInnmeldtVirksomhetsnummer1.id + 1,
@@ -182,6 +197,7 @@ class PNarmesteLederRelasjonSpek : Spek({
                     narmesteLederPersonIdentNumber = NARMESTELEDER_PERSONIDENTNUMBER_ALTERNATIVE,
                     virksomhetsnummer = VIRKSOMHETSNUMMER_DEFAULT,
                     timestamp = secondInnmeldtVirksomhetsnummer1.timestamp.plusDays(1),
+                    status = DEAKTIVERT_ARBEIDSTAKER,
                 )
                 val inputListVirksomhetsnummer1 = listOf(
                     firstInnmeldtVirksomhetsnummer1,
@@ -197,6 +213,7 @@ class PNarmesteLederRelasjonSpek : Spek({
                     aktivTom = null,
                     virksomhetsnummer = VIRKSOMHETSNUMMER_ALTERNATIVE,
                     timestamp = OffsetDateTime.now().minusDays(5),
+                    status = NY_LEDER,
                 )
                 val firstDeaktivertVirksomhetsnummer2 = basePNarmesteLederRelasjon.copy(
                     id = firstInnmeldtVirksomhetsnummer2.id + 1,
@@ -204,6 +221,7 @@ class PNarmesteLederRelasjonSpek : Spek({
                     aktivTom = LocalDate.now().minusDays(10),
                     virksomhetsnummer = VIRKSOMHETSNUMMER_ALTERNATIVE,
                     timestamp = firstInnmeldtVirksomhetsnummer2.timestamp.plusDays(1),
+                    status = null,
                 )
                 val secondInnmeldtVirksomhetsnummer2ReferanseUUid = UUID.randomUUID()
                 val secondInnmeldtVirksomhetsnummer2 = basePNarmesteLederRelasjon.copy(
@@ -212,6 +230,7 @@ class PNarmesteLederRelasjonSpek : Spek({
                     aktivTom = null,
                     virksomhetsnummer = VIRKSOMHETSNUMMER_ALTERNATIVE,
                     timestamp = firstDeaktivertVirksomhetsnummer2.timestamp.plusDays(1),
+                    status = NY_LEDER,
                 )
                 val secondDeaktivertVirksomhetsnummer2 = basePNarmesteLederRelasjon.copy(
                     id = secondInnmeldtVirksomhetsnummer2.id + 1,
@@ -219,6 +238,7 @@ class PNarmesteLederRelasjonSpek : Spek({
                     aktivTom = LocalDate.now().minusDays(10),
                     virksomhetsnummer = VIRKSOMHETSNUMMER_ALTERNATIVE,
                     timestamp = secondInnmeldtVirksomhetsnummer2.timestamp.plusDays(1),
+                    status = DEAKTIVERT_ARBEIDSTAKER_INNSENDT_SYKMELDING,
                 )
                 val inputListVirksomhetsnummer2 = listOf(
                     firstInnmeldtVirksomhetsnummer2,
@@ -234,7 +254,7 @@ class PNarmesteLederRelasjonSpek : Spek({
                 outputListVirksomhetsnummer1.size shouldBeEqualTo inputListVirksomhetsnummer1.distinctBy { it.referanseUuid }.size
 
                 outputListVirksomhetsnummer1[0].id shouldBeEqualTo secondDeaktivertVirksomhetsnummer1.id
-                outputListVirksomhetsnummer1[0].status shouldBeEqualTo NarmesteLederRelasjonStatus.DEAKTIVERT
+                outputListVirksomhetsnummer1[0].status shouldBeEqualTo NarmesteLederRelasjonStatus.DEAKTIVERT_ARBEIDSTAKER
 
                 outputListVirksomhetsnummer1[1].id shouldBeEqualTo firstDeaktivertVirksomhetsnummer1.id
                 outputListVirksomhetsnummer1[1].status shouldBeEqualTo NarmesteLederRelasjonStatus.DEAKTIVERT
@@ -245,7 +265,7 @@ class PNarmesteLederRelasjonSpek : Spek({
                 outputListVirksomhetsnummer2.size shouldBeEqualTo inputListVirksomhetsnummer2.distinctBy { it.referanseUuid }.size
 
                 outputListVirksomhetsnummer2[0].id shouldBeEqualTo secondDeaktivertVirksomhetsnummer2.id
-                outputListVirksomhetsnummer2[0].status shouldBeEqualTo NarmesteLederRelasjonStatus.DEAKTIVERT
+                outputListVirksomhetsnummer2[0].status shouldBeEqualTo NarmesteLederRelasjonStatus.DEAKTIVERT_ARBEIDSTAKER_INNSENDT_SYKMELDING
 
                 outputListVirksomhetsnummer2[1].id shouldBeEqualTo firstDeaktivertVirksomhetsnummer2.id
                 outputListVirksomhetsnummer2[1].status shouldBeEqualTo NarmesteLederRelasjonStatus.DEAKTIVERT

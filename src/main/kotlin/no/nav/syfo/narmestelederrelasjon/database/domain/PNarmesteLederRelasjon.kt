@@ -4,6 +4,7 @@ import no.nav.syfo.domain.PersonIdentNumber
 import no.nav.syfo.domain.Virksomhetsnummer
 import no.nav.syfo.narmestelederrelasjon.domain.NarmesteLederRelasjon
 import no.nav.syfo.narmestelederrelasjon.domain.NarmesteLederRelasjonStatus
+import no.nav.syfo.narmestelederrelasjon.kafka.domain.*
 import java.time.LocalDate
 import java.time.OffsetDateTime
 import java.util.*
@@ -69,10 +70,21 @@ fun PNarmesteLederRelasjon.toNarmesteLederRelasjon() = NarmesteLederRelasjon(
 )
 
 fun PNarmesteLederRelasjon.findStatus(): NarmesteLederRelasjonStatus {
-    val isNarmesteLederRelasjonDeaktivert = this.aktivTom != null
-    return if (isNarmesteLederRelasjonDeaktivert) {
-        NarmesteLederRelasjonStatus.DEAKTIVERT
-    } else {
-        NarmesteLederRelasjonStatus.INNMELDT_AKTIV
+    return when (this.status) {
+        NY_LEDER -> NarmesteLederRelasjonStatus.INNMELDT_AKTIV
+        DEAKTIVERT_ARBEIDSTAKER -> NarmesteLederRelasjonStatus.DEAKTIVERT_ARBEIDSTAKER
+        DEAKTIVERT_ARBEIDSTAKER_INNSENDT_SYKMELDING -> NarmesteLederRelasjonStatus.DEAKTIVERT_ARBEIDSTAKER_INNSENDT_SYKMELDING
+        DEAKTIVERT_ARBEIDSFORHOLD -> NarmesteLederRelasjonStatus.DEAKTIVERT_ARBEIDSFORHOLD
+        DEAKTIVERT_LEDER -> NarmesteLederRelasjonStatus.DEAKTIVERT_LEDER
+        DEAKTIVERT_NY_LEDER -> NarmesteLederRelasjonStatus.DEAKTIVERT_NY_LEDER
+        null -> {
+            val isNarmesteLederRelasjonDeaktivert = this.aktivTom != null
+            return if (isNarmesteLederRelasjonDeaktivert) {
+                NarmesteLederRelasjonStatus.DEAKTIVERT
+            } else {
+                NarmesteLederRelasjonStatus.INNMELDT_AKTIV
+            }
+        }
+        else -> NarmesteLederRelasjonStatus.DEAKTIVERT
     }
 }
