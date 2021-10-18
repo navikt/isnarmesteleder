@@ -71,7 +71,7 @@ const val queryGetNarmesteLederRelasjonWithoutVirksomhetsnavn =
     """
     SELECT *
     FROM NARMESTE_LEDER_RELASJON
-    WHERE virksomhetsnavn IS NULL and aktiv_tom IS NULL
+    WHERE virksomhetsnavn IS NULL
     ORDER BY aktiv_fom DESC
     LIMIT 5000
     """
