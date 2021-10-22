@@ -47,11 +47,11 @@ Run `./gradlew test -i`
 
 #### Create Docker Image
 
-Creating a docker image should be as simple as `docker build -t isdialogmote .`
+Creating a docker image should be as simple as `docker build -t isnarmesteleder .`
 
 #### Run Docker Image
 
-`docker run --rm -it -p 8080:8080 isdialogmote`
+`docker run --rm -it -p 8080:8080 isnarmesteleder`
 
 ### Cache
 

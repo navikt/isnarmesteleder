@@ -10,8 +10,8 @@ fun testEnvironment(
     pdlUrl: String = "pdl",
     syfotilgangskontrollUrl: String = "tilgangskontroll",
 ) = Environment(
-    azureAppClientId = "isdialogmote-client-id",
-    azureAppClientSecret = "isdialogmote-secret",
+    azureAppClientId = "isnarmesteleder-client-id",
+    azureAppClientSecret = "isnarmesteleder-secret",
     azureAppWellKnownUrl = "wellknown",
     azureOpenidConfigTokenEndpoint = azureOpenIdTokenEndpoint,
     electorPath = "electorPath",
