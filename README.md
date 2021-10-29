@@ -58,8 +58,8 @@ Creating a docker image should be as simple as `docker build -t isnarmesteleder 
 ### Cache
 
 This application uses Redis for caching. Redis is deployed automatically on changes to workflow or config on master
-branch. For manual deploy, run: `kubectl apply -f .nais/redis-config.yaml`
-or `kubectl apply -f .nais/redisexporter.yaml`.
+branch. For manual deploy, run: `kubectl apply -f .nais/redis/redis-config.yaml`
+or `kubectl apply -f .nais/redis/redisexporter.yaml`.
 
 ### Kafka
 
