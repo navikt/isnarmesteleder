@@ -1,5 +1,6 @@
 package no.nav.syfo.application.cache
 
+import com.fasterxml.jackson.databind.ObjectMapper
 import no.nav.syfo.util.configuredJacksonMapper
 import org.slf4j.LoggerFactory
 import redis.clients.jedis.JedisPool
@@ -8,7 +9,7 @@ import redis.clients.jedis.exceptions.JedisConnectionException
 class RedisStore(
     private val jedisPool: JedisPool,
 ) {
-    val objectMapper = configuredJacksonMapper()
+    val objectMapper: ObjectMapper = configuredJacksonMapper()
 
     inline fun <reified T> getObject(
         key: String,
