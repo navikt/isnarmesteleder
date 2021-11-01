@@ -18,7 +18,7 @@ class RedisStore(
         }
     }
 
-    fun get(
+    private fun get(
         key: String,
     ): String? {
         try {
@@ -40,7 +40,7 @@ class RedisStore(
         set(key, valueJson, expireSeconds)
     }
 
-    fun set(
+    private fun set(
         key: String,
         value: String,
         expireSeconds: Long,
