@@ -32,6 +32,27 @@ class RedisStore(
         }
     }
 
+    inline fun <reified T> getObject(
+        keyList: List<String>,
+    ): List<T> {
+        return get(keyList = keyList).map {
+            objectMapper.readValue(it, T::class.java)
+        }
+    }
+
+    fun get(
+        keyList: List<String>,
+    ): List<String> {
+        try {
+            jedisPool.resource.use { jedis ->
+                return jedis.mget(*keyList.toTypedArray()).filterNotNull()
+            }
+        } catch (e: JedisConnectionException) {
+            log.warn("Got connection error when fetching from redis! Continuing without cached value", e)
+            return emptyList()
+        }
+    }
+
     fun <T> setObject(
         key: String,
         value: T,

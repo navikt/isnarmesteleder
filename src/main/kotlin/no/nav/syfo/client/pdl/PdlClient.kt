@@ -4,6 +4,7 @@ import io.ktor.client.call.*
 import io.ktor.client.request.*
 import io.ktor.client.statement.*
 import io.ktor.http.*
+import no.nav.syfo.application.cache.RedisStore
 import no.nav.syfo.client.azuread.AzureAdClient
 import no.nav.syfo.client.azuread.AzureAdToken
 import no.nav.syfo.client.httpClientDefault
@@ -15,25 +16,76 @@ class PdlClient(
     private val azureAdClient: AzureAdClient,
     private val pdlClientId: String,
     private val pdlBaseUrl: String,
+    private val redisStore: RedisStore,
 ) {
     private val httpClient = httpClientDefault()
 
     suspend fun personIdentNumberNavnMap(
         callId: String,
         personIdentNumberList: List<PersonIdentNumber>,
-    ): Map<String, String>? {
-        if (personIdentNumberList.isEmpty()) {
-            return emptyMap()
+    ): Map<String, String> {
+        val cachedPersonIdentNameMap = getCachedPersonidentNameMap(
+            personIdentNumberList = personIdentNumberList,
+        )
+
+        val notCachedPersonIdentNumberList = personIdentNumberList.filterNot { personIdentNumber ->
+            cachedPersonIdentNameMap.containsKey(personIdentNumber.value)
         }
+        if (notCachedPersonIdentNumberList.isEmpty()) {
+            return cachedPersonIdentNameMap
+        }
+
+        val pdlPersonIdentNameMap = getPdlPersonIdentNumberNavnMap(
+            callId = callId,
+            personIdentNumberList = notCachedPersonIdentNumberList,
+        )
+
+        return cachedPersonIdentNameMap + pdlPersonIdentNameMap
+    }
+
+    private suspend fun getPdlPersonIdentNumberNavnMap(
+        callId: String,
+        personIdentNumberList: List<PersonIdentNumber>,
+    ): Map<String, String> {
         val token = azureAdClient.getSystemToken(pdlClientId)
             ?: throw RuntimeException("Failed to send request to PDL: No token was found")
 
-        return personList(
+        val pdlPersonIdentNameMap = personList(
             callId = callId,
             personIdentNumberList = personIdentNumberList,
             token = token,
         )?.hentPersonBolk?.associate { (ident, person) ->
             ident to (person?.fullName() ?: "")
+        }
+
+        pdlPersonIdentNameMap?.let {
+            setPersonidentNameMap(pdlPersonIdentNameMap)
+        }
+        return pdlPersonIdentNameMap ?: emptyMap()
+    }
+
+    private fun getCachedPersonidentNameMap(
+        personIdentNumberList: List<PersonIdentNumber>
+    ): Map<String, String> {
+        return redisStore.getObject<PdlPersonidentNameCache>(
+            keyList = personIdentNumberList.map { personIdentNumber ->
+                personIdentNameCacheKey(personIdentNumber.value)
+            },
+        ).associate { pdlPersonIdentNameCache ->
+            pdlPersonIdentNameCache.personident to (pdlPersonIdentNameCache.name)
+        }
+    }
+
+    private fun setPersonidentNameMap(personIdentNameMap: Map<String, String>) {
+        personIdentNameMap.forEach { personIdentName ->
+            redisStore.setObject(
+                key = personIdentNameCacheKey(personIdentName.key),
+                value = PdlPersonidentNameCache(
+                    name = personIdentName.value,
+                    personident = personIdentName.key
+                ),
+                expireSeconds = CACHE_PDL_PERSONIDENT_NAME_TIME_TO_LIVE_SECONDS,
+            )
         }
     }
 
@@ -85,7 +137,13 @@ class PdlClient(
         }
     }
 
+    private fun personIdentNameCacheKey(personIdentNumber: String) =
+        "$CACHE_PDL_PERSONIDENT_NAME_KEY_PREFIX$personIdentNumber"
+
     companion object {
+        const val CACHE_PDL_PERSONIDENT_NAME_KEY_PREFIX = "pdl-personident-name"
+        const val CACHE_PDL_PERSONIDENT_NAME_TIME_TO_LIVE_SECONDS = 24 * 60 * 60L
+
         private val logger = LoggerFactory.getLogger(PdlClient::class.java)
     }
 }
