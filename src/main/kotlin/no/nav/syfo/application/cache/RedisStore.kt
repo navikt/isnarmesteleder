@@ -18,7 +18,7 @@ class RedisStore(
         }
     }
 
-    private fun get(
+    fun get(
         key: String,
     ): String? {
         try {
