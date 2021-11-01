@@ -45,9 +45,9 @@ fun NarmesteLederRelasjon.toNarmesteLederRelasjonDTO() = NarmesteLederRelasjonDT
 )
 
 fun List<NarmesteLederRelasjon>.addNarmesteLederName(
-    maybePersonIdentNumberNameMap: Map<String, String>?,
+    maybePersonIdentNumberNameMap: Map<String, String>,
 ): List<NarmesteLederRelasjon> {
-    if (maybePersonIdentNumberNameMap == null) {
+    if (maybePersonIdentNumberNameMap.isEmpty()) {
         return this
     }
     return this.map { narmesteLederRelasjon ->

@@ -26,9 +26,9 @@ class NarmesteLederRelasjonService(
         pdlClient.personIdentNumberNavnMap(
             callId = callId,
             personIdentNumberList = narmesteLederPersonIdentNumberList,
-        ).let { maybePersonIdentNumberNameMap ->
+        ).let { personIdentNumberNameMap ->
             return narmesteLederRelasjonList.addNarmesteLederName(
-                maybePersonIdentNumberNameMap = maybePersonIdentNumberNameMap,
+                maybePersonIdentNumberNameMap = personIdentNumberNameMap,
             )
         }
     }
