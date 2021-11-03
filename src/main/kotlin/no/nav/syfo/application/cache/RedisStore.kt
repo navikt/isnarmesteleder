@@ -36,11 +36,16 @@ class RedisStore(
     fun <T : Any> getObjectList(
         classType: KClass<T>,
         keyList: List<String>,
-    ): List<T> =
-        get(keyList = keyList).map {
-            classType.java
-            objectMapper.readValue(it, classType.java)
+    ): List<T> {
+        return if (keyList.isEmpty()) {
+            emptyList()
+        } else {
+            get(keyList = keyList).map {
+                classType.java
+                objectMapper.readValue(it, classType.java)
+            }
         }
+    }
 
     fun get(
         keyList: List<String>,
