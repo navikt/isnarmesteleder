@@ -6,13 +6,19 @@ import io.ktor.http.*
 import io.ktor.jackson.*
 import io.ktor.metrics.micrometer.*
 import io.ktor.response.*
+import io.micrometer.core.instrument.distribution.DistributionStatisticConfig
 import no.nav.syfo.metric.METRICS_REGISTRY
 import no.nav.syfo.util.*
+import java.time.Duration
 import java.util.*
 
 fun Application.installMetrics() {
     install(MicrometerMetrics) {
         registry = METRICS_REGISTRY
+        distributionStatisticConfig = DistributionStatisticConfig.Builder()
+            .percentilesHistogram(true)
+            .maximumExpectedValue(Duration.ofSeconds(20).toNanos().toDouble())
+            .build()
     }
 }
 
