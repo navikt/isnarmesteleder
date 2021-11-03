@@ -18,7 +18,7 @@ object Versions {
     const val mockk = "1.12.0"
     const val nimbusJoseJwt = "9.11.3"
     const val micrometerRegistry = "1.7.1"
-    const val postgres = "42.2.23"
+    const val postgres = "42.3.1"
     const val postgresEmbedded = "0.13.4"
     const val redisEmbedded = "0.7.3"
     const val spek = "2.0.15"
