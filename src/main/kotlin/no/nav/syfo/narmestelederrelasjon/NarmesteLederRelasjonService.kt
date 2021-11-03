@@ -20,16 +20,20 @@ class NarmesteLederRelasjonService(
             personIdentNumber = personIdentNumber,
         ).toNarmesteLederRelasjonList()
 
-        val narmesteLederPersonIdentNumberList = narmesteLederRelasjonList.map { narmesteLederRelasjon ->
-            narmesteLederRelasjon.narmesteLederPersonIdentNumber
-        }
-        pdlClient.personIdentNumberNavnMap(
-            callId = callId,
-            personIdentNumberList = narmesteLederPersonIdentNumberList,
-        ).let { personIdentNumberNameMap ->
-            return narmesteLederRelasjonList.addNarmesteLederName(
-                maybePersonIdentNumberNameMap = personIdentNumberNameMap,
-            )
+        if (narmesteLederRelasjonList.isEmpty()) {
+            return narmesteLederRelasjonList
+        } else {
+            val narmesteLederPersonIdentNumberList = narmesteLederRelasjonList.map { narmesteLederRelasjon ->
+                narmesteLederRelasjon.narmesteLederPersonIdentNumber
+            }
+            pdlClient.personIdentNumberNavnMap(
+                callId = callId,
+                personIdentNumberList = narmesteLederPersonIdentNumberList,
+            ).let { personIdentNumberNameMap ->
+                return narmesteLederRelasjonList.addNarmesteLederName(
+                    maybePersonIdentNumberNameMap = personIdentNumberNameMap,
+                )
+            }
         }
     }
 }
