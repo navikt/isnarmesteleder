@@ -21,7 +21,7 @@ object Versions {
     const val postgres = "42.3.1"
     const val postgresEmbedded = "0.13.4"
     const val redisEmbedded = "0.7.3"
-    const val spek = "2.0.15"
+    const val spek = "2.0.17"
 }
 
 plugins {
