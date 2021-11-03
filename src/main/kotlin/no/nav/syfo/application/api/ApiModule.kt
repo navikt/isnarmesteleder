@@ -56,7 +56,8 @@ fun Application.apiModule(
     val pdlClient = PdlClient(
         azureAdClient = azureAdClient,
         pdlClientId = environment.pdlClientId,
-        pdlBaseUrl = environment.pdlUrl
+        pdlBaseUrl = environment.pdlUrl,
+        redisStore = redisStore,
     )
 
     val veilederTilgangskontrollClient = VeilederTilgangskontrollClient(
