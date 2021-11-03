@@ -5,7 +5,7 @@ group = "no.nav.syfo"
 version = "1.0.0"
 
 object Versions {
-    const val flyway = "7.15.0"
+    const val flyway = "8.0.1"
     const val hikari = "5.0.0"
     const val jackson = "2.12.3"
     const val jedis = "3.7.0"
