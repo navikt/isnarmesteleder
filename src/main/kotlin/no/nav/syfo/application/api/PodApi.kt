@@ -35,15 +35,15 @@ private fun isReady(
     applicationState: ApplicationState,
     database: DatabaseInterface,
 ): Boolean {
-    return applicationState.ready && database.isDatabaseOK()
+    return applicationState.ready && database.isOk()
 }
 
-private fun DatabaseInterface.isDatabaseOK(): Boolean {
+private fun DatabaseInterface.isOk(): Boolean {
     return try {
         connection.use {
             it.isValid(1)
         }
-    } catch (exc: Exception) {
+    } catch (ex: Exception) {
         false
     }
 }
