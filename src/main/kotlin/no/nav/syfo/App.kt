@@ -8,10 +8,10 @@ import io.ktor.server.netty.*
 import no.nav.syfo.application.ApplicationState
 import no.nav.syfo.application.Environment
 import no.nav.syfo.application.api.apiModule
-import no.nav.syfo.cronjob.cronjobModule
 import no.nav.syfo.application.database.applicationDatabase
 import no.nav.syfo.application.database.databaseModule
 import no.nav.syfo.client.wellknown.getWellKnown
+import no.nav.syfo.cronjob.cronjobModule
 import no.nav.syfo.narmestelederrelasjon.kafka.launchKafkaTask
 import org.slf4j.LoggerFactory
 import java.util.concurrent.TimeUnit
@@ -59,20 +59,16 @@ fun main() {
     server.environment.monitor.subscribe(ApplicationStarted) { application ->
         applicationState.ready = true
         application.environment.log.info("Application is ready")
-        if (environment.toggleKafkaProcessingEnabled) {
-            launchKafkaTask(
-                applicationState = applicationState,
-                applicationEnvironmentKafka = environment.kafka,
-                database = applicationDatabase,
-            )
-        }
-        if (environment.toggleCronjobVirksomhetsnavnEnabled) {
-            cronjobModule(
-                applicationState = applicationState,
-                database = applicationDatabase,
-                environment = environment,
-            )
-        }
+        launchKafkaTask(
+            applicationState = applicationState,
+            applicationEnvironmentKafka = environment.kafka,
+            database = applicationDatabase,
+        )
+        cronjobModule(
+            applicationState = applicationState,
+            database = applicationDatabase,
+            environment = environment,
+        )
     }
     server.start(wait = false)
 }
