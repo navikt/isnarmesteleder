@@ -36,9 +36,6 @@ data class Environment(
 
     val syfotilgangskontrollClientId: String = getEnvVar("SYFOTILGANGSKONTROLL_CLIENT_ID"),
     val syfotilgangskontrollUrl: String = getEnvVar("SYFOTILGANGSKONTROLL_URL"),
-
-    val toggleCronjobVirksomhetsnavnEnabled: Boolean = getEnvVar("TOGGLE_CRONJOB_VIRKSOMHETSNAVN_ENABLED").toBoolean(),
-    val toggleKafkaProcessingEnabled: Boolean = getEnvVar("TOGGLE_KAFKA_PROCESSING_ENABLED").toBoolean(),
 ) {
     fun jdbcUrl(): String {
         return "jdbc:postgresql://$isnarmestelederDbHost:$isnarmestelederDbPort/$isnarmestelederDbName"

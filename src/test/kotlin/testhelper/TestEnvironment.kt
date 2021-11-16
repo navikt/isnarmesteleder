@@ -35,8 +35,6 @@ fun testEnvironment(
     pdlUrl = pdlUrl,
     syfotilgangskontrollClientId = "dev-fss.teamsykefravr.syfo-tilgangskontroll",
     syfotilgangskontrollUrl = syfotilgangskontrollUrl,
-    toggleCronjobVirksomhetsnavnEnabled = true,
-    toggleKafkaProcessingEnabled = true,
 )
 
 fun testAppState() = ApplicationState(

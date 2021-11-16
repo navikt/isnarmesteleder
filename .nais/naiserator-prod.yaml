@@ -85,7 +85,3 @@ spec:
       value: "https://syfo-tilgangskontroll.prod-fss-pub.nais.io"
     - name: REDIS_HOST
       value: "isnarmesteleder-redis.teamsykefravr.svc.cluster.local"
-    - name: TOGGLE_CRONJOB_VIRKSOMHETSNAVN_ENABLED
-      value: "true"
-    - name: TOGGLE_KAFKA_PROCESSING_ENABLED
-      value: "true"
