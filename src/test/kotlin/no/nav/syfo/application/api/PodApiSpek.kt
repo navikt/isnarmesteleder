@@ -28,13 +28,13 @@ object PodApiSpek : Spek({
             }
 
             it("Returns ok on is_alive") {
-                with(handleRequest(HttpMethod.Get, "/is_alive")) {
+                with(handleRequest(HttpMethod.Get, podLivenessPath)) {
                     response.status()?.isSuccess() shouldBeEqualTo true
                     response.content shouldNotBeEqualTo null
                 }
             }
             it("Returns ok on is_alive") {
-                with(handleRequest(HttpMethod.Get, "/is_ready")) {
+                with(handleRequest(HttpMethod.Get, podReadinessPath)) {
                     println(response.status())
                     response.status()?.isSuccess() shouldBeEqualTo true
                     response.content shouldNotBeEqualTo null
@@ -58,14 +58,14 @@ object PodApiSpek : Spek({
             }
 
             it("Returns internal server error when liveness check fails") {
-                with(handleRequest(HttpMethod.Get, "/is_alive")) {
+                with(handleRequest(HttpMethod.Get, podLivenessPath)) {
                     response.status() shouldBeEqualTo HttpStatusCode.InternalServerError
                     response.content shouldNotBeEqualTo null
                 }
             }
 
             it("Returns internal server error when readiness check fails") {
-                with(handleRequest(HttpMethod.Get, "/is_ready")) {
+                with(handleRequest(HttpMethod.Get, podReadinessPath)) {
                     response.status() shouldBeEqualTo HttpStatusCode.InternalServerError
                     response.content shouldNotBeEqualTo null
                 }
@@ -87,14 +87,14 @@ object PodApiSpek : Spek({
             }
 
             it("Returns ok on is_alive") {
-                with(handleRequest(HttpMethod.Get, "/is_alive")) {
+                with(handleRequest(HttpMethod.Get, podLivenessPath)) {
                     response.status()?.isSuccess() shouldBeEqualTo true
                     response.content shouldNotBeEqualTo null
                 }
             }
 
             it("Returns internal server error when readiness check fails") {
-                with(handleRequest(HttpMethod.Get, "/is_ready")) {
+                with(handleRequest(HttpMethod.Get, podReadinessPath)) {
                     response.status() shouldBeEqualTo HttpStatusCode.InternalServerError
                     response.content shouldNotBeEqualTo null
                 }

@@ -7,26 +7,39 @@ import io.ktor.routing.*
 import no.nav.syfo.application.ApplicationState
 import no.nav.syfo.application.database.DatabaseInterface
 
+const val podLivenessPath = "/is_alive"
+const val podReadinessPath = "/is_ready"
+
 fun Routing.registerPodApi(
     applicationState: ApplicationState,
     database: DatabaseInterface,
 ) {
-    get("/is_alive") {
+    get(podLivenessPath) {
         if (applicationState.alive) {
-            call.respondText("I'm alive! :)")
+            call.respondText(
+                text = "I'm alive! :)",
+            )
         } else {
-            call.respondText("I'm dead x_x", status = HttpStatusCode.InternalServerError)
+            call.respondText(
+                text = "I'm dead x_x",
+                status = HttpStatusCode.InternalServerError,
+            )
         }
     }
-    get("/is_ready") {
+    get(podReadinessPath) {
         val isReady = isReady(
             applicationState = applicationState,
             database = database,
         )
         if (isReady) {
-            call.respondText("I'm ready! :)")
+            call.respondText(
+                text = "I'm ready! :)",
+            )
         } else {
-            call.respondText("Please wait! I'm not ready :(", status = HttpStatusCode.InternalServerError)
+            call.respondText(
+                text = "Please wait! I'm not ready :(",
+                status = HttpStatusCode.InternalServerError,
+            )
         }
     }
 }
