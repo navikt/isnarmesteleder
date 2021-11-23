@@ -22,41 +22,37 @@ fun main() {
     val applicationState = ApplicationState()
     val environment = Environment()
 
-    val server = embeddedServer(
-        Netty,
-        applicationEngineEnvironment {
-            log = LoggerFactory.getLogger("ktor.application")
-            config = HoconApplicationConfig(ConfigFactory.load())
+    val applicationEngineEnvironment = applicationEngineEnvironment {
+        log = LoggerFactory.getLogger("ktor.application")
+        config = HoconApplicationConfig(ConfigFactory.load())
 
-            connector {
-                port = applicationPort
-            }
+        connector {
+            port = applicationPort
+        }
 
-            val wellKnownInternalAzureAD = getWellKnown(
-                wellKnownUrl = environment.azureAppWellKnownUrl
+        val wellKnownInternalAzureAD = getWellKnown(
+            wellKnownUrl = environment.azureAppWellKnownUrl
+        )
+
+        module {
+            databaseModule(
+                environment = environment,
             )
-
-            module {
-                databaseModule(
-                    environment = environment,
-                )
-                apiModule(
-                    applicationState = applicationState,
-                    database = applicationDatabase,
-                    environment = environment,
-                    wellKnownInternalAzureAD = wellKnownInternalAzureAD,
-                )
-            }
+            apiModule(
+                applicationState = applicationState,
+                database = applicationDatabase,
+                environment = environment,
+                wellKnownInternalAzureAD = wellKnownInternalAzureAD,
+            )
         }
+    }
+
+    val server = embeddedServer(
+        factory = Netty,
+        environment = applicationEngineEnvironment,
     )
 
-    Runtime.getRuntime().addShutdownHook(
-        Thread {
-            server.stop(10, 10, TimeUnit.SECONDS)
-        }
-    )
-
-    server.environment.monitor.subscribe(ApplicationStarted) { application ->
+    applicationEngineEnvironment.monitor.subscribe(ApplicationStarted) { application ->
         applicationState.ready = true
         application.environment.log.info("Application is ready")
         launchKafkaTask(
@@ -70,5 +66,12 @@ fun main() {
             environment = environment,
         )
     }
+
+    Runtime.getRuntime().addShutdownHook(
+        Thread {
+            server.stop(10, 10, TimeUnit.SECONDS)
+        }
+    )
+
     server.start(wait = false)
 }
