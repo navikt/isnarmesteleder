@@ -8,9 +8,44 @@ import io.ktor.server.engine.*
 import io.ktor.server.netty.*
 import no.nav.syfo.application.api.installContentNegotiation
 import no.nav.syfo.client.pdl.*
+import no.nav.syfo.client.pdl.PdlClient.Companion.IDENTER_HEADER
+import no.nav.syfo.client.pdl.domain.*
+import no.nav.syfo.domain.PersonIdentNumber
 import testhelper.UserConstants
 import testhelper.UserConstants.NARMESTELEDER_PERSONIDENTNUMBER
 import testhelper.getRandomPort
+
+fun PersonIdentNumber.toHistoricalPersonIdentNumber(): PersonIdentNumber {
+    val firstDigit = this.value[0].digitToInt()
+    val newDigit = firstDigit + 4
+    val dNummer = this.value.replace(
+        firstDigit.toString(),
+        newDigit.toString(),
+    )
+    return PersonIdentNumber(dNummer)
+}
+
+fun generatePdlIdenterResponse(
+    personIdentNumber: PersonIdentNumber,
+) = PdlIdenterResponse(
+    data = PdlHentIdenter(
+        hentIdenter = PdlIdenter(
+            identer = listOf(
+                PdlIdent(
+                    ident = personIdentNumber.value,
+                    historisk = false,
+                    gruppe = IdentType.FOLKEREGISTERIDENT.name,
+                ),
+                PdlIdent(
+                    ident = personIdentNumber.toHistoricalPersonIdentNumber().value,
+                    historisk = true,
+                    gruppe = IdentType.FOLKEREGISTERIDENT.name,
+                ),
+            ),
+        ),
+    ),
+    errors = null,
+)
 
 fun generatePdlPersonResponse() =
     PdlPersonBolkResponse(
@@ -64,9 +99,18 @@ class PdlMock {
             installContentNegotiation()
             routing {
                 post {
-                    val pdlRequest = call.receive<PdlPersonBolkRequest>()
-                    if (pdlRequest.variables.identer.contains(NARMESTELEDER_PERSONIDENTNUMBER.value)) {
-                        call.respond(respons)
+                    if (call.request.headers[IDENTER_HEADER] == IDENTER_HEADER) {
+                        val pdlRequest = call.receive<PdlHentIdenterRequest>()
+                        val personIdentNumber = PersonIdentNumber(pdlRequest.variables.ident)
+                        val response = generatePdlIdenterResponse(
+                            personIdentNumber = personIdentNumber,
+                        )
+                        call.respond(response)
+                    } else {
+                        val pdlRequest = call.receive<PdlPersonBolkRequest>()
+                        if (pdlRequest.variables.identer.contains(NARMESTELEDER_PERSONIDENTNUMBER.value)) {
+                            call.respond(respons)
+                        }
                     }
                 }
             }
