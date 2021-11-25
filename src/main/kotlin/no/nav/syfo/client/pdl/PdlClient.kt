@@ -4,6 +4,7 @@ import io.ktor.client.call.*
 import io.ktor.client.request.*
 import io.ktor.client.statement.*
 import io.ktor.http.*
+import io.netty.handler.codec.http.HttpHeaders.Values.APPLICATION_JSON
 import no.nav.syfo.application.cache.RedisStore
 import no.nav.syfo.client.azuread.AzureAdClient
 import no.nav.syfo.client.azuread.AzureAdToken
@@ -87,7 +88,7 @@ class PdlClient(
                 key = personIdentNameCacheKey(personIdentName.key),
                 value = PdlPersonidentNameCache(
                     name = personIdentName.value,
-                    personIdent = personIdentName.key
+                    personIdent = personIdentName.key,
                 ),
                 expireSeconds = CACHE_PDL_PERSONIDENT_NAME_TIME_TO_LIVE_SECONDS,
             )
@@ -99,9 +100,9 @@ class PdlClient(
         personIdentNumberList: List<PersonIdentNumber>,
         token: AzureAdToken,
     ): PdlHentPersonBolkData? {
-        val query = this::class.java.getResource("/pdl/hentPersonBolk.graphql")
-            .readText()
-            .replace("[\n\r]", "")
+        val query = getPdlQuery(
+            queryFilePath = "/pdl/hentPersonBolk.graphql",
+        )
 
         val request = PdlPersonBolkRequest(
             query = query,
@@ -114,8 +115,8 @@ class PdlClient(
 
         val response: HttpResponse = httpClient.post(pdlBaseUrl) {
             body = request
-            header(HttpHeaders.ContentType, "application/json")
             header(HttpHeaders.Authorization, bearerHeader(token.accessToken))
+            header(HttpHeaders.ContentType, APPLICATION_JSON)
             header(TEMA_HEADER, ALLE_TEMA_HEADERVERDI)
             header(NAV_CALL_ID_HEADER, callId)
         }
@@ -144,6 +145,12 @@ class PdlClient(
 
     private fun personIdentNameCacheKey(personIdentNumber: String) =
         "$CACHE_PDL_PERSONIDENT_NAME_KEY_PREFIX$personIdentNumber"
+
+    private fun getPdlQuery(queryFilePath: String): String {
+        return this::class.java.getResource(queryFilePath)!!
+            .readText()
+            .replace("[\n\r]", "")
+    }
 
     companion object {
         const val CACHE_PDL_PERSONIDENT_NAME_KEY_PREFIX = "pdl-personident-name-"
