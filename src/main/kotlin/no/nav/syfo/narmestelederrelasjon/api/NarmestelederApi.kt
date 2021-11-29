@@ -38,9 +38,9 @@ fun Route.registrerNarmesteLederRelasjonApi(
                     token = token,
                 )
                 if (hasAccessToPerson) {
-                    val narmesteLederRelasjonDTOList = narmesteLederRelasjonService.getRelasjonerForPersonIdent(
+                    val narmesteLederRelasjonDTOList = narmesteLederRelasjonService.getNarmestelederRelasjonList(
                         callId = callId,
-                        personIdentNumber = personIdentNumber,
+                        arbeidstakerPersonIdentNumber = personIdentNumber,
                     ).map {
                         it.toNarmesteLederRelasjonDTO()
                     }

@@ -32,7 +32,9 @@ import testhelper.UserConstants.ARBEIDSTAKER_VEILEDER_NO_ACCESS
 import testhelper.UserConstants.VEILEDER_IDENT
 import testhelper.UserConstants.VIRKSOMHETSNUMMER_NO_VIRKSOMHETSNAVN
 import testhelper.generator.generateNarmesteLederLeesah
+import testhelper.mock.toHistoricalPersonIdentNumber
 import java.time.Duration
+import java.time.OffsetDateTime
 
 class NarmestelederApiSpek : Spek({
     val objectMapper: ObjectMapper = configuredJacksonMapper()
@@ -106,7 +108,9 @@ class NarmestelederApiSpek : Spek({
                         partition,
                     )
                     val narmesteLederLeesah = generateNarmesteLederLeesah(
+                        arbeidstakerPersonIdentNumber = ARBEIDSTAKER_FNR.toHistoricalPersonIdentNumber(),
                         status = null,
+                        timestamp = OffsetDateTime.now().minusDays(1),
                     )
                     val narmesteLederLeesahRecord = ConsumerRecord(
                         NARMESTE_LEDER_RELASJON_TOPIC,
@@ -147,7 +151,7 @@ class NarmestelederApiSpek : Spek({
                     )
                     every { mockConsumer.commitSync() } returns Unit
 
-                    it("should return list of NarmestelederRelasjon if request is successful") {
+                    it("should return list of NarmestelederRelasjon for all historical PersonIdent if request is successful") {
                         runBlocking {
                             pollAndProcessNarmesteLederRelasjon(
                                 database = database,
@@ -184,19 +188,19 @@ class NarmestelederApiSpek : Spek({
 
                             narmestelederRelasjonList.size shouldBeEqualTo 1
 
-                            val narmesteLederRelasjon = narmestelederRelasjonList.first()
-                            narmesteLederRelasjon.arbeidstakerPersonIdentNumber shouldBeEqualTo narmesteLederLeesah.fnr
-                            narmesteLederRelasjon.virksomhetsnavn shouldBeEqualTo externalMockEnvironment.isproxyMock.eregOrganisasjonResponse.toEregVirksomhetsnavn().virksomhetsnavn
-                            narmesteLederRelasjon.virksomhetsnummer shouldBeEqualTo narmesteLederLeesah.orgnummer
-                            narmesteLederRelasjon.narmesteLederPersonIdentNumber shouldBeEqualTo narmesteLederLeesah.narmesteLederFnr
-                            narmesteLederRelasjon.narmesteLederTelefonnummer shouldBeEqualTo narmesteLederLeesah.narmesteLederTelefonnummer
-                            narmesteLederRelasjon.narmesteLederEpost shouldBeEqualTo narmesteLederLeesah.narmesteLederEpost
-                            narmesteLederRelasjon.narmesteLederNavn shouldBeEqualTo externalMockEnvironment.pdlMock.respons.data.hentPersonBolk?.get(
+                            val narmesteLederRelasjonDeaktivert = narmestelederRelasjonList.first()
+                            narmesteLederRelasjonDeaktivert.arbeidstakerPersonIdentNumber shouldBeEqualTo ARBEIDSTAKER_FNR.value
+                            narmesteLederRelasjonDeaktivert.virksomhetsnavn shouldBeEqualTo externalMockEnvironment.isproxyMock.eregOrganisasjonResponse.toEregVirksomhetsnavn().virksomhetsnavn
+                            narmesteLederRelasjonDeaktivert.virksomhetsnummer shouldBeEqualTo narmesteLederLeesah.orgnummer
+                            narmesteLederRelasjonDeaktivert.narmesteLederPersonIdentNumber shouldBeEqualTo narmesteLederLeesah.narmesteLederFnr
+                            narmesteLederRelasjonDeaktivert.narmesteLederTelefonnummer shouldBeEqualTo narmesteLederLeesah.narmesteLederTelefonnummer
+                            narmesteLederRelasjonDeaktivert.narmesteLederEpost shouldBeEqualTo narmesteLederLeesah.narmesteLederEpost
+                            narmesteLederRelasjonDeaktivert.narmesteLederNavn shouldBeEqualTo externalMockEnvironment.pdlMock.respons.data.hentPersonBolk?.get(
                                 0
                             )?.person?.fullName()
-                            narmesteLederRelasjon.aktivFom shouldBeEqualTo narmesteLederLeesah.aktivFom
-                            narmesteLederRelasjon.aktivTom shouldBeEqualTo narmesteLederLeesah.aktivTom
-                            narmesteLederRelasjon.status shouldBeEqualTo NarmesteLederRelasjonStatus.INNMELDT_AKTIV.name
+                            narmesteLederRelasjonDeaktivert.aktivFom shouldBeEqualTo narmesteLederLeesah.aktivFom
+                            narmesteLederRelasjonDeaktivert.aktivTom shouldBeEqualTo narmesteLederLeesah.aktivTom
+                            narmesteLederRelasjonDeaktivert.status shouldBeEqualTo NarmesteLederRelasjonStatus.INNMELDT_AKTIV.name
                         }
                     }
                 }

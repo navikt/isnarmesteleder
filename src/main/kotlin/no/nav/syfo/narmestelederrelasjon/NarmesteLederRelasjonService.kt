@@ -12,28 +12,58 @@ class NarmesteLederRelasjonService(
     private val database: DatabaseInterface,
     private val pdlClient: PdlClient,
 ) {
-    suspend fun getRelasjonerForPersonIdent(
+    suspend fun getNarmestelederRelasjonList(
         callId: String,
-        personIdentNumber: PersonIdentNumber,
+        arbeidstakerPersonIdentNumber: PersonIdentNumber,
     ): List<NarmesteLederRelasjon> {
-        val narmesteLederRelasjonList = database.getNarmesteLederRelasjonList(
-            personIdentNumber = personIdentNumber,
-        ).toNarmesteLederRelasjonList()
+        val narmesteLederRelasjonHistoryList = getNarmesteLederRelasjonHistoryList(
+            callId = callId,
+            arbeidstakerPersonIdentNumber = arbeidstakerPersonIdentNumber,
+        )
 
-        if (narmesteLederRelasjonList.isEmpty()) {
-            return narmesteLederRelasjonList
+        return if (narmesteLederRelasjonHistoryList.isEmpty()) {
+            narmesteLederRelasjonHistoryList
         } else {
-            val narmesteLederPersonIdentNumberList = narmesteLederRelasjonList.map { narmesteLederRelasjon ->
-                narmesteLederRelasjon.narmesteLederPersonIdentNumber
-            }
-            pdlClient.personIdentNumberNavnMap(
+            getNarmesteLederRelasjonListWithName(
                 callId = callId,
-                personIdentNumberList = narmesteLederPersonIdentNumberList,
-            ).let { personIdentNumberNameMap ->
-                return narmesteLederRelasjonList.addNarmesteLederName(
-                    maybePersonIdentNumberNameMap = personIdentNumberNameMap,
+                narmesteLederRelasjonList = narmesteLederRelasjonHistoryList,
+            ).map { narmesteLederRelasjon ->
+                narmesteLederRelasjon.copy(
+                    arbeidstakerPersonIdentNumber = arbeidstakerPersonIdentNumber,
                 )
             }
         }
     }
+
+    private suspend fun getNarmesteLederRelasjonListWithName(
+        callId: String,
+        narmesteLederRelasjonList: List<NarmesteLederRelasjon>,
+    ): List<NarmesteLederRelasjon> {
+        val narmesteLederPersonIdentNumberList = narmesteLederRelasjonList.map { narmesteLederRelasjon ->
+            narmesteLederRelasjon.narmesteLederPersonIdentNumber
+        }
+        pdlClient.personIdentNumberNavnMap(
+            callId = callId,
+            personIdentNumberList = narmesteLederPersonIdentNumberList,
+        ).let { personIdentNumberNameMap ->
+            return narmesteLederRelasjonList.addNarmesteLederName(
+                maybePersonIdentNumberNameMap = personIdentNumberNameMap,
+            )
+        }
+    }
+
+    private suspend fun getNarmesteLederRelasjonHistoryList(
+        callId: String,
+        arbeidstakerPersonIdentNumber: PersonIdentNumber,
+    ): List<NarmesteLederRelasjon> =
+        pdlClient.identList(
+            callId = callId,
+            withHistory = true,
+            personIdentNumber = arbeidstakerPersonIdentNumber,
+        )?.flatMap { personIdent ->
+            database.getNarmesteLederRelasjonList(
+                personIdentNumber = personIdent,
+            )
+        }?.toNarmesteLederRelasjonList()
+            ?: emptyList()
 }
