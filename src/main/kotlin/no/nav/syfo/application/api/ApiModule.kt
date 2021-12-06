@@ -13,7 +13,9 @@ import no.nav.syfo.client.pdl.PdlClient
 import no.nav.syfo.client.veiledertilgang.VeilederTilgangskontrollClient
 import no.nav.syfo.client.wellknown.WellKnown
 import no.nav.syfo.narmestelederrelasjon.NarmesteLederRelasjonService
+import no.nav.syfo.narmestelederrelasjon.api.access.APIConsumerAccessService
 import no.nav.syfo.narmestelederrelasjon.api.registrerNarmesteLederRelasjonApi
+import no.nav.syfo.narmestelederrelasjon.api.registrerNarmesteLederRelasjonSystemApi
 import redis.clients.jedis.*
 
 fun Application.apiModule(
@@ -71,6 +73,10 @@ fun Application.apiModule(
         pdlClient = pdlClient,
     )
 
+    val apiConsumerAccessService = APIConsumerAccessService(
+        azureAppPreAuthorizedApps = environment.azureAppPreAuthorizedApps,
+    )
+
     routing {
         registerPodApi(
             applicationState = applicationState,
@@ -81,6 +87,11 @@ fun Application.apiModule(
             registrerNarmesteLederRelasjonApi(
                 narmesteLederRelasjonService = narmesteLederRelasjonService,
                 veilederTilgangskontrollClient = veilederTilgangskontrollClient,
+            )
+            registrerNarmesteLederRelasjonSystemApi(
+                apiConsumerAccessService = apiConsumerAccessService,
+                authorizedApplicationNameList = environment.systemAPIAuthorizedConsumerApplicationNameList,
+                narmesteLederRelasjonService = narmesteLederRelasjonService,
             )
         }
     }

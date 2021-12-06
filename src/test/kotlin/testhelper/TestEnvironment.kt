@@ -1,6 +1,8 @@
 package testhelper
 
 import no.nav.syfo.application.*
+import no.nav.syfo.narmestelederrelasjon.api.access.PreAuthorizedClient
+import no.nav.syfo.util.configuredJacksonMapper
 import java.net.ServerSocket
 
 fun testEnvironment(
@@ -12,6 +14,7 @@ fun testEnvironment(
 ) = Environment(
     azureAppClientId = "isnarmesteleder-client-id",
     azureAppClientSecret = "isnarmesteleder-secret",
+    azureAppPreAuthorizedApps = configuredJacksonMapper().writeValueAsString(testAzureAppPreAuthorizedApps),
     azureAppWellKnownUrl = "wellknown",
     azureOpenidConfigTokenEndpoint = azureOpenIdTokenEndpoint,
     electorPath = "electorPath",
@@ -45,3 +48,11 @@ fun testAppState() = ApplicationState(
 fun getRandomPort() = ServerSocket(0).use {
     it.localPort
 }
+
+const val testSyfomoteadminClientId = "syfomoteadmin-client-id"
+val testAzureAppPreAuthorizedApps = listOf(
+    PreAuthorizedClient(
+        name = "dev-fss:teamsykefravr:syfomoteadmin",
+        clientId = testSyfomoteadminClientId,
+    ),
+)

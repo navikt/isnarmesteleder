@@ -9,6 +9,7 @@ import io.ktor.metrics.micrometer.*
 import io.ktor.response.*
 import io.micrometer.core.instrument.distribution.DistributionStatisticConfig
 import no.nav.syfo.metric.METRICS_REGISTRY
+import no.nav.syfo.narmestelederrelasjon.api.access.ForbiddenAccessSystemConsumer
 import no.nav.syfo.util.*
 import java.time.Duration
 import java.util.*
@@ -47,6 +48,9 @@ fun Application.installStatusPages() {
                 }
                 is IllegalArgumentException -> {
                     HttpStatusCode.BadRequest
+                }
+                is ForbiddenAccessSystemConsumer -> {
+                    HttpStatusCode.Forbidden
                 }
                 else -> {
                     HttpStatusCode.InternalServerError
