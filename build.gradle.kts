@@ -11,7 +11,7 @@ object Versions {
     const val jedis = "3.7.0"
     const val kafka = "2.8.0"
     const val kafkaEmbedded = "2.8.0"
-    const val ktor = "1.6.6"
+    const val ktor = "1.6.7"
     const val kluent = "1.68"
     const val logback = "1.2.7"
     const val logstashEncoder = "7.0.1"
