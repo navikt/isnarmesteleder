@@ -5,8 +5,7 @@ import no.nav.syfo.client.pdl.PdlClient
 import no.nav.syfo.domain.PersonIdentNumber
 import no.nav.syfo.narmestelederrelasjon.database.domain.toNarmesteLederRelasjonList
 import no.nav.syfo.narmestelederrelasjon.database.getNarmesteLederRelasjonList
-import no.nav.syfo.narmestelederrelasjon.domain.NarmesteLederRelasjon
-import no.nav.syfo.narmestelederrelasjon.domain.addNarmesteLederName
+import no.nav.syfo.narmestelederrelasjon.domain.*
 
 class NarmesteLederRelasjonService(
     private val database: DatabaseInterface,
@@ -14,11 +13,13 @@ class NarmesteLederRelasjonService(
 ) {
     suspend fun getNarmestelederRelasjonList(
         callId: String,
-        arbeidstakerPersonIdentNumber: PersonIdentNumber,
+        personIdentNumber: PersonIdentNumber,
+        shouldGetAnsatte: Boolean,
     ): List<NarmesteLederRelasjon> {
         val narmesteLederRelasjonHistoryList = getNarmesteLederRelasjonHistoryList(
             callId = callId,
-            arbeidstakerPersonIdentNumber = arbeidstakerPersonIdentNumber,
+            personIdentNumber = personIdentNumber,
+            shouldGetAnsatte = shouldGetAnsatte,
         )
 
         return if (narmesteLederRelasjonHistoryList.isEmpty()) {
@@ -28,12 +29,31 @@ class NarmesteLederRelasjonService(
                 callId = callId,
                 narmesteLederRelasjonList = narmesteLederRelasjonHistoryList,
             ).map { narmesteLederRelasjon ->
-                narmesteLederRelasjon.copy(
-                    arbeidstakerPersonIdentNumber = arbeidstakerPersonIdentNumber,
-                )
+                if (shouldGetAnsatte) {
+                    narmesteLederRelasjon.newNarmesteLederPersonIdentNumber(personIdentNumber)
+                } else {
+                    narmesteLederRelasjon.newArbeidstakerPersonIdentNumber(personIdentNumber)
+                }
             }
         }
     }
+
+    private suspend fun getNarmesteLederRelasjonHistoryList(
+        callId: String,
+        personIdentNumber: PersonIdentNumber,
+        shouldGetAnsatte: Boolean,
+    ): List<NarmesteLederRelasjon> =
+        pdlClient.identList(
+            callId = callId,
+            withHistory = true,
+            personIdentNumber = personIdentNumber,
+        )?.flatMap { personIdent ->
+            database.getNarmesteLederRelasjonList(
+                personIdentNumber = personIdent,
+                shouldGetAnsatte = shouldGetAnsatte,
+            )
+        }?.toNarmesteLederRelasjonList()
+            ?: emptyList()
 
     private suspend fun getNarmesteLederRelasjonListWithName(
         callId: String,
@@ -51,19 +71,4 @@ class NarmesteLederRelasjonService(
             )
         }
     }
-
-    private suspend fun getNarmesteLederRelasjonHistoryList(
-        callId: String,
-        arbeidstakerPersonIdentNumber: PersonIdentNumber,
-    ): List<NarmesteLederRelasjon> =
-        pdlClient.identList(
-            callId = callId,
-            withHistory = true,
-            personIdentNumber = arbeidstakerPersonIdentNumber,
-        )?.flatMap { personIdent ->
-            database.getNarmesteLederRelasjonList(
-                personIdentNumber = personIdent,
-            )
-        }?.toNarmesteLederRelasjonList()
-            ?: emptyList()
 }

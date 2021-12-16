@@ -114,11 +114,21 @@ const val queryGetNarmesteLederRelasjonList =
     WHERE arbeidstaker_personident = ?;
     """
 
+const val queryGetAnsatteList =
+    """
+    SELECT *
+    FROM narmeste_leder_relasjon
+    WHERE narmeste_leder_personident = ?;
+    """
+
 fun DatabaseInterface.getNarmesteLederRelasjonList(
     personIdentNumber: PersonIdentNumber,
+    shouldGetAnsatte: Boolean,
 ): List<PNarmesteLederRelasjon> {
+    val query = if (shouldGetAnsatte) queryGetAnsatteList else queryGetNarmesteLederRelasjonList
+
     return this.connection.use { connection ->
-        connection.prepareStatement(queryGetNarmesteLederRelasjonList).use {
+        connection.prepareStatement(query).use {
             it.setString(1, personIdentNumber.value)
             it.executeQuery().toList {
                 toPNarmesteLederRelasjon()

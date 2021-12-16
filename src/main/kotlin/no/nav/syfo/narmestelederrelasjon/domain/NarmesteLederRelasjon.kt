@@ -58,6 +58,18 @@ fun List<NarmesteLederRelasjon>.addNarmesteLederName(
     }
 }
 
+fun NarmesteLederRelasjon.newArbeidstakerPersonIdentNumber(newIdent: PersonIdentNumber): NarmesteLederRelasjon {
+    return this.copy(
+        arbeidstakerPersonIdentNumber = newIdent,
+    )
+}
+
+fun NarmesteLederRelasjon.newNarmesteLederPersonIdentNumber(newIdent: PersonIdentNumber): NarmesteLederRelasjon {
+    return this.copy(
+        narmesteLederPersonIdentNumber = newIdent,
+    )
+}
+
 enum class NarmesteLederRelasjonStatus {
     INNMELDT_AKTIV,
     DEAKTIVERT,

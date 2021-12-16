@@ -14,6 +14,7 @@ import org.slf4j.LoggerFactory
 private val log: Logger = LoggerFactory.getLogger("no.nav.syfo")
 
 const val narmesteLederSystemApiV1Path = "/api/system/v1/narmestelederrelasjoner"
+const val ANSATTE_QUERYPARAM = "ansatte"
 
 fun Route.registrerNarmesteLederRelasjonSystemApi(
     apiConsumerAccessService: APIConsumerAccessService,
@@ -36,9 +37,12 @@ fun Route.registrerNarmesteLederRelasjonSystemApi(
             }
                 ?: throw IllegalArgumentException("No PersonIdent supplied to system api when getting narmestelederRelasjoner, callID=$callId")
 
+            val shouldGetAnsatte = this.call.request.queryParameters[ANSATTE_QUERYPARAM].toBoolean()
+
             val narmesteLederRelasjonDTOList = narmesteLederRelasjonService.getNarmestelederRelasjonList(
                 callId = callId,
-                arbeidstakerPersonIdentNumber = personIdentNumber,
+                personIdentNumber = personIdentNumber,
+                shouldGetAnsatte = shouldGetAnsatte,
             ).map {
                 it.toNarmesteLederRelasjonDTO()
             }

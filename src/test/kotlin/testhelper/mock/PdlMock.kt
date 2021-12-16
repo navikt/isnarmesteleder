@@ -17,10 +17,10 @@ import testhelper.getRandomPort
 
 fun PersonIdentNumber.toHistoricalPersonIdentNumber(): PersonIdentNumber {
     val firstDigit = this.value[0].digitToInt()
-    val newDigit = firstDigit + 4
+    val lastDigitOfNewNumber = (firstDigit + 4) % 10
     val dNummer = this.value.replace(
         firstDigit.toString(),
-        newDigit.toString(),
+        lastDigitOfNewNumber.toString(),
     )
     return PersonIdentNumber(dNummer)
 }

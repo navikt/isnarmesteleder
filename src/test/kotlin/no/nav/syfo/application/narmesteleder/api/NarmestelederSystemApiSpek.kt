@@ -21,7 +21,7 @@ import no.nav.syfo.narmestelederrelasjon.kafka.NARMESTE_LEDER_RELASJON_TOPIC
 import no.nav.syfo.narmestelederrelasjon.kafka.domain.NY_LEDER
 import no.nav.syfo.narmestelederrelasjon.kafka.pollAndProcessNarmesteLederRelasjon
 import no.nav.syfo.util.*
-import org.amshove.kluent.shouldBeEqualTo
+import org.amshove.kluent.*
 import org.apache.kafka.clients.consumer.*
 import org.apache.kafka.common.TopicPartition
 import org.spekframework.spek2.Spek
@@ -30,6 +30,8 @@ import redis.clients.jedis.*
 import testhelper.*
 import testhelper.UserConstants.ARBEIDSTAKER_FNR
 import testhelper.UserConstants.ARBEIDSTAKER_NO_VIRKSOMHETNAVN
+import testhelper.UserConstants.NARMESTELEDER_PERSONIDENTNUMBER
+import testhelper.UserConstants.VIRKSOMHETSNUMMER_DEFAULT
 import testhelper.UserConstants.VIRKSOMHETSNUMMER_NO_VIRKSOMHETSNAVN
 import testhelper.generator.generateNarmesteLederLeesah
 import testhelper.mock.toHistoricalPersonIdentNumber
@@ -137,7 +139,6 @@ class NarmestelederSystemApiSpek : Spek({
                         2,
                         "something",
                         objectMapper.writeValueAsString(narmesteLederLeesahNoVirksomhetsnavn),
-
                     )
                     val mockConsumer = mockk<KafkaConsumer<String, String>>()
                     every { mockConsumer.poll(any<Duration>()) } returns ConsumerRecords(
@@ -201,6 +202,69 @@ class NarmestelederSystemApiSpek : Spek({
                             narmesteLederRelasjonDeaktivert.aktivFom shouldBeEqualTo narmesteLederLeesah.aktivFom
                             narmesteLederRelasjonDeaktivert.aktivTom shouldBeEqualTo narmesteLederLeesah.aktivTom
                             narmesteLederRelasjonDeaktivert.status shouldBeEqualTo NarmesteLederRelasjonStatus.INNMELDT_AKTIV.name
+                        }
+                    }
+
+                    it("should return list of NarmestelederRelasjon of ansatte for all historical lederPersonIdent if request is successful") {
+                        runBlocking {
+                            pollAndProcessNarmesteLederRelasjon(
+                                database = database,
+                                kafkaConsumerNarmesteLederRelasjon = mockConsumer,
+                            )
+                        }
+
+                        verify(exactly = 2) { mockConsumer.commitSync() }
+
+                        runBlocking {
+                            val result = virksomhetsnavnCronjob.virksomhetsnavnJob()
+
+                            result.failed shouldBeEqualTo 1
+                            result.updated shouldBeEqualTo 1
+                        }
+
+                        runBlocking {
+                            val result = virksomhetsnavnCronjob.virksomhetsnavnJob()
+
+                            result.failed shouldBeEqualTo 1
+                            result.updated shouldBeEqualTo 0
+                        }
+                        with(
+                            handleRequest(HttpMethod.Get, "$url?ansatte=true") {
+                                addHeader(Authorization, bearerHeader(validToken))
+                                addHeader(NAV_PERSONIDENT_HEADER, NARMESTELEDER_PERSONIDENTNUMBER.value)
+                            }
+                        ) {
+                            response.status() shouldBeEqualTo HttpStatusCode.OK
+
+                            val ansatte =
+                                objectMapper.readValue<List<NarmesteLederRelasjonDTO>>(response.content!!)
+
+                            ansatte.size shouldBeEqualTo 2
+
+                            val relasjonDefaultVirksomhet = ansatte.find {
+                                it.virksomhetsnummer == VIRKSOMHETSNUMMER_DEFAULT.value
+                            }
+
+                            relasjonDefaultVirksomhet `should not be` null
+                            relasjonDefaultVirksomhet?.narmesteLederPersonIdentNumber shouldBeEqualTo NARMESTELEDER_PERSONIDENTNUMBER.value
+                            relasjonDefaultVirksomhet?.arbeidstakerPersonIdentNumber shouldBeEqualTo ARBEIDSTAKER_FNR.toHistoricalPersonIdentNumber().value
+                            relasjonDefaultVirksomhet?.virksomhetsnavn shouldBeEqualTo externalMockEnvironment.isproxyMock.eregOrganisasjonResponse.toEregVirksomhetsnavn().virksomhetsnavn
+                            relasjonDefaultVirksomhet?.virksomhetsnummer shouldBeEqualTo narmesteLederLeesah.orgnummer
+                            relasjonDefaultVirksomhet?.narmesteLederTelefonnummer shouldBeEqualTo narmesteLederLeesah.narmesteLederTelefonnummer
+                            relasjonDefaultVirksomhet?.narmesteLederEpost shouldBeEqualTo narmesteLederLeesah.narmesteLederEpost
+                            relasjonDefaultVirksomhet?.narmesteLederNavn shouldBeEqualTo externalMockEnvironment.pdlMock.respons.data.hentPersonBolk?.get(
+                                0
+                            )?.person?.fullName()
+                            relasjonDefaultVirksomhet?.aktivFom shouldBeEqualTo narmesteLederLeesah.aktivFom
+                            relasjonDefaultVirksomhet?.aktivTom shouldBeEqualTo narmesteLederLeesah.aktivTom
+                            relasjonDefaultVirksomhet?.status shouldBeEqualTo NarmesteLederRelasjonStatus.INNMELDT_AKTIV.name
+
+                            val relasjonVirksomhetNoName = ansatte.find {
+                                it.virksomhetsnummer == VIRKSOMHETSNUMMER_NO_VIRKSOMHETSNAVN.value
+                            }
+
+                            relasjonVirksomhetNoName `should not be` null
+                            relasjonVirksomhetNoName?.virksomhetsnavn `should be` null
                         }
                     }
                 }
