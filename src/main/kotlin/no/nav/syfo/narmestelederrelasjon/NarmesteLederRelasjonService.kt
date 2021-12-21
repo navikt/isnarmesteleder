@@ -3,8 +3,10 @@ package no.nav.syfo.narmestelederrelasjon
 import no.nav.syfo.application.database.DatabaseInterface
 import no.nav.syfo.client.pdl.PdlClient
 import no.nav.syfo.domain.PersonIdentNumber
+import no.nav.syfo.narmestelederrelasjon.database.domain.PNarmesteLederRelasjon
 import no.nav.syfo.narmestelederrelasjon.database.domain.toNarmesteLederRelasjonList
 import no.nav.syfo.narmestelederrelasjon.database.getNarmesteLederRelasjonList
+import no.nav.syfo.narmestelederrelasjon.database.getNarmesteLedere
 import no.nav.syfo.narmestelederrelasjon.domain.NarmesteLederRelasjon
 import no.nav.syfo.narmestelederrelasjon.domain.addNarmesteLederName
 
@@ -12,11 +14,11 @@ class NarmesteLederRelasjonService(
     private val database: DatabaseInterface,
     private val pdlClient: PdlClient,
 ) {
-    suspend fun getNarmestelederRelasjonList(
+    suspend fun getNarmesteLedere(
         callId: String,
         arbeidstakerPersonIdentNumber: PersonIdentNumber,
     ): List<NarmesteLederRelasjon> {
-        val narmesteLederRelasjonHistoryList = getNarmesteLederRelasjonHistoryList(
+        val narmesteLederRelasjonHistoryList = getNarmesteLedereHistory(
             callId = callId,
             arbeidstakerPersonIdentNumber = arbeidstakerPersonIdentNumber,
         )
@@ -33,6 +35,56 @@ class NarmesteLederRelasjonService(
                 )
             }
         }
+    }
+
+    suspend fun getNarmestelederRelasjonList(
+        callId: String,
+        personIdentNumber: PersonIdentNumber,
+    ): List<NarmesteLederRelasjon> {
+        val narmesteLederRelasjonHistoryList = getNarmesteLederRelasjonHistoryList(
+            callId = callId,
+            personIdentNumber = personIdentNumber,
+        )
+
+        return if (narmesteLederRelasjonHistoryList.isEmpty()) {
+            narmesteLederRelasjonHistoryList
+        } else {
+            getNarmesteLederRelasjonListWithName(
+                callId = callId,
+                narmesteLederRelasjonList = narmesteLederRelasjonHistoryList,
+            )
+        }
+    }
+
+    private suspend fun getNarmesteLederRelasjonHistoryList(
+        callId: String,
+        personIdentNumber: PersonIdentNumber,
+    ): List<NarmesteLederRelasjon> =
+        pdlClient.identList(
+            callId = callId,
+            withHistory = true,
+            personIdentNumber = personIdentNumber,
+        )?.flatMap { personIdent ->
+            val liste = database.getNarmesteLederRelasjonList(
+                personIdentNumber = personIdent,
+            )
+            liste.map { narmestelederRelasjon ->
+                narmestelederRelasjon.replaceIdent(
+                    oldIdent = personIdent,
+                    newIdent = personIdentNumber,
+                )
+            }
+        }?.toNarmesteLederRelasjonList()
+            ?: emptyList()
+
+    private fun PNarmesteLederRelasjon.replaceIdent(
+        oldIdent: PersonIdentNumber,
+        newIdent: PersonIdentNumber
+    ): PNarmesteLederRelasjon {
+        return this.copy(
+            arbeidstakerPersonIdentNumber = if (this.arbeidstakerPersonIdentNumber == oldIdent) newIdent else this.arbeidstakerPersonIdentNumber,
+            narmesteLederPersonIdentNumber = if (this.narmesteLederPersonIdentNumber == oldIdent) newIdent else this.narmesteLederPersonIdentNumber
+        )
     }
 
     private suspend fun getNarmesteLederRelasjonListWithName(
@@ -52,7 +104,7 @@ class NarmesteLederRelasjonService(
         }
     }
 
-    private suspend fun getNarmesteLederRelasjonHistoryList(
+    private suspend fun getNarmesteLedereHistory(
         callId: String,
         arbeidstakerPersonIdentNumber: PersonIdentNumber,
     ): List<NarmesteLederRelasjon> =
@@ -61,7 +113,7 @@ class NarmesteLederRelasjonService(
             withHistory = true,
             personIdentNumber = arbeidstakerPersonIdentNumber,
         )?.flatMap { personIdent ->
-            database.getNarmesteLederRelasjonList(
+            database.getNarmesteLedere(
                 personIdentNumber = personIdent,
             )
         }?.toNarmesteLederRelasjonList()
