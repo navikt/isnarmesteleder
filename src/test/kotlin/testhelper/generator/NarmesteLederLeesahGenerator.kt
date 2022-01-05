@@ -13,6 +13,7 @@ import java.util.*
 
 fun generateNarmesteLederLeesah(
     arbeidstakerPersonIdentNumber: PersonIdentNumber = ARBEIDSTAKER_FNR,
+    narmestelederPersonIdentNumber: PersonIdentNumber = NARMESTELEDER_PERSONIDENTNUMBER,
     status: String? = NY_LEDER,
     timestamp: OffsetDateTime = OffsetDateTime.now().minusDays(5),
     virksomhetsnummer: Virksomhetsnummer = UserConstants.VIRKSOMHETSNUMMER_DEFAULT,
@@ -20,7 +21,7 @@ fun generateNarmesteLederLeesah(
     narmesteLederId = UUID.randomUUID(),
     fnr = arbeidstakerPersonIdentNumber.value,
     orgnummer = virksomhetsnummer.value,
-    narmesteLederFnr = NARMESTELEDER_PERSONIDENTNUMBER.value,
+    narmesteLederFnr = narmestelederPersonIdentNumber.value,
     narmesteLederTelefonnummer = "99119911",
     narmesteLederEpost = "test@test.com",
     aktivFom = LocalDate.now().minusDays(10),

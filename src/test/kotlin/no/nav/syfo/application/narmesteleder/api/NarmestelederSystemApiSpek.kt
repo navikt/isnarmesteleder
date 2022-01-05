@@ -30,6 +30,7 @@ import redis.clients.jedis.*
 import testhelper.*
 import testhelper.UserConstants.ARBEIDSTAKER_FNR
 import testhelper.UserConstants.ARBEIDSTAKER_NO_VIRKSOMHETNAVN
+import testhelper.UserConstants.NARMESTELEDER_PERSONIDENTNUMBER_ALTERNATIVE
 import testhelper.UserConstants.VIRKSOMHETSNUMMER_NO_VIRKSOMHETSNAVN
 import testhelper.generator.generateNarmesteLederLeesah
 import testhelper.mock.toHistoricalPersonIdentNumber
@@ -126,6 +127,19 @@ class NarmestelederSystemApiSpek : Spek({
                         "something",
                         objectMapper.writeValueAsString(narmesteLederLeesah),
                     )
+                    val ansattLeesah = generateNarmesteLederLeesah(
+                        arbeidstakerPersonIdentNumber = NARMESTELEDER_PERSONIDENTNUMBER_ALTERNATIVE,
+                        narmestelederPersonIdentNumber = ARBEIDSTAKER_FNR.toHistoricalPersonIdentNumber(),
+                        status = null,
+                        timestamp = OffsetDateTime.now().minusDays(1),
+                    )
+                    val ansattLeesahRecord = ConsumerRecord(
+                        NARMESTE_LEDER_RELASJON_TOPIC,
+                        partition,
+                        3,
+                        "something",
+                        objectMapper.writeValueAsString(ansattLeesah),
+                    )
                     val narmesteLederLeesahNoVirksomhetsnavn = generateNarmesteLederLeesah(
                         arbeidstakerPersonIdentNumber = ARBEIDSTAKER_NO_VIRKSOMHETNAVN,
                         virksomhetsnummer = VIRKSOMHETSNUMMER_NO_VIRKSOMHETSNAVN,
@@ -137,7 +151,6 @@ class NarmestelederSystemApiSpek : Spek({
                         2,
                         "something",
                         objectMapper.writeValueAsString(narmesteLederLeesahNoVirksomhetsnavn),
-
                     )
                     val mockConsumer = mockk<KafkaConsumer<String, String>>()
                     every { mockConsumer.poll(any<Duration>()) } returns ConsumerRecords(
@@ -146,12 +159,13 @@ class NarmestelederSystemApiSpek : Spek({
                                 narmesteLederLeesahRecord,
                                 narmesteLederLeesahRecordDuplicate,
                                 narmesteLederLeesahRecordNoVirksomhetsnavn,
+                                ansattLeesahRecord,
                             )
                         )
                     )
                     every { mockConsumer.commitSync() } returns Unit
 
-                    it("should return list of NarmestelederRelasjon for all historical PersonIdent if request is successful") {
+                    it("should return list of NarmestelederRelasjon for all historical PersonIdent both as innbygger and leder if request is successful") {
                         runBlocking {
                             pollAndProcessNarmesteLederRelasjon(
                                 database = database,
@@ -165,7 +179,7 @@ class NarmestelederSystemApiSpek : Spek({
                             val result = virksomhetsnavnCronjob.virksomhetsnavnJob()
 
                             result.failed shouldBeEqualTo 1
-                            result.updated shouldBeEqualTo 1
+                            result.updated shouldBeEqualTo 2
                         }
 
                         runBlocking {
@@ -186,21 +200,30 @@ class NarmestelederSystemApiSpek : Spek({
                             val narmestelederRelasjonList =
                                 objectMapper.readValue<List<NarmesteLederRelasjonDTO>>(response.content!!)
 
-                            narmestelederRelasjonList.size shouldBeEqualTo 1
+                            narmestelederRelasjonList.size shouldBeEqualTo 2
 
-                            val narmesteLederRelasjonDeaktivert = narmestelederRelasjonList.first()
-                            narmesteLederRelasjonDeaktivert.arbeidstakerPersonIdentNumber shouldBeEqualTo ARBEIDSTAKER_FNR.value
-                            narmesteLederRelasjonDeaktivert.virksomhetsnavn shouldBeEqualTo externalMockEnvironment.isproxyMock.eregOrganisasjonResponse.toEregVirksomhetsnavn().virksomhetsnavn
-                            narmesteLederRelasjonDeaktivert.virksomhetsnummer shouldBeEqualTo narmesteLederLeesah.orgnummer
-                            narmesteLederRelasjonDeaktivert.narmesteLederPersonIdentNumber shouldBeEqualTo narmesteLederLeesah.narmesteLederFnr
-                            narmesteLederRelasjonDeaktivert.narmesteLederTelefonnummer shouldBeEqualTo narmesteLederLeesah.narmesteLederTelefonnummer
-                            narmesteLederRelasjonDeaktivert.narmesteLederEpost shouldBeEqualTo narmesteLederLeesah.narmesteLederEpost
-                            narmesteLederRelasjonDeaktivert.narmesteLederNavn shouldBeEqualTo externalMockEnvironment.pdlMock.respons.data.hentPersonBolk?.get(
+                            val lederRelasjon =
+                                narmestelederRelasjonList.find { it.arbeidstakerPersonIdentNumber == ARBEIDSTAKER_FNR.value }
+                                    ?: throw NoSuchElementException("Fant ikke leder")
+                            val ansattRelasjon =
+                                narmestelederRelasjonList.find { it.narmesteLederPersonIdentNumber == ARBEIDSTAKER_FNR.value }
+                                    ?: throw NoSuchElementException("Fant ikke ansatte")
+
+                            ansattRelasjon.arbeidstakerPersonIdentNumber shouldBeEqualTo NARMESTELEDER_PERSONIDENTNUMBER_ALTERNATIVE.value
+                            ansattRelasjon.narmesteLederPersonIdentNumber shouldBeEqualTo ARBEIDSTAKER_FNR.value
+
+                            lederRelasjon.arbeidstakerPersonIdentNumber shouldBeEqualTo ARBEIDSTAKER_FNR.value
+                            lederRelasjon.virksomhetsnavn shouldBeEqualTo externalMockEnvironment.isproxyMock.eregOrganisasjonResponse.toEregVirksomhetsnavn().virksomhetsnavn
+                            lederRelasjon.virksomhetsnummer shouldBeEqualTo narmesteLederLeesah.orgnummer
+                            lederRelasjon.narmesteLederPersonIdentNumber shouldBeEqualTo narmesteLederLeesah.narmesteLederFnr
+                            lederRelasjon.narmesteLederTelefonnummer shouldBeEqualTo narmesteLederLeesah.narmesteLederTelefonnummer
+                            lederRelasjon.narmesteLederEpost shouldBeEqualTo narmesteLederLeesah.narmesteLederEpost
+                            lederRelasjon.narmesteLederNavn shouldBeEqualTo externalMockEnvironment.pdlMock.respons.data.hentPersonBolk?.get(
                                 0
                             )?.person?.fullName()
-                            narmesteLederRelasjonDeaktivert.aktivFom shouldBeEqualTo narmesteLederLeesah.aktivFom
-                            narmesteLederRelasjonDeaktivert.aktivTom shouldBeEqualTo narmesteLederLeesah.aktivTom
-                            narmesteLederRelasjonDeaktivert.status shouldBeEqualTo NarmesteLederRelasjonStatus.INNMELDT_AKTIV.name
+                            lederRelasjon.aktivFom shouldBeEqualTo narmesteLederLeesah.aktivFom
+                            lederRelasjon.aktivTom shouldBeEqualTo narmesteLederLeesah.aktivTom
+                            lederRelasjon.status shouldBeEqualTo NarmesteLederRelasjonStatus.INNMELDT_AKTIV.name
                         }
                     }
                 }

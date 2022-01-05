@@ -107,11 +107,32 @@ fun DatabaseInterface.updateNarmesteLederRelasjonVirksomhetsnavn(
     }
 }
 
-const val queryGetNarmesteLederRelasjonList =
+const val queryGetNarmesteLedere =
     """
     SELECT *
     FROM narmeste_leder_relasjon
     WHERE arbeidstaker_personident = ?;
+    """
+
+fun DatabaseInterface.getNarmesteLedere(
+    personIdentNumber: PersonIdentNumber,
+): List<PNarmesteLederRelasjon> {
+    return this.connection.use { connection ->
+        connection.prepareStatement(queryGetNarmesteLedere).use {
+            it.setString(1, personIdentNumber.value)
+            it.executeQuery().toList {
+                toPNarmesteLederRelasjon()
+            }
+        }
+    }
+}
+
+const val queryGetNarmesteLederRelasjonList =
+    """
+    SELECT *
+    FROM narmeste_leder_relasjon
+    WHERE (arbeidstaker_personident = ? OR narmeste_leder_personident = ?)
+    AND aktiv_tom IS null;
     """
 
 fun DatabaseInterface.getNarmesteLederRelasjonList(
@@ -120,6 +141,7 @@ fun DatabaseInterface.getNarmesteLederRelasjonList(
     return this.connection.use { connection ->
         connection.prepareStatement(queryGetNarmesteLederRelasjonList).use {
             it.setString(1, personIdentNumber.value)
+            it.setString(2, personIdentNumber.value)
             it.executeQuery().toList {
                 toPNarmesteLederRelasjon()
             }
