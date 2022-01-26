@@ -66,3 +66,9 @@ or `kubectl apply -f .nais/redis/redisexporter.yaml`.
 This application consumes the following topic(s):
 
 * teamsykmelding.syfo-narmesteleder-leesah
+
+## Contact
+
+### For NAV employees
+
+We are available at the Slack channel `#isyfo`.
