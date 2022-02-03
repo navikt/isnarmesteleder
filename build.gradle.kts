@@ -19,7 +19,7 @@ object Versions {
     const val nimbusJoseJwt = "9.18"
     const val micrometerRegistry = "1.8.1"
     const val postgres = "42.3.2"
-    const val postgresEmbedded = "1.0.0"
+    const val postgresEmbedded = "0.13.4"
     const val redisEmbedded = "0.8.2"
     const val spek = "2.0.17"
 }
