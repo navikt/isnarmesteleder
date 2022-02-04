@@ -20,7 +20,7 @@ object Versions {
     const val micrometerRegistry = "1.8.1"
     const val postgres = "42.3.2"
     const val postgresEmbedded = "0.13.4"
-    const val redisEmbedded = "0.8.2"
+    const val redisEmbedded = "0.7.3"
     const val spek = "2.0.17"
 }
 
@@ -59,7 +59,7 @@ dependencies {
 
     // Cache
     implementation("redis.clients:jedis:${Versions.jedis}")
-    testImplementation("org.signal:embedded-redis:${Versions.redisEmbedded}")
+    testImplementation("it.ozimov:embedded-redis:${Versions.redisEmbedded}")
 
     // (De-)serialization
     implementation("com.fasterxml.jackson.datatype:jackson-datatype-jsr310:${Versions.jackson}")
