@@ -10,7 +10,7 @@ import no.nav.syfo.application.cache.RedisStore
 import no.nav.syfo.client.azuread.AzureAdClient
 import no.nav.syfo.client.ereg.EregClient
 import no.nav.syfo.client.ereg.toEregVirksomhetsnavn
-import no.nav.syfo.client.pdl.fullName
+import no.nav.syfo.client.pdl.domain.fullName
 import no.nav.syfo.cronjob.virksomhetsnavn.VirksomhetsnavnCronjob
 import no.nav.syfo.cronjob.virksomhetsnavn.VirksomhetsnavnService
 import no.nav.syfo.narmestelederrelasjon.api.*

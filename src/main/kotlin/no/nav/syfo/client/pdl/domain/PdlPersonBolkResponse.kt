@@ -1,27 +1,10 @@
-package no.nav.syfo.client.pdl
+package no.nav.syfo.client.pdl.domain
 
 import no.nav.syfo.util.lowerCapitalize
 
 data class PdlPersonBolkResponse(
     val data: PdlHentPersonBolkData,
     val errors: List<PdlError>?,
-)
-
-data class PdlError(
-    val message: String,
-    val locations: List<PdlErrorLocation>,
-    val path: List<String>?,
-    val extensions: PdlErrorExtension,
-)
-
-data class PdlErrorLocation(
-    val line: Int?,
-    val column: Int?,
-)
-
-data class PdlErrorExtension(
-    val code: String?,
-    val classification: String,
 )
 
 data class PdlHentPersonBolkData(
@@ -46,7 +29,7 @@ data class PdlPersonNavn(
 
 fun PdlPerson.fullName(): String? {
     val nameList = this.navn
-    if (nameList.isNullOrEmpty()) {
+    if (nameList.isEmpty()) {
         return null
     }
     nameList.first().let {
@@ -60,8 +43,4 @@ fun PdlPerson.fullName(): String? {
             "$fornavn ${mellomnavn.lowerCapitalize()} $etternavn"
         }
     }
-}
-
-fun PdlError.errorMessage(): String {
-    return "${this.message} with code: ${extensions.code} and classification: ${extensions.classification}"
 }

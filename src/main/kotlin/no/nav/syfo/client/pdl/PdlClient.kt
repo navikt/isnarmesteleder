@@ -4,7 +4,6 @@ import io.ktor.client.call.*
 import io.ktor.client.request.*
 import io.ktor.client.statement.*
 import io.ktor.http.*
-import io.netty.handler.codec.http.HttpHeaders.Values.APPLICATION_JSON
 import no.nav.syfo.application.cache.RedisStore
 import no.nav.syfo.client.azuread.AzureAdClient
 import no.nav.syfo.client.azuread.AzureAdToken
@@ -81,7 +80,7 @@ class PdlClient(
         val response: HttpResponse = httpClient.post(pdlBaseUrl) {
             body = request
             header(HttpHeaders.Authorization, bearerHeader(token.accessToken))
-            header(HttpHeaders.ContentType, APPLICATION_JSON)
+            header(HttpHeaders.ContentType, ContentType.Application.Json.toString())
             header(TEMA_HEADER, ALLE_TEMA_HEADERVERDI)
             header(NAV_CALL_ID_HEADER, callId)
             header(IDENTER_HEADER, IDENTER_HEADER)
@@ -207,7 +206,7 @@ class PdlClient(
         val response: HttpResponse = httpClient.post(pdlBaseUrl) {
             body = request
             header(HttpHeaders.Authorization, bearerHeader(token.accessToken))
-            header(HttpHeaders.ContentType, APPLICATION_JSON)
+            header(HttpHeaders.ContentType, ContentType.Application.Json.toString())
             header(TEMA_HEADER, ALLE_TEMA_HEADERVERDI)
             header(NAV_CALL_ID_HEADER, callId)
         }

@@ -1,4 +1,4 @@
-package no.nav.syfo.client.pdl
+package no.nav.syfo.client.pdl.domain
 
 data class PdlPersonBolkRequest(
     val query: String,

@@ -1,6 +1,5 @@
 package no.nav.syfo.client.pdl.domain
 
-import no.nav.syfo.client.pdl.PdlError
 import no.nav.syfo.domain.PersonIdentNumber
 
 data class PdlIdenterResponse(

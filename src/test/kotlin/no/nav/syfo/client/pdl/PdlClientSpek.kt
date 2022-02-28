@@ -8,6 +8,7 @@ import no.nav.syfo.application.cache.RedisStore
 import no.nav.syfo.client.azuread.*
 import no.nav.syfo.client.pdl.PdlClient.Companion.CACHE_PDL_PERSONIDENT_NAME_KEY_PREFIX
 import no.nav.syfo.client.pdl.PdlClient.Companion.CACHE_PDL_PERSONIDENT_NAME_TIME_TO_LIVE_SECONDS
+import no.nav.syfo.client.pdl.domain.fullName
 import no.nav.syfo.util.configuredJacksonMapper
 import org.amshove.kluent.shouldBeEqualTo
 import org.spekframework.spek2.Spek
