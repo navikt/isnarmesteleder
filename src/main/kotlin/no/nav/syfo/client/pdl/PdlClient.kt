@@ -91,7 +91,7 @@ class PdlClient(
             HttpStatusCode.OK -> {
                 val pdlIdenterResponse = response.receive<PdlIdenterResponse>()
                 return if (!pdlIdenterResponse.errors.isNullOrEmpty()) {
-                    COUNT_CALL_PDL_PERSONBOLK_FAIL.increment()
+                    COUNT_CALL_PDL_IDENTER_FAIL.increment()
                     pdlIdenterResponse.errors.forEach {
                         logger.error("Error while requesting IdentList from PersonDataLosningen: ${it.errorMessage()}")
                     }
