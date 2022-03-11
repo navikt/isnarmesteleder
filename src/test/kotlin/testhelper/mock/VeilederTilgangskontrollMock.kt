@@ -26,34 +26,22 @@ class VeilederTilgangskontrollMock {
     )
 
     val name = "veiledertilgangskontroll"
-    val server = mockTilgangServer(
-        port,
-        tilgangFalse,
-        tilgangTrue
-    )
-
-    private fun mockTilgangServer(
-        port: Int,
-        tilgangFalse: Tilgang,
-        tilgangTrue: Tilgang,
-    ): NettyApplicationEngine {
-        return embeddedServer(
-            factory = Netty,
-            port = port
-        ) {
-            installContentNegotiation()
-            routing {
-                get(TILGANGSKONTROLL_PERSON_PATH) {
-                    when {
-                        call.request.headers[NAV_PERSONIDENT_HEADER] == ARBEIDSTAKER_VEILEDER_NO_ACCESS.value -> {
-                            call.respond(HttpStatusCode.Forbidden, tilgangFalse)
-                        }
-                        call.request.headers[NAV_PERSONIDENT_HEADER] != null -> {
-                            call.respond(tilgangTrue)
-                        }
-                        else -> {
-                            call.respond(HttpStatusCode.BadRequest)
-                        }
+    val server = embeddedServer(
+        factory = Netty,
+        port = port,
+    ) {
+        installContentNegotiation()
+        routing {
+            get(TILGANGSKONTROLL_PERSON_PATH) {
+                when {
+                    call.request.headers[NAV_PERSONIDENT_HEADER] == ARBEIDSTAKER_VEILEDER_NO_ACCESS.value -> {
+                        call.respond(HttpStatusCode.Forbidden, tilgangFalse)
+                    }
+                    call.request.headers[NAV_PERSONIDENT_HEADER] != null -> {
+                        call.respond(tilgangTrue)
+                    }
+                    else -> {
+                        call.respond(HttpStatusCode.BadRequest)
                     }
                 }
             }

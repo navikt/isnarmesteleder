@@ -8,7 +8,7 @@ fun testKafka(
     withSchemaRegistry: Boolean = false,
     topicNames: List<String> = listOf(
         NARMESTE_LEDER_RELASJON_TOPIC,
-    )
+    ),
 ) = KafkaEnvironment(
     autoStart = autoStart,
     withSchemaRegistry = withSchemaRegistry,

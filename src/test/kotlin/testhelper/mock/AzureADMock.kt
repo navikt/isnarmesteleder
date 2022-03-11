@@ -31,20 +31,14 @@ class AzureAdMock {
     )
 
     val name = "azuread"
-    val server = mockAzureAdServer(port = port)
-
-    private fun mockAzureAdServer(
-        port: Int
-    ): NettyApplicationEngine {
-        return embeddedServer(
-            factory = Netty,
-            port = port,
-        ) {
-            installContentNegotiation()
-            routing {
-                post {
-                    call.respond(azureAdTokenResponse)
-                }
+    val server = embeddedServer(
+        factory = Netty,
+        port = port,
+    ) {
+        installContentNegotiation()
+        routing {
+            post {
+                call.respond(azureAdTokenResponse)
             }
         }
     }

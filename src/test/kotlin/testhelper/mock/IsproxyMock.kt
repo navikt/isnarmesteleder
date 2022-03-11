@@ -26,23 +26,17 @@ class IsproxyMock {
     )
 
     val name = "isproxy"
-    val server = mockIsproxyServer(port)
-
-    private fun mockIsproxyServer(
-        port: Int,
-    ): NettyApplicationEngine {
-        return embeddedServer(
-            factory = Netty,
-            port = port
-        ) {
-            installContentNegotiation()
-            routing {
-                get("$EREG_PATH/${VIRKSOMHETSNUMMER_DEFAULT.value}") {
-                    call.respond(eregOrganisasjonResponse)
-                }
-                get("$EREG_PATH/${VIRKSOMHETSNUMMER_NO_VIRKSOMHETSNAVN.value}") {
-                    call.respond(HttpStatusCode.InternalServerError, "")
-                }
+    val server = embeddedServer(
+        factory = Netty,
+        port = port,
+    ) {
+        installContentNegotiation()
+        routing {
+            get("$EREG_PATH/${VIRKSOMHETSNUMMER_DEFAULT.value}") {
+                call.respond(eregOrganisasjonResponse)
+            }
+            get("$EREG_PATH/${VIRKSOMHETSNUMMER_NO_VIRKSOMHETSNAVN.value}") {
+                call.respond(HttpStatusCode.InternalServerError, "")
             }
         }
     }
