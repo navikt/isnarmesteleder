@@ -49,6 +49,9 @@ spec:
         - application: syfomoteadmin
           namespace: teamsykefravr
           cluster: dev-fss
+        - application: isdialogmote
+          namespace: teamsykefravr
+          cluster: dev-gcp
     outbound:
       external:
         - host: "login.microsoftonline.com"

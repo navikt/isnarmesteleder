@@ -39,8 +39,10 @@ data class Environment(
     val syfotilgangskontrollUrl: String = getEnvVar("SYFOTILGANGSKONTROLL_URL"),
 
     val syfomoteadminApplicationName: String = "syfomoteadmin",
+    val isdialogmoteApplicationName: String = "isdialogmote",
     val systemAPIAuthorizedConsumerApplicationNameList: List<String> = listOf(
         syfomoteadminApplicationName,
+        isdialogmoteApplicationName,
     ),
 ) {
     fun jdbcUrl(): String {
