@@ -21,7 +21,7 @@ Applikasjon for å vise informasjon relasjoner mellom ansatte og deres narmeste 
 
 #### Requirements
 
-* JDK 11
+* JDK 17
 
 ### Build
 
