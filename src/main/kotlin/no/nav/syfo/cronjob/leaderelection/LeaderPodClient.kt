@@ -29,7 +29,7 @@ class LeaderPodClient(
                     accept(ContentType.Text.Plain)
                 }
                 val leaderPodDTO: LeaderPodDTO = objectMapper.readValue(
-                    response.receive<String>()
+                    response.bodyAsText()
                 )
                 val hostname: String = InetAddress.getLocalHost().hostName
 
