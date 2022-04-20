@@ -78,7 +78,7 @@ class PdlClient(
         )
 
         val response: HttpResponse = httpClient.post(pdlBaseUrl) {
-            body = request
+            setBody(request)
             header(HttpHeaders.Authorization, bearerHeader(token.accessToken))
             header(HttpHeaders.ContentType, ContentType.Application.Json.toString())
             header(TEMA_HEADER, ALLE_TEMA_HEADERVERDI)
@@ -88,7 +88,7 @@ class PdlClient(
 
         when (response.status) {
             HttpStatusCode.OK -> {
-                val pdlIdenterResponse = response.receive<PdlIdenterResponse>()
+                val pdlIdenterResponse = response.body<PdlIdenterResponse>()
                 return if (!pdlIdenterResponse.errors.isNullOrEmpty()) {
                     COUNT_CALL_PDL_IDENTER_FAIL.increment()
                     pdlIdenterResponse.errors.forEach {
@@ -204,7 +204,7 @@ class PdlClient(
         )
 
         val response: HttpResponse = httpClient.post(pdlBaseUrl) {
-            body = request
+            setBody(request)
             header(HttpHeaders.Authorization, bearerHeader(token.accessToken))
             header(HttpHeaders.ContentType, ContentType.Application.Json.toString())
             header(TEMA_HEADER, ALLE_TEMA_HEADERVERDI)
@@ -213,7 +213,7 @@ class PdlClient(
 
         when (response.status) {
             HttpStatusCode.OK -> {
-                val pdlPersonReponse = response.receive<PdlPersonBolkResponse>()
+                val pdlPersonReponse = response.body<PdlPersonBolkResponse>()
                 return if (!pdlPersonReponse.errors.isNullOrEmpty()) {
                     COUNT_CALL_PDL_PERSONBOLK_FAIL.increment()
                     pdlPersonReponse.errors.forEach {

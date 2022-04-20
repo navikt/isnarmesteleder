@@ -1,17 +1,13 @@
 package no.nav.syfo.narmestelederrelasjon.api
 
-import io.ktor.application.*
-import io.ktor.response.*
-import io.ktor.routing.*
+import io.ktor.server.application.*
+import io.ktor.server.response.*
+import io.ktor.server.routing.*
 import no.nav.syfo.domain.PersonIdentNumber
 import no.nav.syfo.narmestelederrelasjon.NarmesteLederRelasjonService
 import no.nav.syfo.narmestelederrelasjon.api.access.APIConsumerAccessService
 import no.nav.syfo.narmestelederrelasjon.domain.toNarmesteLederRelasjonDTO
 import no.nav.syfo.util.*
-import org.slf4j.Logger
-import org.slf4j.LoggerFactory
-
-private val log: Logger = LoggerFactory.getLogger("no.nav.syfo")
 
 const val narmesteLederSystemApiV1Path = "/api/system/v1/narmestelederrelasjoner"
 
