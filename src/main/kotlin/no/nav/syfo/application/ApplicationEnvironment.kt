@@ -8,7 +8,7 @@ import no.nav.syfo.client.ClientEnvironment
 import no.nav.syfo.client.ClientsEnvironment
 import no.nav.syfo.client.azuread.AzureEnvironment
 
-const val NAIS_DATABASE_ENV_PREFIX = "NAIS_DATABASE_ISNARMESTELEDER_ISNARMESTELEDER"
+const val NAIS_DATABASE_ENV_PREFIX = "NAIS_DATABASE_ISNARMESTELEDER_ISNARMESTELEDER_DB"
 
 data class Environment(
     val azure: AzureEnvironment = AzureEnvironment(
