@@ -30,8 +30,7 @@ class ExternalMockEnvironment {
         syfotilgangskontrollUrl = tilgangskontrollMock.url,
     )
     val redisServer = testRedis(
-        port = environment.redisPort,
-        secret = environment.redisSecret,
+        redisEnvironment = environment.redis,
     )
 
     val wellKnownInternalAzureAD = wellKnownInternalAzureAD()

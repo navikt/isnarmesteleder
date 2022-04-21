@@ -6,6 +6,7 @@ import io.ktor.client.request.*
 import io.ktor.http.*
 import net.logstash.logback.argument.StructuredArguments
 import no.nav.syfo.application.cache.RedisStore
+import no.nav.syfo.client.ClientEnvironment
 import no.nav.syfo.client.azuread.AzureAdClient
 import no.nav.syfo.client.httpClientDefault
 import no.nav.syfo.domain.Virksomhetsnummer
@@ -15,13 +16,12 @@ import org.slf4j.LoggerFactory
 
 class EregClient(
     private val azureAdClient: AzureAdClient,
-    private val isproxyClientId: String,
-    baseUrl: String,
+    private val clientEnvironment: ClientEnvironment,
     private val redisStore: RedisStore,
 ) {
     private val httpClient = httpClientDefault()
 
-    private val eregOrganisasjonUrl: String = "$baseUrl/$EREG_PATH"
+    private val eregOrganisasjonUrl: String = "${clientEnvironment.baseUrl}/$EREG_PATH"
 
     suspend fun organisasjonVirksomhetsnavn(
         callId: String,
@@ -34,7 +34,7 @@ class EregClient(
             return cachedResponse
         } else {
             val systemToken = azureAdClient.getSystemToken(
-                scopeClientId = isproxyClientId,
+                scopeClientId = clientEnvironment.clientId,
             )?.accessToken
                 ?: throw RuntimeException("Failed to request Organisasjon from Isproxy-Ereg: Failed to get system token from AzureAD")
 

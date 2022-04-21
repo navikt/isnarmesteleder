@@ -26,7 +26,6 @@ import org.apache.kafka.clients.consumer.*
 import org.apache.kafka.common.TopicPartition
 import org.spekframework.spek2.Spek
 import org.spekframework.spek2.style.specification.describe
-import redis.clients.jedis.*
 import testhelper.*
 import testhelper.UserConstants.ARBEIDSTAKER_FNR
 import testhelper.UserConstants.ARBEIDSTAKER_NO_VIRKSOMHETNAVN
@@ -51,26 +50,17 @@ class NarmestelederSystemApiSpek : Spek({
         )
 
         val redisStore = RedisStore(
-            jedisPool = JedisPool(
-                JedisPoolConfig(),
-                externalMockEnvironment.environment.redisHost,
-                externalMockEnvironment.environment.redisPort,
-                Protocol.DEFAULT_TIMEOUT,
-                externalMockEnvironment.environment.redisSecret,
-            ),
+            redisEnvironment = externalMockEnvironment.environment.redis,
         )
 
         val azureAdClient = AzureAdClient(
-            azureAppClientId = externalMockEnvironment.environment.azureAppClientId,
-            azureAppClientSecret = externalMockEnvironment.environment.azureAppClientSecret,
-            azureOpenidConfigTokenEndpoint = externalMockEnvironment.environment.azureOpenidConfigTokenEndpoint,
+            azureEnviroment = externalMockEnvironment.environment.azure,
             redisStore = redisStore,
         )
 
         val eregClient = EregClient(
             azureAdClient = azureAdClient,
-            isproxyClientId = externalMockEnvironment.environment.isproxyClientId,
-            baseUrl = externalMockEnvironment.environment.isproxyUrl,
+            clientEnvironment = externalMockEnvironment.environment.clients.isproxy,
             redisStore = redisStore,
         )
 
@@ -98,7 +88,7 @@ class NarmestelederSystemApiSpek : Spek({
             describe("Get list of NarmestelederRelasjon for PersonIdent") {
                 val url = narmesteLederSystemApiV1Path
                 val validToken = generateJWT(
-                    externalMockEnvironment.environment.azureAppClientId,
+                    externalMockEnvironment.environment.azure.appClientId,
                     testSyfomoteadminClientId,
                     externalMockEnvironment.wellKnownInternalAzureAD.issuer,
                 )
@@ -259,7 +249,7 @@ class NarmestelederSystemApiSpek : Spek({
                     }
                     it("should return status Forbidden if unauthorized AZP is supplied") {
                         val validTokenUnauthorizedAZP = generateJWT(
-                            externalMockEnvironment.environment.azureAppClientId,
+                            externalMockEnvironment.environment.azure.appClientId,
                             "unauthorizedId",
                             externalMockEnvironment.wellKnownInternalAzureAD.issuer,
                         )

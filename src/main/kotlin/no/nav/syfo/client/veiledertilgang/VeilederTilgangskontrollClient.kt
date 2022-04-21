@@ -6,6 +6,7 @@ import io.ktor.client.request.*
 import io.ktor.client.statement.*
 import io.ktor.http.*
 import net.logstash.logback.argument.StructuredArguments
+import no.nav.syfo.client.ClientEnvironment
 import no.nav.syfo.client.azuread.AzureAdClient
 import no.nav.syfo.client.httpClientDefault
 import no.nav.syfo.domain.PersonIdentNumber
@@ -14,12 +15,11 @@ import org.slf4j.LoggerFactory
 
 class VeilederTilgangskontrollClient(
     private val azureAdClient: AzureAdClient,
-    private val syfotilgangskontrollClientId: String,
-    tilgangskontrollBaseUrl: String,
+    private val clientEnvironment: ClientEnvironment,
 ) {
     private val httpClient = httpClientDefault()
 
-    private val tilgangskontrollPersonUrl = "$tilgangskontrollBaseUrl$TILGANGSKONTROLL_PERSON_PATH"
+    private val tilgangskontrollPersonUrl = "${clientEnvironment.baseUrl}$TILGANGSKONTROLL_PERSON_PATH"
 
     suspend fun hasAccess(
         callId: String,
@@ -27,7 +27,7 @@ class VeilederTilgangskontrollClient(
         token: String,
     ): Boolean {
         val oboToken = azureAdClient.getOnBehalfOfToken(
-            scopeClientId = syfotilgangskontrollClientId,
+            scopeClientId = clientEnvironment.clientId,
             token = token
         )?.accessToken ?: throw RuntimeException("Failed to request access to Person: Failed to get OBO token")
 

@@ -1,9 +1,9 @@
 package no.nav.syfo.narmestelederrelasjon.kafka
 
 import com.fasterxml.jackson.module.kotlin.readValue
-import no.nav.syfo.application.ApplicationEnvironmentKafka
 import no.nav.syfo.application.ApplicationState
 import no.nav.syfo.application.database.DatabaseInterface
+import no.nav.syfo.application.kafka.KafkaEnvironment
 import no.nav.syfo.narmestelederrelasjon.database.NoElementInsertedException
 import no.nav.syfo.narmestelederrelasjon.database.createNarmesteLederRelasjon
 import no.nav.syfo.narmestelederrelasjon.kafka.domain.NarmesteLederLeesah
@@ -20,12 +20,12 @@ const val NARMESTE_LEDER_RELASJON_TOPIC = "teamsykmelding.syfo-narmesteleder-lee
 
 fun blockingApplicationLogicNarmesteLederRelasjon(
     applicationState: ApplicationState,
-    applicationEnvironmentKafka: ApplicationEnvironmentKafka,
+    kafkaEnvironment: KafkaEnvironment,
     database: DatabaseInterface,
 ) {
     log.info("Setting up kafka consumer NarmesteLederLeesah")
 
-    val consumerProperties = kafkaNarmesteLederRelasjonConsumerConfig(applicationEnvironmentKafka)
+    val consumerProperties = kafkaNarmesteLederRelasjonConsumerConfig(kafkaEnvironment)
     val kafkaConsumerNarmesteLederRelasjon = KafkaConsumer<String, String>(consumerProperties)
 
     kafkaConsumerNarmesteLederRelasjon.subscribe(
@@ -77,7 +77,10 @@ fun createAndStoreNarmesteLederRelasjonFromRecords(
                     narmesteLederLeesah = narmesteLederLeesah,
                 )
             } catch (noElementInsertedException: NoElementInsertedException) {
-                log.warn("No NarmesteLederRelasjon was inserted into database, probably due to an attempt to insert a duplicate", noElementInsertedException)
+                log.warn(
+                    "No NarmesteLederRelasjon was inserted into database, probably due to an attempt to insert a duplicate",
+                    noElementInsertedException
+                )
                 COUNT_KAFKA_CONSUMER_NARMESTELEDERRELASJON_DUPLICATE.increment()
             }
         }

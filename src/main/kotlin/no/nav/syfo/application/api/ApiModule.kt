@@ -16,7 +16,6 @@ import no.nav.syfo.narmestelederrelasjon.NarmesteLederRelasjonService
 import no.nav.syfo.narmestelederrelasjon.api.access.APIConsumerAccessService
 import no.nav.syfo.narmestelederrelasjon.api.registrerNarmesteLederRelasjonApi
 import no.nav.syfo.narmestelederrelasjon.api.registrerNarmesteLederRelasjonSystemApi
-import redis.clients.jedis.*
 
 fun Application.apiModule(
     applicationState: ApplicationState,
@@ -30,7 +29,7 @@ fun Application.apiModule(
     installJwtAuthentication(
         jwtIssuerList = listOf(
             JwtIssuer(
-                acceptedAudienceList = listOf(environment.azureAppClientId),
+                acceptedAudienceList = listOf(environment.azure.appClientId),
                 jwtIssuerType = JwtIssuerType.INTERNAL_AZUREAD,
                 wellKnown = wellKnownInternalAzureAD,
             ),
@@ -39,33 +38,23 @@ fun Application.apiModule(
     installStatusPages()
 
     val redisStore = RedisStore(
-        jedisPool = JedisPool(
-            JedisPoolConfig(),
-            environment.redisHost,
-            environment.redisPort,
-            Protocol.DEFAULT_TIMEOUT,
-            environment.redisSecret,
-        ),
+        redisEnvironment = environment.redis,
     )
 
     val azureAdClient = AzureAdClient(
-        azureAppClientId = environment.azureAppClientId,
-        azureAppClientSecret = environment.azureAppClientSecret,
-        azureOpenidConfigTokenEndpoint = environment.azureOpenidConfigTokenEndpoint,
+        azureEnviroment = environment.azure,
         redisStore = redisStore,
     )
 
     val pdlClient = PdlClient(
         azureAdClient = azureAdClient,
-        pdlClientId = environment.pdlClientId,
-        pdlBaseUrl = environment.pdlUrl,
+        clientEnvironment = environment.clients.pdl,
         redisStore = redisStore,
     )
 
     val veilederTilgangskontrollClient = VeilederTilgangskontrollClient(
         azureAdClient = azureAdClient,
-        syfotilgangskontrollClientId = environment.syfotilgangskontrollClientId,
-        tilgangskontrollBaseUrl = environment.syfotilgangskontrollUrl,
+        clientEnvironment = environment.clients.syfotilgangskontroll,
     )
 
     val narmesteLederRelasjonService = NarmesteLederRelasjonService(
@@ -74,7 +63,7 @@ fun Application.apiModule(
     )
 
     val apiConsumerAccessService = APIConsumerAccessService(
-        azureAppPreAuthorizedApps = environment.azureAppPreAuthorizedApps,
+        azureAppPreAuthorizedApps = environment.azure.appPreAuthorizedApps,
     )
 
     routing {
