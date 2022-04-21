@@ -31,12 +31,12 @@ fun main() {
         }
 
         val wellKnownInternalAzureAD = getWellKnown(
-            wellKnownUrl = environment.azureAppWellKnownUrl
+            wellKnownUrl = environment.azure.appWellKnownUrl
         )
 
         module {
             databaseModule(
-                environment = environment,
+                databaseEnvironment = environment.database,
             )
             apiModule(
                 applicationState = applicationState,
@@ -57,7 +57,7 @@ fun main() {
         application.environment.log.info("Application is ready")
         launchKafkaTask(
             applicationState = applicationState,
-            applicationEnvironmentKafka = environment.kafka,
+            kafkaEnvironment = environment.kafka,
             database = applicationDatabase,
         )
         cronjobModule(

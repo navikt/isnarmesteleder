@@ -1,6 +1,6 @@
 package no.nav.syfo.narmestelederrelasjon.kafka
 
-import no.nav.syfo.application.ApplicationEnvironmentKafka
+import no.nav.syfo.application.kafka.KafkaEnvironment
 import org.apache.kafka.clients.CommonClientConfigs
 import org.apache.kafka.clients.consumer.ConsumerConfig
 import org.apache.kafka.common.config.SaslConfigs
@@ -9,10 +9,10 @@ import org.apache.kafka.common.serialization.StringDeserializer
 import java.util.*
 
 fun kafkaNarmesteLederRelasjonConsumerConfig(
-    applicationEnvironmentKafka: ApplicationEnvironmentKafka,
+    kafkaEnvironment: KafkaEnvironment,
 ): Properties {
     return Properties().apply {
-        putAll(commonKafkaAivenConfig(applicationEnvironmentKafka))
+        putAll(commonKafkaAivenConfig(kafkaEnvironment))
 
         this[ConsumerConfig.GROUP_ID_CONFIG] = "isnarmesteleder-v2"
         this[ConsumerConfig.KEY_DESERIALIZER_CLASS_CONFIG] = StringDeserializer::class.java.canonicalName
@@ -25,17 +25,17 @@ fun kafkaNarmesteLederRelasjonConsumerConfig(
 }
 
 private fun commonKafkaAivenConfig(
-    applicationEnvironmentKafka: ApplicationEnvironmentKafka,
+    kafkaEnvironment: KafkaEnvironment,
 ) = Properties().apply {
     this[SaslConfigs.SASL_MECHANISM] = "PLAIN"
-    this[CommonClientConfigs.BOOTSTRAP_SERVERS_CONFIG] = applicationEnvironmentKafka.aivenBootstrapServers
-    this[CommonClientConfigs.SECURITY_PROTOCOL_CONFIG] = applicationEnvironmentKafka.aivenSecurityProtocol
+    this[CommonClientConfigs.BOOTSTRAP_SERVERS_CONFIG] = kafkaEnvironment.aivenBootstrapServers
+    this[CommonClientConfigs.SECURITY_PROTOCOL_CONFIG] = kafkaEnvironment.aivenSecurityProtocol
     this[SslConfigs.SSL_ENDPOINT_IDENTIFICATION_ALGORITHM_CONFIG] = ""
     this[SslConfigs.SSL_TRUSTSTORE_TYPE_CONFIG] = "jks"
     this[SslConfigs.SSL_KEYSTORE_TYPE_CONFIG] = "PKCS12"
-    this[SslConfigs.SSL_TRUSTSTORE_LOCATION_CONFIG] = applicationEnvironmentKafka.aivenTruststoreLocation
-    this[SslConfigs.SSL_TRUSTSTORE_PASSWORD_CONFIG] = applicationEnvironmentKafka.aivenCredstorePassword
-    this[SslConfigs.SSL_KEYSTORE_LOCATION_CONFIG] = applicationEnvironmentKafka.aivenKeystoreLocation
-    this[SslConfigs.SSL_KEYSTORE_PASSWORD_CONFIG] = applicationEnvironmentKafka.aivenCredstorePassword
-    this[SslConfigs.SSL_KEY_PASSWORD_CONFIG] = applicationEnvironmentKafka.aivenCredstorePassword
+    this[SslConfigs.SSL_TRUSTSTORE_LOCATION_CONFIG] = kafkaEnvironment.aivenTruststoreLocation
+    this[SslConfigs.SSL_TRUSTSTORE_PASSWORD_CONFIG] = kafkaEnvironment.aivenCredstorePassword
+    this[SslConfigs.SSL_KEYSTORE_LOCATION_CONFIG] = kafkaEnvironment.aivenKeystoreLocation
+    this[SslConfigs.SSL_KEYSTORE_PASSWORD_CONFIG] = kafkaEnvironment.aivenCredstorePassword
+    this[SslConfigs.SSL_KEY_PASSWORD_CONFIG] = kafkaEnvironment.aivenCredstorePassword
 }

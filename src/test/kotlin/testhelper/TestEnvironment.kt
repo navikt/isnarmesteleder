@@ -1,6 +1,13 @@
 package testhelper
 
-import no.nav.syfo.application.*
+import no.nav.syfo.application.ApplicationState
+import no.nav.syfo.application.Environment
+import no.nav.syfo.application.cache.RedisEnvironment
+import no.nav.syfo.application.database.DatabaseEnvironment
+import no.nav.syfo.application.kafka.KafkaEnvironment
+import no.nav.syfo.client.ClientEnvironment
+import no.nav.syfo.client.ClientsEnvironment
+import no.nav.syfo.client.azuread.AzureEnvironment
 import no.nav.syfo.narmestelederrelasjon.api.access.PreAuthorizedClient
 import no.nav.syfo.util.configuredJacksonMapper
 import java.net.ServerSocket
@@ -12,32 +19,47 @@ fun testEnvironment(
     pdlUrl: String = "pdl",
     syfotilgangskontrollUrl: String = "tilgangskontroll",
 ) = Environment(
-    azureAppClientId = "isnarmesteleder-client-id",
-    azureAppClientSecret = "isnarmesteleder-secret",
-    azureAppPreAuthorizedApps = configuredJacksonMapper().writeValueAsString(testAzureAppPreAuthorizedApps),
-    azureAppWellKnownUrl = "wellknown",
-    azureOpenidConfigTokenEndpoint = azureOpenIdTokenEndpoint,
+    azure = AzureEnvironment(
+        appClientId = "appClientId",
+        appClientSecret = "appClientSecret",
+        appPreAuthorizedApps = configuredJacksonMapper().writeValueAsString(testAzureAppPreAuthorizedApps),
+        appWellKnownUrl = "appWellKnownUrl",
+        openidConfigTokenEndpoint = azureOpenIdTokenEndpoint,
+    ),
+    database = DatabaseEnvironment(
+        host = "localhost",
+        port = "5432",
+        name = "isnarmesteleder_dev",
+        username = "username",
+        password = "password",
+    ),
     electorPath = "electorPath",
-    kafka = ApplicationEnvironmentKafka(
+    kafka = KafkaEnvironment(
         aivenBootstrapServers = kafkaBootstrapServers,
         aivenCredstorePassword = "credstorepassord",
         aivenKeystoreLocation = "keystore",
         aivenSecurityProtocol = "SSL",
         aivenTruststoreLocation = "truststore",
     ),
-    redisHost = "localhost",
-    redisSecret = "password",
-    isnarmestelederDbHost = "localhost",
-    isnarmestelederDbPort = "5432",
-    isnarmestelederDbName = "isnarmesteleder_dev",
-    isnarmestelederDbUsername = "username",
-    isnarmestelederDbPassword = "password",
-    isproxyClientId = "dev-fss.teamsykefravr.isproxy",
-    isproxyUrl = isproxyUrl,
-    pdlClientId = "dev-fss.pdl.pdl-api",
-    pdlUrl = pdlUrl,
-    syfotilgangskontrollClientId = "dev-fss.teamsykefravr.syfo-tilgangskontroll",
-    syfotilgangskontrollUrl = syfotilgangskontrollUrl,
+    clients = ClientsEnvironment(
+        isproxy = ClientEnvironment(
+            baseUrl = isproxyUrl,
+            clientId = "dev-fss.teamsykefravr.isproxy",
+        ),
+        pdl = ClientEnvironment(
+            baseUrl = pdlUrl,
+            clientId = "dev-fss.pdl.pdl-api",
+        ),
+        syfotilgangskontroll = ClientEnvironment(
+            baseUrl = syfotilgangskontrollUrl,
+            clientId = "dev-fss.teamsykefravr.syfotilgangskontroll",
+        ),
+    ),
+    redis = RedisEnvironment(
+        host = "localhost",
+        port = 6379,
+        secret = "password",
+    ),
 )
 
 fun testAppState() = ApplicationState(

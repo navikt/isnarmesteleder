@@ -5,6 +5,7 @@ import io.ktor.server.testing.*
 import io.mockk.*
 import kotlinx.coroutines.runBlocking
 import no.nav.syfo.application.cache.RedisStore
+import no.nav.syfo.client.ClientEnvironment
 import no.nav.syfo.client.azuread.*
 import no.nav.syfo.client.pdl.PdlClient.Companion.CACHE_PDL_PERSONIDENT_NAME_KEY_PREFIX
 import no.nav.syfo.client.pdl.PdlClient.Companion.CACHE_PDL_PERSONIDENT_NAME_TIME_TO_LIVE_SECONDS
@@ -35,8 +36,10 @@ class PdlClientSpek : Spek({
 
             val client = PdlClient(
                 azureAdClient = azureAdClientMock,
-                pdlBaseUrl = pdlMock.url,
-                pdlClientId = pdlClientId,
+                clientEnvironment = ClientEnvironment(
+                    baseUrl = pdlMock.url,
+                    clientId = pdlClientId,
+                ),
                 redisStore = redisStoreMock,
             )
 

@@ -1,9 +1,9 @@
 package no.nav.syfo.narmestelederrelasjon.kafka
 
 import kotlinx.coroutines.*
-import no.nav.syfo.application.ApplicationEnvironmentKafka
 import no.nav.syfo.application.ApplicationState
 import no.nav.syfo.application.database.DatabaseInterface
+import no.nav.syfo.application.kafka.KafkaEnvironment
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 
@@ -25,13 +25,13 @@ fun launchBackgroundTask(
 
 fun launchKafkaTask(
     applicationState: ApplicationState,
-    applicationEnvironmentKafka: ApplicationEnvironmentKafka,
+    kafkaEnvironment: KafkaEnvironment,
     database: DatabaseInterface,
 ) {
     launchBackgroundTask(applicationState = applicationState) {
         blockingApplicationLogicNarmesteLederRelasjon(
             applicationState = applicationState,
-            applicationEnvironmentKafka = applicationEnvironmentKafka,
+            kafkaEnvironment = kafkaEnvironment,
             database = database,
         )
     }

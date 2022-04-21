@@ -5,7 +5,7 @@ import no.nav.syfo.application.*
 
 lateinit var applicationDatabase: DatabaseInterface
 fun Application.databaseModule(
-    environment: Environment,
+    databaseEnvironment: DatabaseEnvironment,
 ) {
     isDev {
         applicationDatabase = Database(
@@ -20,9 +20,9 @@ fun Application.databaseModule(
     isProd {
         applicationDatabase = Database(
             DatabaseConfig(
-                jdbcUrl = environment.jdbcUrl(),
-                username = environment.isnarmestelederDbUsername,
-                password = environment.isnarmestelederDbPassword,
+                jdbcUrl = databaseEnvironment.jdbcUrl(),
+                username = databaseEnvironment.username,
+                password = databaseEnvironment.password,
             )
         )
     }

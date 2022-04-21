@@ -24,7 +24,6 @@ import org.apache.kafka.clients.consumer.*
 import org.apache.kafka.common.TopicPartition
 import org.spekframework.spek2.Spek
 import org.spekframework.spek2.style.specification.describe
-import redis.clients.jedis.*
 import testhelper.*
 import testhelper.UserConstants.ARBEIDSTAKER_FNR
 import testhelper.UserConstants.ARBEIDSTAKER_NO_VIRKSOMHETNAVN
@@ -50,26 +49,17 @@ class NarmestelederApiSpek : Spek({
         )
 
         val redisStore = RedisStore(
-            jedisPool = JedisPool(
-                JedisPoolConfig(),
-                externalMockEnvironment.environment.redisHost,
-                externalMockEnvironment.environment.redisPort,
-                Protocol.DEFAULT_TIMEOUT,
-                externalMockEnvironment.environment.redisSecret,
-            ),
+            redisEnvironment = externalMockEnvironment.environment.redis,
         )
 
         val azureAdClient = AzureAdClient(
-            azureAppClientId = externalMockEnvironment.environment.azureAppClientId,
-            azureAppClientSecret = externalMockEnvironment.environment.azureAppClientSecret,
-            azureOpenidConfigTokenEndpoint = externalMockEnvironment.environment.azureOpenidConfigTokenEndpoint,
+            azureEnviroment = externalMockEnvironment.environment.azure,
             redisStore = redisStore,
         )
 
         val eregClient = EregClient(
             azureAdClient = azureAdClient,
-            isproxyClientId = externalMockEnvironment.environment.isproxyClientId,
-            baseUrl = externalMockEnvironment.environment.isproxyUrl,
+            clientEnvironment = externalMockEnvironment.environment.clients.isproxy,
             redisStore = redisStore,
         )
 
@@ -97,7 +87,7 @@ class NarmestelederApiSpek : Spek({
             describe("Get list of NarmestelederRelasjon for PersonIdent") {
                 val url = "$narmesteLederApiV1Path$narmesteLederApiV1PersonIdentPath"
                 val validToken = generateJWT(
-                    externalMockEnvironment.environment.azureAppClientId,
+                    externalMockEnvironment.environment.azure.appClientId,
                     testSyfomoteadminClientId,
                     externalMockEnvironment.wellKnownInternalAzureAD.issuer,
                     VEILEDER_IDENT,
@@ -138,7 +128,6 @@ class NarmestelederApiSpek : Spek({
                         2,
                         "something",
                         objectMapper.writeValueAsString(narmesteLederLeesahNoVirksomhetsnavn),
-
                     )
                     val mockConsumer = mockk<KafkaConsumer<String, String>>()
                     every { mockConsumer.poll(any<Duration>()) } returns ConsumerRecords(
