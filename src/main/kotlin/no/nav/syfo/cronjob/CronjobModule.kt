@@ -1,7 +1,6 @@
 package no.nav.syfo.cronjob
 
-import no.nav.syfo.application.ApplicationState
-import no.nav.syfo.application.Environment
+import no.nav.syfo.application.*
 import no.nav.syfo.application.cache.RedisStore
 import no.nav.syfo.application.database.DatabaseInterface
 import no.nav.syfo.client.azuread.AzureAdClient
@@ -9,7 +8,6 @@ import no.nav.syfo.client.ereg.EregClient
 import no.nav.syfo.cronjob.leaderelection.LeaderPodClient
 import no.nav.syfo.cronjob.virksomhetsnavn.VirksomhetsnavnCronjob
 import no.nav.syfo.cronjob.virksomhetsnavn.VirksomhetsnavnService
-import no.nav.syfo.narmestelederrelasjon.kafka.launchBackgroundTask
 
 fun cronjobModule(
     applicationState: ApplicationState,
