@@ -34,6 +34,7 @@ class ExternalMockEnvironment {
     )
 
     val wellKnownInternalAzureAD = wellKnownInternalAzureAD()
+    val wellKnownSelvbetjening = wellKnownSelvbetjening()
 }
 
 fun ExternalMockEnvironment.startExternalMocks() {

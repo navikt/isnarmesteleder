@@ -86,7 +86,7 @@ class NarmestelederApiSpek : Spek({
 
             describe("Get list of NarmestelederRelasjon for PersonIdent") {
                 val url = "$narmesteLederApiV1Path$narmesteLederApiV1PersonIdentPath"
-                val validToken = generateJWT(
+                val validToken = generateJWTAzureAD(
                     externalMockEnvironment.environment.azure.appClientId,
                     testSyfomoteadminClientId,
                     externalMockEnvironment.wellKnownInternalAzureAD.issuer,

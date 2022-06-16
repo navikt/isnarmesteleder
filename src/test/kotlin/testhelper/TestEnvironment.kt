@@ -1,7 +1,6 @@
 package testhelper
 
-import no.nav.syfo.application.ApplicationState
-import no.nav.syfo.application.Environment
+import no.nav.syfo.application.*
 import no.nav.syfo.application.cache.RedisEnvironment
 import no.nav.syfo.application.database.DatabaseEnvironment
 import no.nav.syfo.application.kafka.KafkaEnvironment
@@ -25,6 +24,10 @@ fun testEnvironment(
         appPreAuthorizedApps = configuredJacksonMapper().writeValueAsString(testAzureAppPreAuthorizedApps),
         appWellKnownUrl = "appWellKnownUrl",
         openidConfigTokenEndpoint = azureOpenIdTokenEndpoint,
+    ),
+    tokenx = TokenxEnvironment(
+        tokenxClientId = "tokenxClientId",
+        tokenxWellKnownUrl = "tokenxWellKnownUrl",
     ),
     database = DatabaseEnvironment(
         host = "localhost",
@@ -72,6 +75,7 @@ fun getRandomPort() = ServerSocket(0).use {
 }
 
 const val testSyfomoteadminClientId = "syfomoteadmin-client-id"
+
 val testAzureAppPreAuthorizedApps = listOf(
     PreAuthorizedClient(
         name = "dev-fss:teamsykefravr:syfomoteadmin",

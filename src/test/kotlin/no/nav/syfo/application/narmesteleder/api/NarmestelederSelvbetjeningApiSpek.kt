@@ -14,8 +14,7 @@ import no.nav.syfo.client.ereg.toEregVirksomhetsnavn
 import no.nav.syfo.client.pdl.domain.fullName
 import no.nav.syfo.cronjob.virksomhetsnavn.VirksomhetsnavnCronjob
 import no.nav.syfo.cronjob.virksomhetsnavn.VirksomhetsnavnService
-import no.nav.syfo.narmestelederrelasjon.api.NarmesteLederRelasjonDTO
-import no.nav.syfo.narmestelederrelasjon.api.narmesteLederSystemApiV1Path
+import no.nav.syfo.narmestelederrelasjon.api.*
 import no.nav.syfo.narmestelederrelasjon.domain.NarmesteLederRelasjonStatus
 import no.nav.syfo.narmestelederrelasjon.kafka.pollAndProcessNarmesteLederRelasjon
 import no.nav.syfo.util.*
@@ -25,13 +24,11 @@ import org.spekframework.spek2.Spek
 import org.spekframework.spek2.style.specification.describe
 import testhelper.*
 import testhelper.UserConstants.ARBEIDSTAKER_FNR
-import testhelper.UserConstants.NARMESTELEDER_AKTIV_FOM
-import testhelper.UserConstants.NARMESTELEDER_PERSONIDENTNUMBER
 import testhelper.UserConstants.NARMESTELEDER_PERSONIDENTNUMBER_ALTERNATIVE
 import testhelper.UserConstants.VIRKSOMHETSNUMMER_DEFAULT
 import java.time.Duration
 
-class NarmestelederSystemApiSpek : Spek({
+class NarmestelederSelvbetjeningApiSpek : Spek({
     val objectMapper: ObjectMapper = configuredJacksonMapper()
 
     with(TestApplicationEngine()) {
@@ -78,15 +75,17 @@ class NarmestelederSystemApiSpek : Spek({
             externalMockEnvironment.stopExternalMocks()
         }
 
-        describe(NarmestelederSystemApiSpek::class.java.simpleName) {
+        describe(NarmestelederSelvbetjeningApiSpek::class.java.simpleName) {
 
             describe("Get list of NarmestelederRelasjon for PersonIdent") {
-                val url = narmesteLederSystemApiV1Path
-                val validToken = generateJWTAzureAD(
-                    externalMockEnvironment.environment.azure.appClientId,
-                    testSyfomoteadminClientId,
-                    externalMockEnvironment.wellKnownInternalAzureAD.issuer,
+                val url = narmesteLederSelvbetjeningApiV1Path
+                val validToken = generateJWTTokenx(
+                    audience = externalMockEnvironment.environment.tokenx.tokenxClientId,
+                    clientId = "dev-gcp:teamsykefravr:isdialogmote",
+                    issuer = externalMockEnvironment.wellKnownSelvbetjening.issuer,
+                    subject = ARBEIDSTAKER_FNR.value,
                 )
+
                 describe("Happy path") {
 
                     val mockConsumer = mockk<KafkaConsumer<String, String>>()
@@ -120,7 +119,6 @@ class NarmestelederSystemApiSpek : Spek({
                         with(
                             handleRequest(HttpMethod.Get, url) {
                                 addHeader(Authorization, bearerHeader(validToken))
-                                addHeader(NAV_PERSONIDENT_HEADER, ARBEIDSTAKER_FNR.value)
                             }
                         ) {
                             response.status() shouldBeEqualTo HttpStatusCode.OK
@@ -143,13 +141,13 @@ class NarmestelederSystemApiSpek : Spek({
                             lederRelasjon.arbeidstakerPersonIdentNumber shouldBeEqualTo ARBEIDSTAKER_FNR.value
                             lederRelasjon.virksomhetsnavn shouldBeEqualTo externalMockEnvironment.isproxyMock.eregOrganisasjonResponse.toEregVirksomhetsnavn().virksomhetsnavn
                             lederRelasjon.virksomhetsnummer shouldBeEqualTo VIRKSOMHETSNUMMER_DEFAULT.value
-                            lederRelasjon.narmesteLederPersonIdentNumber shouldBeEqualTo NARMESTELEDER_PERSONIDENTNUMBER.value
+                            lederRelasjon.narmesteLederPersonIdentNumber shouldBeEqualTo UserConstants.NARMESTELEDER_PERSONIDENTNUMBER.value
                             lederRelasjon.narmesteLederTelefonnummer shouldBeEqualTo UserConstants.NARMESTELEDER_TELEFON
                             lederRelasjon.narmesteLederEpost shouldBeEqualTo UserConstants.NARMESTELEDER_EPOST
                             lederRelasjon.narmesteLederNavn shouldBeEqualTo externalMockEnvironment.pdlMock.respons.data.hentPersonBolk?.get(
                                 0
                             )?.person?.fullName()
-                            lederRelasjon.aktivFom shouldBeEqualTo NARMESTELEDER_AKTIV_FOM
+                            lederRelasjon.aktivFom shouldBeEqualTo UserConstants.NARMESTELEDER_AKTIV_FOM
                             lederRelasjon.aktivTom shouldBeEqualTo null
                             lederRelasjon.status shouldBeEqualTo NarmesteLederRelasjonStatus.INNMELDT_AKTIV.name
                         }
@@ -165,40 +163,19 @@ class NarmestelederSystemApiSpek : Spek({
                         }
                     }
 
-                    it("should return status BadRequest if no $NAV_PERSONIDENT_HEADER is supplied") {
-                        with(
-                            handleRequest(HttpMethod.Get, url) {
-                                addHeader(Authorization, bearerHeader(validToken))
-                            }
-                        ) {
-                            response.status() shouldBeEqualTo HttpStatusCode.BadRequest
-                        }
-                    }
-
                     it("should return status BadRequest if $NAV_PERSONIDENT_HEADER with invalid PersonIdent is supplied") {
+                        val validTokenInvalidSubject = generateJWTTokenx(
+                            audience = externalMockEnvironment.environment.tokenx.tokenxClientId,
+                            clientId = "dev-gcp:teamsykefravr:isdialogmote",
+                            issuer = externalMockEnvironment.wellKnownSelvbetjening.issuer,
+                            subject = ARBEIDSTAKER_FNR.value.drop(1),
+                        )
                         with(
                             handleRequest(HttpMethod.Get, url) {
-                                addHeader(Authorization, bearerHeader(validToken))
-                                addHeader(NAV_PERSONIDENT_HEADER, ARBEIDSTAKER_FNR.value.drop(1))
+                                addHeader(Authorization, bearerHeader(validTokenInvalidSubject))
                             }
                         ) {
                             response.status() shouldBeEqualTo HttpStatusCode.BadRequest
-                        }
-                    }
-                    it("should return status Forbidden if unauthorized AZP is supplied") {
-                        val validTokenUnauthorizedAZP = generateJWTAzureAD(
-                            externalMockEnvironment.environment.azure.appClientId,
-                            "unauthorizedId",
-                            externalMockEnvironment.wellKnownInternalAzureAD.issuer,
-                        )
-
-                        with(
-                            handleRequest(HttpMethod.Get, url) {
-                                addHeader(Authorization, bearerHeader(validTokenUnauthorizedAZP))
-                                addHeader(NAV_PERSONIDENT_HEADER, ARBEIDSTAKER_FNR.value)
-                            }
-                        ) {
-                            response.status() shouldBeEqualTo HttpStatusCode.Forbidden
                         }
                     }
                 }

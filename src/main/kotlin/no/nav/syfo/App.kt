@@ -34,6 +34,10 @@ fun main() {
             wellKnownUrl = environment.azure.appWellKnownUrl
         )
 
+        val wellKnownSelvbetjening = getWellKnown(
+            wellKnownUrl = environment.tokenx.tokenxWellKnownUrl
+        )
+
         module {
             databaseModule(
                 databaseEnvironment = environment.database,
@@ -43,6 +47,7 @@ fun main() {
                 database = applicationDatabase,
                 environment = environment,
                 wellKnownInternalAzureAD = wellKnownInternalAzureAD,
+                wellKnownSelvbetjening = wellKnownSelvbetjening,
             )
         }
     }

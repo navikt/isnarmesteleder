@@ -19,6 +19,11 @@ data class Environment(
         openidConfigTokenEndpoint = getEnvVar("AZURE_OPENID_CONFIG_TOKEN_ENDPOINT"),
     ),
 
+    val tokenx: TokenxEnvironment = TokenxEnvironment(
+        tokenxClientId = getEnvVar("TOKEN_X_CLIENT_ID"),
+        tokenxWellKnownUrl = getEnvVar("TOKEN_X_WELL_KNOWN_URL"),
+    ),
+
     val database: DatabaseEnvironment = DatabaseEnvironment(
         host = getEnvVar("${NAIS_DATABASE_ENV_PREFIX}_HOST"),
         name = getEnvVar("${NAIS_DATABASE_ENV_PREFIX}_DATABASE"),
@@ -64,6 +69,11 @@ data class Environment(
         syfomoteadminApplicationName,
         isdialogmoteApplicationName,
     ),
+)
+
+data class TokenxEnvironment(
+    val tokenxClientId: String,
+    val tokenxWellKnownUrl: String,
 )
 
 fun getEnvVar(varName: String, defaultValue: String? = null) =

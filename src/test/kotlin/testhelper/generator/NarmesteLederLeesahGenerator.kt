@@ -6,8 +6,10 @@ import no.nav.syfo.narmestelederrelasjon.kafka.domain.NY_LEDER
 import no.nav.syfo.narmestelederrelasjon.kafka.domain.NarmesteLederLeesah
 import testhelper.UserConstants
 import testhelper.UserConstants.ARBEIDSTAKER_FNR
+import testhelper.UserConstants.NARMESTELEDER_AKTIV_FOM
+import testhelper.UserConstants.NARMESTELEDER_EPOST
 import testhelper.UserConstants.NARMESTELEDER_PERSONIDENTNUMBER
-import java.time.LocalDate
+import testhelper.UserConstants.NARMESTELEDER_TELEFON
 import java.time.OffsetDateTime
 import java.util.*
 
@@ -22,9 +24,9 @@ fun generateNarmesteLederLeesah(
     fnr = arbeidstakerPersonIdentNumber.value,
     orgnummer = virksomhetsnummer.value,
     narmesteLederFnr = narmestelederPersonIdentNumber.value,
-    narmesteLederTelefonnummer = "99119911",
-    narmesteLederEpost = "test@test.com",
-    aktivFom = LocalDate.now().minusDays(10),
+    narmesteLederTelefonnummer = NARMESTELEDER_TELEFON,
+    narmesteLederEpost = NARMESTELEDER_EPOST,
+    aktivFom = NARMESTELEDER_AKTIV_FOM,
     aktivTom = null,
     arbeidsgiverForskutterer = null,
     timestamp = timestamp,
