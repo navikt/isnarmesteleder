@@ -60,7 +60,7 @@ class PdlClient(
         personIdentNumber: PersonIdentNumber,
     ): PdlHentIdenter? {
         val token = azureAdClient.getSystemToken(clientEnvironment.clientId)
-            ?: throw RuntimeException("Failed to send PdlHentIdenterRequest to PDL: No token was found")
+            ?: throw RuntimeException("Failed to get system token from AzureAD")
 
         val query = getPdlQuery(
             queryFilePath = "/pdl/hentIdenter.graphql",
@@ -139,7 +139,7 @@ class PdlClient(
         personIdentNumberList: List<PersonIdentNumber>,
     ): Map<String, String> {
         val token = azureAdClient.getSystemToken(clientEnvironment.clientId)
-            ?: throw RuntimeException("Failed to send request to PDL: No token was found")
+            ?: throw RuntimeException("Failed to get system token from AzureAD")
 
         val pdlPersonIdentNameMap = personList(
             callId = callId,

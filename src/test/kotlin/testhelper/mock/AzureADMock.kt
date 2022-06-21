@@ -16,7 +16,16 @@ fun wellKnownInternalAzureAD(): WellKnown {
     val uri = Paths.get(path).toUri().toURL()
     return WellKnown(
         issuer = "https://sts.issuer.net/veileder/v2",
-        jwksUri = uri.toString()
+        jwksUri = uri.toString(),
+    )
+}
+
+fun wellKnownSelvbetjening(): WellKnown {
+    val path = "src/test/resources/jwkset.json"
+    val uri = Paths.get(path).toUri().toURL()
+    return WellKnown(
+        issuer = "https://tokendings.dev-gcp.nais.io",
+        jwksUri = uri.toString(),
     )
 }
 

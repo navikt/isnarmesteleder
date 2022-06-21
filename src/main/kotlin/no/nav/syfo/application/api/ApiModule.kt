@@ -13,15 +13,15 @@ import no.nav.syfo.client.pdl.PdlClient
 import no.nav.syfo.client.veiledertilgang.VeilederTilgangskontrollClient
 import no.nav.syfo.client.wellknown.WellKnown
 import no.nav.syfo.narmestelederrelasjon.NarmesteLederRelasjonService
+import no.nav.syfo.narmestelederrelasjon.api.*
 import no.nav.syfo.narmestelederrelasjon.api.access.APIConsumerAccessService
-import no.nav.syfo.narmestelederrelasjon.api.registrerNarmesteLederRelasjonApi
-import no.nav.syfo.narmestelederrelasjon.api.registrerNarmesteLederRelasjonSystemApi
 
 fun Application.apiModule(
     applicationState: ApplicationState,
     database: DatabaseInterface,
     environment: Environment,
     wellKnownInternalAzureAD: WellKnown,
+    wellKnownSelvbetjening: WellKnown,
 ) {
     installMetrics()
     installCallId()
@@ -32,6 +32,11 @@ fun Application.apiModule(
                 acceptedAudienceList = listOf(environment.azure.appClientId),
                 jwtIssuerType = JwtIssuerType.INTERNAL_AZUREAD,
                 wellKnown = wellKnownInternalAzureAD,
+            ),
+            JwtIssuer(
+                acceptedAudienceList = listOf(environment.tokenx.tokenxClientId),
+                jwtIssuerType = JwtIssuerType.SELVBETJENING,
+                wellKnown = wellKnownSelvbetjening,
             ),
         ),
     )
@@ -80,6 +85,11 @@ fun Application.apiModule(
             registrerNarmesteLederRelasjonSystemApi(
                 apiConsumerAccessService = apiConsumerAccessService,
                 authorizedApplicationNameList = environment.systemAPIAuthorizedConsumerApplicationNameList,
+                narmesteLederRelasjonService = narmesteLederRelasjonService,
+            )
+        }
+        authenticate(JwtIssuerType.SELVBETJENING.name) {
+            registrerNarmesteLederRelasjonSelvbetjeningApi(
                 narmesteLederRelasjonService = narmesteLederRelasjonService,
             )
         }

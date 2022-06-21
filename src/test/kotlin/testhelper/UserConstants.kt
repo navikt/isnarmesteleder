@@ -2,6 +2,7 @@ package testhelper
 
 import no.nav.syfo.domain.PersonIdentNumber
 import no.nav.syfo.domain.Virksomhetsnummer
+import java.time.LocalDate
 
 object UserConstants {
     val ARBEIDSTAKER_FNR = PersonIdentNumber("12345678912")
@@ -10,6 +11,9 @@ object UserConstants {
 
     val NARMESTELEDER_PERSONIDENTNUMBER = PersonIdentNumber("01015432101")
     val NARMESTELEDER_PERSONIDENTNUMBER_ALTERNATIVE = PersonIdentNumber("20025432101")
+    val NARMESTELEDER_TELEFON = "99119911"
+    val NARMESTELEDER_EPOST = "test@test.com"
+    val NARMESTELEDER_AKTIV_FOM = LocalDate.now().minusDays(10)
 
     val VIRKSOMHETSNUMMER_DEFAULT = Virksomhetsnummer("912345678")
     val VIRKSOMHETSNUMMER_ALTERNATIVE = Virksomhetsnummer(VIRKSOMHETSNUMMER_DEFAULT.value.replace("1", "2"))

@@ -64,6 +64,8 @@ spec:
     application:
       enabled: true
       tenant: nav.no
+  tokenx:
+    enabled: true
   envFrom:
     - secret: isnarmesteleder-redis-password
   gcp:
