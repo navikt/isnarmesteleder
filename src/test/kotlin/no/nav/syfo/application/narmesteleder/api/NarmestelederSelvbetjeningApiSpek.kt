@@ -8,7 +8,6 @@ import io.ktor.server.testing.*
 import io.mockk.*
 import kotlinx.coroutines.runBlocking
 import no.nav.syfo.application.cache.RedisStore
-import no.nav.syfo.client.azuread.AzureAdClient
 import no.nav.syfo.client.ereg.EregClient
 import no.nav.syfo.client.ereg.toEregVirksomhetsnavn
 import no.nav.syfo.client.pdl.domain.fullName
@@ -45,13 +44,7 @@ class NarmestelederSelvbetjeningApiSpek : Spek({
             redisEnvironment = externalMockEnvironment.environment.redis,
         )
 
-        val azureAdClient = AzureAdClient(
-            azureEnviroment = externalMockEnvironment.environment.azure,
-            redisStore = redisStore,
-        )
-
         val eregClient = EregClient(
-            azureAdClient = azureAdClient,
             clientEnvironment = externalMockEnvironment.environment.clients.ereg,
             redisStore = redisStore,
         )

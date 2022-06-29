@@ -3,7 +3,6 @@ package no.nav.syfo.cronjob
 import no.nav.syfo.application.*
 import no.nav.syfo.application.cache.RedisStore
 import no.nav.syfo.application.database.DatabaseInterface
-import no.nav.syfo.client.azuread.AzureAdClient
 import no.nav.syfo.client.ereg.EregClient
 import no.nav.syfo.cronjob.leaderelection.LeaderPodClient
 import no.nav.syfo.cronjob.virksomhetsnavn.VirksomhetsnavnCronjob
@@ -18,13 +17,7 @@ fun cronjobModule(
         redisEnvironment = environment.redis,
     )
 
-    val azureAdClient = AzureAdClient(
-        azureEnviroment = environment.azure,
-        redisStore = redisStore,
-    )
-
     val eregClient = EregClient(
-        azureAdClient = azureAdClient,
         clientEnvironment = environment.clients.ereg,
         redisStore = redisStore,
     )
