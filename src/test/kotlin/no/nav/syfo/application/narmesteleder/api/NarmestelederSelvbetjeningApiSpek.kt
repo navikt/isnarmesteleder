@@ -8,7 +8,6 @@ import io.ktor.server.testing.*
 import io.mockk.*
 import kotlinx.coroutines.runBlocking
 import no.nav.syfo.application.cache.RedisStore
-import no.nav.syfo.client.azuread.AzureAdClient
 import no.nav.syfo.client.ereg.EregClient
 import no.nav.syfo.client.ereg.toEregVirksomhetsnavn
 import no.nav.syfo.client.pdl.domain.fullName
@@ -45,14 +44,8 @@ class NarmestelederSelvbetjeningApiSpek : Spek({
             redisEnvironment = externalMockEnvironment.environment.redis,
         )
 
-        val azureAdClient = AzureAdClient(
-            azureEnviroment = externalMockEnvironment.environment.azure,
-            redisStore = redisStore,
-        )
-
         val eregClient = EregClient(
-            azureAdClient = azureAdClient,
-            clientEnvironment = externalMockEnvironment.environment.clients.isproxy,
+            clientEnvironment = externalMockEnvironment.environment.clients.ereg,
             redisStore = redisStore,
         )
 
@@ -139,7 +132,7 @@ class NarmestelederSelvbetjeningApiSpek : Spek({
                             ansattRelasjon.narmesteLederPersonIdentNumber shouldBeEqualTo ARBEIDSTAKER_FNR.value
 
                             lederRelasjon.arbeidstakerPersonIdentNumber shouldBeEqualTo ARBEIDSTAKER_FNR.value
-                            lederRelasjon.virksomhetsnavn shouldBeEqualTo externalMockEnvironment.isproxyMock.eregOrganisasjonResponse.toEregVirksomhetsnavn().virksomhetsnavn
+                            lederRelasjon.virksomhetsnavn shouldBeEqualTo externalMockEnvironment.eregMock.eregOrganisasjonResponse.toEregVirksomhetsnavn().virksomhetsnavn
                             lederRelasjon.virksomhetsnummer shouldBeEqualTo VIRKSOMHETSNUMMER_DEFAULT.value
                             lederRelasjon.narmesteLederPersonIdentNumber shouldBeEqualTo UserConstants.NARMESTELEDER_PERSONIDENTNUMBER.value
                             lederRelasjon.narmesteLederTelefonnummer shouldBeEqualTo UserConstants.NARMESTELEDER_TELEFON

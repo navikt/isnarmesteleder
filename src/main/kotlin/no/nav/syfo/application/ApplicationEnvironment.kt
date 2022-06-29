@@ -49,9 +49,9 @@ data class Environment(
     ),
 
     val clients: ClientsEnvironment = ClientsEnvironment(
-        isproxy = ClientEnvironment(
-            baseUrl = getEnvVar("ISPROXY_URL"),
-            clientId = getEnvVar("ISPROXY_CLIENT_ID"),
+        ereg = ClientEnvironment(
+            baseUrl = getEnvVar("EREG_URL"),
+            clientId = "",
         ),
         pdl = ClientEnvironment(
             baseUrl = getEnvVar("PDL_URL"),

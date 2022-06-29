@@ -14,7 +14,7 @@ import testhelper.UserConstants.VIRKSOMHETSNUMMER_DEFAULT
 import testhelper.UserConstants.VIRKSOMHETSNUMMER_NO_VIRKSOMHETSNAVN
 import testhelper.getRandomPort
 
-class IsproxyMock {
+class EregMock {
     private val port = getRandomPort()
     val url = "http://localhost:$port"
 
@@ -25,7 +25,7 @@ class IsproxyMock {
         )
     )
 
-    val name = "isproxy"
+    val name = "ereg"
     val server = embeddedServer(
         factory = Netty,
         port = port,
