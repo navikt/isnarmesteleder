@@ -52,7 +52,7 @@ class NarmestelederSelvbetjeningApiSpek : Spek({
 
         val eregClient = EregClient(
             azureAdClient = azureAdClient,
-            clientEnvironment = externalMockEnvironment.environment.clients.isproxy,
+            clientEnvironment = externalMockEnvironment.environment.clients.ereg,
             redisStore = redisStore,
         )
 
@@ -139,7 +139,7 @@ class NarmestelederSelvbetjeningApiSpek : Spek({
                             ansattRelasjon.narmesteLederPersonIdentNumber shouldBeEqualTo ARBEIDSTAKER_FNR.value
 
                             lederRelasjon.arbeidstakerPersonIdentNumber shouldBeEqualTo ARBEIDSTAKER_FNR.value
-                            lederRelasjon.virksomhetsnavn shouldBeEqualTo externalMockEnvironment.isproxyMock.eregOrganisasjonResponse.toEregVirksomhetsnavn().virksomhetsnavn
+                            lederRelasjon.virksomhetsnavn shouldBeEqualTo externalMockEnvironment.eregMock.eregOrganisasjonResponse.toEregVirksomhetsnavn().virksomhetsnavn
                             lederRelasjon.virksomhetsnummer shouldBeEqualTo VIRKSOMHETSNUMMER_DEFAULT.value
                             lederRelasjon.narmesteLederPersonIdentNumber shouldBeEqualTo UserConstants.NARMESTELEDER_PERSONIDENTNUMBER.value
                             lederRelasjon.narmesteLederTelefonnummer shouldBeEqualTo UserConstants.NARMESTELEDER_TELEFON

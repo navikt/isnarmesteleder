@@ -14,7 +14,7 @@ import java.net.ServerSocket
 fun testEnvironment(
     azureOpenIdTokenEndpoint: String = "azureTokenEndpoint",
     kafkaBootstrapServers: String,
-    isproxyUrl: String = "isproxy",
+    eregUrl: String = "ereg",
     pdlUrl: String = "pdl",
     syfotilgangskontrollUrl: String = "tilgangskontroll",
 ) = Environment(
@@ -45,9 +45,9 @@ fun testEnvironment(
         aivenTruststoreLocation = "truststore",
     ),
     clients = ClientsEnvironment(
-        isproxy = ClientEnvironment(
-            baseUrl = isproxyUrl,
-            clientId = "dev-fss.teamsykefravr.isproxy",
+        ereg = ClientEnvironment(
+            baseUrl = eregUrl,
+            clientId = "",
         ),
         pdl = ClientEnvironment(
             baseUrl = pdlUrl,

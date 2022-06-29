@@ -36,7 +36,7 @@ class EregClient(
             val systemToken = azureAdClient.getSystemToken(
                 scopeClientId = clientEnvironment.clientId,
             )?.accessToken
-                ?: throw RuntimeException("Failed to request Organisasjon from Isproxy-Ereg: Failed to get system token from AzureAD")
+                ?: throw RuntimeException("Failed to request Organisasjon from Ereg: Failed to get system token from AzureAD")
 
             try {
                 val url = "$eregOrganisasjonUrl/${virksomhetsnummer.value}"
@@ -85,7 +85,7 @@ class EregClient(
     }
 
     companion object {
-        const val EREG_PATH = "/api/v1/ereg/organisasjon"
+        const val EREG_PATH = "/ereg/api/v1/organisasjon"
 
         const val CACHE_EREG_VIRKSOMHETSNAVN_KEY_PREFIX = "ereg-virksomhetsnavn-"
         const val CACHE_EREG_VIRKSOMHETSNAVN_TIME_TO_LIVE_SECONDS = 12 * 60 * 60L

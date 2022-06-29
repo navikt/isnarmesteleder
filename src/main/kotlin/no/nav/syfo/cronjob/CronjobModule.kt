@@ -25,7 +25,7 @@ fun cronjobModule(
 
     val eregClient = EregClient(
         azureAdClient = azureAdClient,
-        clientEnvironment = environment.clients.isproxy,
+        clientEnvironment = environment.clients.ereg,
         redisStore = redisStore,
     )
 
