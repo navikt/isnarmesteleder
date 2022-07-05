@@ -77,7 +77,7 @@ class NarmestelederSystemApiSpek : Spek({
                 val url = narmesteLederSystemApiV1Path
                 val validToken = generateJWTAzureAD(
                     externalMockEnvironment.environment.azure.appClientId,
-                    testSyfomoteadminClientId,
+                    testIsdialogmoteClientId,
                     externalMockEnvironment.wellKnownInternalAzureAD.issuer,
                 )
                 describe("Happy path") {
