@@ -63,10 +63,8 @@ data class Environment(
         ),
     ),
 
-    private val syfomoteadminApplicationName: String = "syfomoteadmin",
     private val isdialogmoteApplicationName: String = "isdialogmote",
     val systemAPIAuthorizedConsumerApplicationNameList: List<String> = listOf(
-        syfomoteadminApplicationName,
         isdialogmoteApplicationName,
     ),
 )
