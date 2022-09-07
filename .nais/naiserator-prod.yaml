@@ -46,6 +46,9 @@ spec:
         - application: syfomodiaperson
           namespace: teamsykefravr
           cluster: prod-fss
+        - application: syfomotebehov
+          namespace: team-esyfo
+          cluster: prod-fss
         - application: isdialogmote
           namespace: teamsykefravr
           cluster: prod-gcp
