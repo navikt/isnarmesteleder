@@ -63,9 +63,11 @@ data class Environment(
         ),
     ),
 
+    private val syfomotebehovApplicationName: String = "syfomotebehov",
     private val isdialogmoteApplicationName: String = "isdialogmote",
     val systemAPIAuthorizedConsumerApplicationNameList: List<String> = listOf(
         isdialogmoteApplicationName,
+        syfomotebehovApplicationName
     ),
 )
 
