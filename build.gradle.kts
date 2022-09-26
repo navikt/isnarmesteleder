@@ -9,7 +9,7 @@ object Versions {
     const val hikari = "5.0.1"
     const val jackson = "2.13.3"
     const val jedis = "4.2.3"
-    const val kafka = "3.2.0"
+    const val kafka = "3.2.3"
     const val kafkaEmbedded = "3.2.1"
     const val ktor = "2.1.0"
     const val kluent = "1.68"
