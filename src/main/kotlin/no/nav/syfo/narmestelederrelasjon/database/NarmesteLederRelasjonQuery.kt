@@ -132,7 +132,6 @@ const val queryGetNarmesteLederRelasjonList =
     SELECT *
     FROM narmeste_leder_relasjon
     WHERE (arbeidstaker_personident = ? OR narmeste_leder_personident = ?)
-    AND aktiv_tom IS null;
     """
 
 fun DatabaseInterface.getNarmesteLederRelasjonList(
