@@ -70,7 +70,7 @@ spec:
     - secret: isnarmesteleder-redis-password
   gcp:
     sqlInstances:
-      - type: POSTGRES_12
+      - type: POSTGRES_14
         databases:
           - name: isnarmesteleder-db
         diskAutoresize: true
