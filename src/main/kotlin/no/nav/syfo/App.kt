@@ -61,7 +61,6 @@ fun main() {
         callGroupSize = 16
     }
 
-
     applicationEngineEnvironment.monitor.subscribe(ApplicationStarted) { application ->
         applicationState.ready = true
         application.environment.log.info("Application is ready, running Java VM ${Runtime.version()}")
