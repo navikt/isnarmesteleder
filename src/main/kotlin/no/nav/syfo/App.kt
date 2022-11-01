@@ -55,7 +55,11 @@ fun main() {
     val server = embeddedServer(
         factory = Netty,
         environment = applicationEngineEnvironment,
-    )
+    ) {
+        connectionGroupSize = 8
+        workerGroupSize = 8
+        callGroupSize = 16
+    }
 
     applicationEngineEnvironment.monitor.subscribe(ApplicationStarted) { application ->
         applicationState.ready = true
