@@ -65,6 +65,7 @@ spec:
         - application: isnarmesteleder-redis
   azure:
     application:
+      allowAllUsers: true
       enabled: true
       tenant: nav.no
   tokenx:
