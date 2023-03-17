@@ -40,6 +40,7 @@ spec:
       memory: 384Mi
   ingresses:
     - "https://isnarmesteleder.dev.intern.nav.no"
+    - "https://isnarmesteleder.intern.dev.nav.no"
   accessPolicy:
     inbound:
       rules:
