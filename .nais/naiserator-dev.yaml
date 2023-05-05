@@ -60,8 +60,8 @@ spec:
         - host: "login.microsoftonline.com"
         - host: "ereg-services-q1.dev-fss-pub.nais.io"
         - host: "pdl-api.dev-fss-pub.nais.io"
-        - host: "syfo-tilgangskontroll.dev-fss-pub.nais.io"
       rules:
+        - application: syfo-tilgangskontroll
         - application: isnarmesteleder-redis
   azure:
     application:
@@ -90,8 +90,8 @@ spec:
     - name: PDL_URL
       value: "https://pdl-api.dev-fss-pub.nais.io/graphql"
     - name: SYFOTILGANGSKONTROLL_CLIENT_ID
-      value: "dev-fss.teamsykefravr.syfo-tilgangskontroll"
+      value: "dev-gcp.teamsykefravr.syfo-tilgangskontroll"
     - name: SYFOTILGANGSKONTROLL_URL
-      value: "https://syfo-tilgangskontroll.dev-fss-pub.nais.io"
+      value: "http://syfo-tilgangskontroll"
     - name: REDIS_HOST
       value: "isnarmesteleder-redis.teamsykefravr.svc.cluster.local"
