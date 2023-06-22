@@ -10,13 +10,13 @@ object Versions {
     const val jedis = "4.3.1"
     const val kafka = "3.4.0"
     const val kafkaEmbedded = "3.2.2"
-    const val ktor = "2.2.4"
+    const val ktor = "2.3.1"
     const val kluent = "1.72"
     const val logback = "1.4.5"
     const val logstashEncoder = "7.3"
     const val mockk = "1.13.4"
     const val nimbusJoseJwt = "9.31"
-    const val micrometerRegistry = "1.10.4"
+    const val micrometerRegistry = "1.11.1"
     const val postgres = "42.5.4"
     const val postgresEmbedded = "0.13.4"
     const val redisEmbedded = "0.7.3"
@@ -25,9 +25,9 @@ object Versions {
 }
 
 plugins {
-    kotlin("jvm") version "1.8.20"
+    kotlin("jvm") version "1.8.22"
     id("com.github.johnrengelman.shadow") version "8.1.1"
-    id("org.jlleitschuh.gradle.ktlint") version "10.3.0"
+    id("org.jlleitschuh.gradle.ktlint") version "11.4.0"
 }
 
 val githubUser: String by project
