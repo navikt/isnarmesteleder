@@ -16,7 +16,7 @@ fun testEnvironment(
     kafkaBootstrapServers: String,
     eregUrl: String = "ereg",
     pdlUrl: String = "pdl",
-    syfotilgangskontrollUrl: String = "tilgangskontroll",
+    tilgangskontrollUrl: String = "tilgangskontroll",
 ) = Environment(
     azure = AzureEnvironment(
         appClientId = "appClientId",
@@ -53,9 +53,9 @@ fun testEnvironment(
             baseUrl = pdlUrl,
             clientId = "dev-fss.pdl.pdl-api",
         ),
-        syfotilgangskontroll = ClientEnvironment(
-            baseUrl = syfotilgangskontrollUrl,
-            clientId = "dev-fss.teamsykefravr.syfotilgangskontroll",
+        tilgangskontroll = ClientEnvironment(
+            baseUrl = tilgangskontrollUrl,
+            clientId = "dev-gcp.teamsykefravr.istilgangskontroll",
         ),
     ),
     redis = RedisEnvironment(
