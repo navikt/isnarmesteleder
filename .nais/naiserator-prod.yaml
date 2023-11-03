@@ -60,7 +60,7 @@ spec:
         - host: "ereg-services.prod-fss-pub.nais.io"
         - host: "pdl-api.prod-fss-pub.nais.io"
       rules:
-        - application: syfo-tilgangskontroll
+        - application: istilgangskontroll
         - application: isnarmesteleder-redis
   azure:
     application:
@@ -89,9 +89,9 @@ spec:
       value: "prod-fss.pdl.pdl-api"
     - name: PDL_URL
       value: "https://pdl-api.prod-fss-pub.nais.io/graphql"
-    - name: SYFOTILGANGSKONTROLL_CLIENT_ID
-      value: "prod-gcp.teamsykefravr.syfo-tilgangskontroll"
-    - name: SYFOTILGANGSKONTROLL_URL
-      value: "http://syfo-tilgangskontroll"
+    - name: ISTILGANGSKONTROLL_CLIENT_ID
+      value: "prod-gcp.teamsykefravr.istilgangskontroll"
+    - name: ISTILGANGSKONTROLL_URL
+      value: "http://istilgangskontroll"
     - name: REDIS_HOST
       value: "isnarmesteleder-redis.teamsykefravr.svc.cluster.local"

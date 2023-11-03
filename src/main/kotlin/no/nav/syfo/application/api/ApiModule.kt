@@ -59,7 +59,7 @@ fun Application.apiModule(
 
     val veilederTilgangskontrollClient = VeilederTilgangskontrollClient(
         azureAdClient = azureAdClient,
-        clientEnvironment = environment.clients.syfotilgangskontroll,
+        clientEnvironment = environment.clients.tilgangskontroll,
     )
 
     val narmesteLederRelasjonService = NarmesteLederRelasjonService(

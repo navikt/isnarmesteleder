@@ -27,7 +27,7 @@ class ExternalMockEnvironment {
         kafkaBootstrapServers = embeddedEnvironment.brokersURL,
         eregUrl = eregMock.url,
         pdlUrl = pdlMock.url,
-        syfotilgangskontrollUrl = tilgangskontrollMock.url,
+        tilgangskontrollUrl = tilgangskontrollMock.url,
     )
     val redisServer = testRedis(
         redisEnvironment = environment.redis,
