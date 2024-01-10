@@ -48,6 +48,9 @@ spec:
         - application: syfomotebehov
           namespace: team-esyfo
           cluster: dev-fss
+        - application: oppfolgingsplan-backend
+          namespace: team-esyfo
+          cluster: dev-gcp
         - application: syfomotebehov
           namespace: team-esyfo
           cluster: dev-gcp
