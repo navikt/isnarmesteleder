@@ -48,6 +48,9 @@ spec:
         - application: syfomotebehov
           namespace: team-esyfo
           cluster: prod-fss
+        - application: oppfolgingsplan-backend
+          namespace: team-esyfo
+          cluster: prod-gcp
         - application: syfomotebehov
           namespace: team-esyfo
           cluster: prod-gcp
