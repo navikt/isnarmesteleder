@@ -9,7 +9,6 @@ object Versions {
     const val jacksonDataType = "2.16.0"
     const val jedis = "5.1.0"
     const val kafka = "3.6.1"
-    const val kafkaEmbedded = "3.2.2"
     const val ktor = "2.3.8"
     const val kluent = "1.73"
     const val logback = "1.4.14"
@@ -77,28 +76,6 @@ dependencies {
         exclude(group = "log4j")
     }
     implementation("org.apache.kafka:kafka-clients:${Versions.kafka}", excludeLog4j)
-
-    testImplementation("no.nav:kafka-embedded-env:${Versions.kafkaEmbedded}", excludeLog4j)
-    constraints {
-        implementation("org.yaml:snakeyaml") {
-            because("no.nav:kafka-embedded-env:${Versions.kafkaEmbedded} -> https://advisory.checkmarx.net/advisory/vulnerability/CVE-2022-25857/")
-            version {
-                require("1.33")
-            }
-        }
-        implementation("org.eclipse.jetty.http2:http2-server") {
-            because("no.nav:kafka-embedded-env:${Versions.kafkaEmbedded} -> https://advisory.checkmarx.net/advisory/vulnerability/CVE-2022-2048/")
-            version {
-                require("9.4.48.v20220622")
-            }
-        }
-        implementation("com.google.protobuf:protobuf-java") {
-            because("no.nav:kafka-embedded-env:${Versions.kafkaEmbedded} -> https://cwe.mitre.org/data/definitions/400.html")
-            version {
-                require("3.21.7")
-            }
-        }
-    }
 
     testImplementation("com.nimbusds:nimbus-jose-jwt:${Versions.nimbusJoseJwt}")
     testImplementation("io.ktor:ktor-server-test-host:${Versions.ktor}")

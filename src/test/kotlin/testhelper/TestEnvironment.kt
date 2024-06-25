@@ -13,7 +13,6 @@ import java.net.ServerSocket
 
 fun testEnvironment(
     azureOpenIdTokenEndpoint: String = "azureTokenEndpoint",
-    kafkaBootstrapServers: String,
     eregUrl: String = "ereg",
     pdlUrl: String = "pdl",
     tilgangskontrollUrl: String = "tilgangskontroll",
@@ -38,7 +37,7 @@ fun testEnvironment(
     ),
     electorPath = "electorPath",
     kafka = KafkaEnvironment(
-        aivenBootstrapServers = kafkaBootstrapServers,
+        aivenBootstrapServers = "kafkaBootstrapServers",
         aivenCredstorePassword = "credstorepassord",
         aivenKeystoreLocation = "keystore",
         aivenSecurityProtocol = "SSL",
