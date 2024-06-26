@@ -3,7 +3,7 @@ import com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar
 group = "no.nav.syfo"
 version = "1.0.0"
 
-val flyway = "9.22.3"
+val flyway = "10.15.0"
 val hikari = "5.0.1"
 val jacksonDataType = "2.16.0"
 val jedis = "5.1.0"
