@@ -1,14 +1,12 @@
 package testhelper
 
 import io.ktor.server.netty.*
-import no.nav.common.KafkaEnvironment
 import no.nav.syfo.application.ApplicationState
 import testhelper.mock.*
 
 class ExternalMockEnvironment {
     val applicationState: ApplicationState = testAppState()
     val database = TestDatabase()
-    val embeddedEnvironment: KafkaEnvironment = testKafka()
 
     val azureAdMock = AzureAdMock()
     val eregMock = EregMock()
@@ -24,7 +22,6 @@ class ExternalMockEnvironment {
 
     val environment = testEnvironment(
         azureOpenIdTokenEndpoint = azureAdMock.url,
-        kafkaBootstrapServers = embeddedEnvironment.brokersURL,
         eregUrl = eregMock.url,
         pdlUrl = pdlMock.url,
         tilgangskontrollUrl = tilgangskontrollMock.url,
@@ -38,7 +35,6 @@ class ExternalMockEnvironment {
 }
 
 fun ExternalMockEnvironment.startExternalMocks() {
-    this.embeddedEnvironment.start()
     this.externalApplicationMockMap.start()
     this.redisServer.start()
 }
@@ -46,7 +42,6 @@ fun ExternalMockEnvironment.startExternalMocks() {
 fun ExternalMockEnvironment.stopExternalMocks() {
     this.externalApplicationMockMap.stop()
     this.database.stop()
-    this.embeddedEnvironment.tearDown()
     this.redisServer.stop()
 }
 
