@@ -16,7 +16,7 @@ val mockk = "1.13.4"
 val nimbusJoseJwt = "9.37.2"
 val micrometerRegistry = "1.12.0"
 val postgres = "42.7.2"
-val postgresEmbedded = "0.13.4"
+val postgresEmbedded = "1.1.0"
 val redisEmbedded = "0.7.3"
 val spek = "2.0.19"
 
