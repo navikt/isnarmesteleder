@@ -1,4 +1,5 @@
 import com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar
+import org.apache.tools.ant.taskdefs.condition.Os
 
 group = "no.nav.syfo"
 version = "1.0.0"
@@ -12,16 +13,16 @@ val ktor = "2.3.8"
 val kluent = "1.73"
 val logback = "1.4.14"
 val logstashEncoder = "7.4"
-val mockk = "1.13.4"
+val mockk = "1.13.12"
 val nimbusJoseJwt = "9.37.2"
 val micrometerRegistry = "1.12.0"
 val postgres = "42.7.2"
-val postgresEmbedded = "0.13.4"
+val postgresEmbedded = if (Os.isFamily(Os.FAMILY_MAC)) "1.0.0" else "0.13.4"
 val redisEmbedded = "0.7.3"
 val spek = "2.0.19"
 
 plugins {
-    kotlin("jvm") version "1.9.22"
+    kotlin("jvm") version "2.0.10"
     id("com.github.johnrengelman.shadow") version "8.1.1"
     id("org.jlleitschuh.gradle.ktlint") version "11.4.1"
 }
@@ -88,7 +89,7 @@ dependencies {
 }
 
 kotlin {
-    jvmToolchain(17)
+    jvmToolchain(21)
 }
 
 tasks {

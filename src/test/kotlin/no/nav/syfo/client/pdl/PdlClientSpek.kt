@@ -68,9 +68,7 @@ class PdlClientSpek : Spek({
             describe("Get name") {
                 it("returns cached PdlPersonidentName") {
                     every {
-                        redisStoreMock.get(
-                            keyList = listOf(pdlPersonidentNameCacheKey),
-                        )
+                        redisStoreMock.get(keyList = listOf(pdlPersonidentNameCacheKey),)
                     } returns listOf(objectMapper.writeValueAsString(pdlPersonidentNameCache))
 
                     runBlocking {
