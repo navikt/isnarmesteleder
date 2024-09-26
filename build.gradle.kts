@@ -1,29 +1,26 @@
-import com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar
-import org.apache.tools.ant.taskdefs.condition.Os
-
 group = "no.nav.syfo"
 version = "1.0.0"
 
-val flyway = "9.22.3"
+val flyway = "10.17.2"
 val hikari = "5.0.1"
-val jacksonDataType = "2.16.0"
+val jacksonDataType = "2.17.2"
 val jedis = "5.1.0"
-val kafka = "3.6.1"
-val ktor = "2.3.8"
+val kafka = "3.7.0"
+val ktor = "2.3.12"
 val kluent = "1.73"
-val logback = "1.4.14"
+val logback = "1.5.7"
 val logstashEncoder = "7.4"
 val mockk = "1.13.12"
-val nimbusJoseJwt = "9.37.2"
-val micrometerRegistry = "1.12.0"
-val postgres = "42.7.2"
-val postgresEmbedded = if (Os.isFamily(Os.FAMILY_MAC)) "1.0.0" else "0.13.4"
+val nimbusJoseJwt = "9.40"
+val micrometerRegistry = "1.12.7"
+val postgres = "42.7.4"
+val postgresEmbedded = "2.0.7"
 val redisEmbedded = "0.7.3"
 val spek = "2.0.19"
 
 plugins {
-    kotlin("jvm") version "2.0.10"
-    id("com.github.johnrengelman.shadow") version "8.1.1"
+    kotlin("jvm") version "2.0.20"
+    id("com.gradleup.shadow") version "8.3.1"
     id("org.jlleitschuh.gradle.ktlint") version "11.4.1"
 }
 
@@ -65,10 +62,10 @@ dependencies {
     implementation("com.fasterxml.jackson.datatype:jackson-datatype-jsr310:$jacksonDataType")
 
     // Database
-    implementation("org.flywaydb:flyway-core:$flyway")
+    implementation("org.flywaydb:flyway-database-postgresql:$flyway")
     implementation("com.zaxxer:HikariCP:$hikari")
     implementation("org.postgresql:postgresql:$postgres")
-    testImplementation("com.opentable.components:otj-pg-embedded:$postgresEmbedded")
+    testImplementation("io.zonky.test:embedded-postgres:$postgresEmbedded")
 
     // Kafka
     val excludeLog4j = fun ExternalModuleDependency.() {
@@ -93,7 +90,7 @@ kotlin {
 }
 
 tasks {
-    withType<Jar> {
+    jar {
         manifest.attributes["Main-Class"] = "no.nav.syfo.AppKt"
     }
 
@@ -103,13 +100,13 @@ tasks {
         }
     }
 
-    withType<ShadowJar> {
+    shadowJar {
         archiveBaseName.set("app")
         archiveClassifier.set("")
         archiveVersion.set("")
     }
 
-    withType<Test> {
+    test {
         useJUnitPlatform {
             includeEngines("spek2")
         }
