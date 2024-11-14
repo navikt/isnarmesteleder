@@ -2,6 +2,7 @@ package testhelper
 
 import io.ktor.server.netty.*
 import no.nav.syfo.application.ApplicationState
+import no.nav.syfo.application.cache.RedisStore
 import testhelper.mock.*
 
 class ExternalMockEnvironment {
@@ -26,9 +27,7 @@ class ExternalMockEnvironment {
         pdlUrl = pdlMock.url,
         tilgangskontrollUrl = tilgangskontrollMock.url,
     )
-    val redisServer = testRedis(
-        redisEnvironment = environment.redis,
-    )
+    lateinit var redisCache: RedisStore
 
     val wellKnownInternalAzureAD = wellKnownInternalAzureAD()
     val wellKnownSelvbetjening = wellKnownSelvbetjening()
@@ -36,13 +35,11 @@ class ExternalMockEnvironment {
 
 fun ExternalMockEnvironment.startExternalMocks() {
     this.externalApplicationMockMap.start()
-    this.redisServer.start()
 }
 
 fun ExternalMockEnvironment.stopExternalMocks() {
     this.externalApplicationMockMap.stop()
     this.database.stop()
-    this.redisServer.stop()
 }
 
 fun HashMap<String, NettyApplicationEngine>.start() {
