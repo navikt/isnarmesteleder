@@ -28,6 +28,7 @@ class ExternalMockEnvironment {
         tilgangskontrollUrl = tilgangskontrollMock.url,
     )
     lateinit var redisCache: RedisStore
+    val redisServer = testRedis(environment.redisConfig)
 
     val wellKnownInternalAzureAD = wellKnownInternalAzureAD()
     val wellKnownSelvbetjening = wellKnownSelvbetjening()
@@ -35,11 +36,13 @@ class ExternalMockEnvironment {
 
 fun ExternalMockEnvironment.startExternalMocks() {
     this.externalApplicationMockMap.start()
+    this.redisServer.start()
 }
 
 fun ExternalMockEnvironment.stopExternalMocks() {
     this.externalApplicationMockMap.stop()
     this.database.stop()
+    this.redisServer.stop()
 }
 
 fun HashMap<String, NettyApplicationEngine>.start() {
