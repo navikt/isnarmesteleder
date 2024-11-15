@@ -67,16 +67,16 @@ spec:
         - host: "pdl-api.dev-fss-pub.nais.io"
       rules:
         - application: istilgangskontroll
-        - application: isnarmesteleder-redis
   azure:
     application:
       allowAllUsers: true
       enabled: true
       tenant: trygdeetaten.no
+  redis:
+    - instance: cache
+      access: readwrite
   tokenx:
     enabled: true
-  envFrom:
-    - secret: isnarmesteleder-redis-password
   gcp:
     sqlInstances:
       - type: POSTGRES_14
@@ -99,5 +99,3 @@ spec:
       value: "dev-gcp.teamsykefravr.istilgangskontroll"
     - name: ISTILGANGSKONTROLL_URL
       value: "http://istilgangskontroll"
-    - name: REDIS_HOST
-      value: "isnarmesteleder-redis.teamsykefravr.svc.cluster.local"

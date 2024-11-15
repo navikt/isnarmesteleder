@@ -6,7 +6,6 @@ import io.ktor.http.*
 import io.ktor.server.testing.*
 import io.mockk.*
 import kotlinx.coroutines.runBlocking
-import no.nav.syfo.application.cache.RedisStore
 import no.nav.syfo.client.ereg.EregClient
 import no.nav.syfo.client.ereg.toEregVirksomhetsnavn
 import no.nav.syfo.client.pdl.domain.fullName
@@ -47,13 +46,9 @@ class NarmestelederApiSpek : Spek({
             externalMockEnvironment = externalMockEnvironment,
         )
 
-        val redisStore = RedisStore(
-            redisEnvironment = externalMockEnvironment.environment.redis,
-        )
-
         val eregClient = EregClient(
             clientEnvironment = externalMockEnvironment.environment.clients.ereg,
-            redisStore = redisStore,
+            redisStore = externalMockEnvironment.redisCache,
         )
 
         val virksomhetsnavnCronjob = VirksomhetsnavnCronjob(

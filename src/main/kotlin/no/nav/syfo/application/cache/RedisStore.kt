@@ -7,18 +7,8 @@ import redis.clients.jedis.*
 import redis.clients.jedis.exceptions.JedisConnectionException
 import kotlin.reflect.KClass
 
-class RedisStore(
-    redisEnvironment: RedisEnvironment,
-) {
+class RedisStore(private val jedisPool: JedisPool) {
     val objectMapper: ObjectMapper = configuredJacksonMapper()
-
-    private val jedisPool: JedisPool = JedisPool(
-        JedisPoolConfig(),
-        redisEnvironment.host,
-        redisEnvironment.port,
-        Protocol.DEFAULT_TIMEOUT,
-        redisEnvironment.secret,
-    )
 
     inline fun <reified T> getObject(
         key: String,

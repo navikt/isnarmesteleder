@@ -8,12 +8,17 @@ import io.ktor.server.netty.*
 import no.nav.syfo.application.ApplicationState
 import no.nav.syfo.application.Environment
 import no.nav.syfo.application.api.apiModule
+import no.nav.syfo.application.cache.RedisStore
 import no.nav.syfo.application.database.applicationDatabase
 import no.nav.syfo.application.database.databaseModule
 import no.nav.syfo.client.wellknown.getWellKnown
 import no.nav.syfo.cronjob.cronjobModule
 import no.nav.syfo.narmestelederrelasjon.kafka.launchKafkaTask
 import org.slf4j.LoggerFactory
+import redis.clients.jedis.DefaultJedisClientConfig
+import redis.clients.jedis.HostAndPort
+import redis.clients.jedis.JedisPool
+import redis.clients.jedis.JedisPoolConfig
 import java.util.concurrent.TimeUnit
 
 const val applicationPort = 8080
@@ -21,6 +26,19 @@ const val applicationPort = 8080
 fun main() {
     val applicationState = ApplicationState()
     val environment = Environment()
+    val redisConfig = environment.redisConfig
+    val cache = RedisStore(
+        JedisPool(
+            JedisPoolConfig(),
+            HostAndPort(redisConfig.host, redisConfig.port),
+            DefaultJedisClientConfig.builder()
+                .ssl(redisConfig.ssl)
+                .user(redisConfig.redisUsername)
+                .password(redisConfig.redisPassword)
+                .database(redisConfig.redisDB)
+                .build()
+        )
+    )
 
     val applicationEngineEnvironment = applicationEngineEnvironment {
         log = LoggerFactory.getLogger("ktor.application")
@@ -48,6 +66,7 @@ fun main() {
                 environment = environment,
                 wellKnownInternalAzureAD = wellKnownInternalAzureAD,
                 wellKnownSelvbetjening = wellKnownSelvbetjening,
+                redisStore = cache,
             )
         }
     }
@@ -64,6 +83,7 @@ fun main() {
             applicationState = applicationState,
             database = applicationDatabase,
             environment = environment,
+            redisStore = cache,
         )
     }
 

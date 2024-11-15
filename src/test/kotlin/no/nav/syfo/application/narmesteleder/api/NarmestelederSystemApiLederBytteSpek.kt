@@ -7,7 +7,6 @@ import io.ktor.http.HttpHeaders.Authorization
 import io.ktor.server.testing.*
 import io.mockk.*
 import kotlinx.coroutines.runBlocking
-import no.nav.syfo.application.cache.RedisStore
 import no.nav.syfo.client.ereg.EregClient
 import no.nav.syfo.cronjob.virksomhetsnavn.VirksomhetsnavnCronjob
 import no.nav.syfo.cronjob.virksomhetsnavn.VirksomhetsnavnService
@@ -38,13 +37,9 @@ class NarmestelederSystemApiLederBytteSpek : Spek({
             externalMockEnvironment = externalMockEnvironment,
         )
 
-        val redisStore = RedisStore(
-            redisEnvironment = externalMockEnvironment.environment.redis,
-        )
-
         val eregClient = EregClient(
             clientEnvironment = externalMockEnvironment.environment.clients.ereg,
-            redisStore = redisStore,
+            redisStore = externalMockEnvironment.redisCache,
         )
 
         val virksomhetsnavnCronjob = VirksomhetsnavnCronjob(

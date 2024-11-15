@@ -12,11 +12,8 @@ fun cronjobModule(
     applicationState: ApplicationState,
     database: DatabaseInterface,
     environment: Environment,
+    redisStore: RedisStore,
 ) {
-    val redisStore = RedisStore(
-        redisEnvironment = environment.redis,
-    )
-
     val eregClient = EregClient(
         clientEnvironment = environment.clients.ereg,
         redisStore = redisStore,
