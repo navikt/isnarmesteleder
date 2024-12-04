@@ -27,6 +27,8 @@ import testhelper.UserConstants.NARMESTELEDER_AKTIV_FOM
 import testhelper.UserConstants.NARMESTELEDER_PERSONIDENTNUMBER
 import testhelper.UserConstants.NARMESTELEDER_PERSONIDENTNUMBER_ALTERNATIVE
 import testhelper.UserConstants.VIRKSOMHETSNUMMER_DEFAULT
+import testhelper.mock.eregOrganisasjonMockResponse
+import testhelper.mock.pdlPersonMockRespons
 import java.time.Duration
 
 class NarmestelederSystemApiSpek : Spek({
@@ -45,6 +47,7 @@ class NarmestelederSystemApiSpek : Spek({
         val eregClient = EregClient(
             clientEnvironment = externalMockEnvironment.environment.clients.ereg,
             redisStore = externalMockEnvironment.redisCache,
+            httpClient = externalMockEnvironment.mockHttpClient,
         )
 
         val virksomhetsnavnCronjob = VirksomhetsnavnCronjob(
@@ -56,14 +59,6 @@ class NarmestelederSystemApiSpek : Spek({
 
         afterEachTest {
             database.dropData()
-        }
-
-        beforeGroup {
-            externalMockEnvironment.startExternalMocks()
-        }
-
-        afterGroup {
-            externalMockEnvironment.stopExternalMocks()
         }
 
         describe(NarmestelederSystemApiSpek::class.java.simpleName) {
@@ -129,12 +124,12 @@ class NarmestelederSystemApiSpek : Spek({
                             ansattRelasjon.narmesteLederPersonIdentNumber shouldBeEqualTo ARBEIDSTAKER_FNR.value
 
                             lederRelasjon.arbeidstakerPersonIdentNumber shouldBeEqualTo ARBEIDSTAKER_FNR.value
-                            lederRelasjon.virksomhetsnavn shouldBeEqualTo externalMockEnvironment.eregMock.eregOrganisasjonResponse.toEregVirksomhetsnavn().virksomhetsnavn
+                            lederRelasjon.virksomhetsnavn shouldBeEqualTo eregOrganisasjonMockResponse.toEregVirksomhetsnavn().virksomhetsnavn
                             lederRelasjon.virksomhetsnummer shouldBeEqualTo VIRKSOMHETSNUMMER_DEFAULT.value
                             lederRelasjon.narmesteLederPersonIdentNumber shouldBeEqualTo NARMESTELEDER_PERSONIDENTNUMBER.value
                             lederRelasjon.narmesteLederTelefonnummer shouldBeEqualTo UserConstants.NARMESTELEDER_TELEFON
                             lederRelasjon.narmesteLederEpost shouldBeEqualTo UserConstants.NARMESTELEDER_EPOST
-                            lederRelasjon.narmesteLederNavn shouldBeEqualTo externalMockEnvironment.pdlMock.respons.data.hentPersonBolk?.get(
+                            lederRelasjon.narmesteLederNavn shouldBeEqualTo pdlPersonMockRespons.data.hentPersonBolk?.get(
                                 0
                             )?.person?.fullName()
                             lederRelasjon.aktivFom shouldBeEqualTo NARMESTELEDER_AKTIV_FOM

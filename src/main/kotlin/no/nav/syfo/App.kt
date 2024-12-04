@@ -11,8 +11,12 @@ import no.nav.syfo.application.api.apiModule
 import no.nav.syfo.application.cache.RedisStore
 import no.nav.syfo.application.database.applicationDatabase
 import no.nav.syfo.application.database.databaseModule
+import no.nav.syfo.client.azuread.AzureAdClient
+import no.nav.syfo.client.pdl.PdlClient
+import no.nav.syfo.client.veiledertilgang.VeilederTilgangskontrollClient
 import no.nav.syfo.client.wellknown.getWellKnown
 import no.nav.syfo.cronjob.cronjobModule
+import no.nav.syfo.narmestelederrelasjon.NarmesteLederRelasjonService
 import no.nav.syfo.narmestelederrelasjon.kafka.launchKafkaTask
 import org.slf4j.LoggerFactory
 import redis.clients.jedis.DefaultJedisClientConfig
@@ -40,6 +44,20 @@ fun main() {
         )
     )
 
+    val azureAdClient = AzureAdClient(
+        azureEnviroment = environment.azure,
+        redisStore = cache,
+    )
+    val pdlClient = PdlClient(
+        azureAdClient = azureAdClient,
+        clientEnvironment = environment.clients.pdl,
+        redisStore = cache,
+    )
+    val veilederTilgangskontrollClient = VeilederTilgangskontrollClient(
+        azureAdClient = azureAdClient,
+        clientEnvironment = environment.clients.tilgangskontroll,
+    )
+
     val applicationEngineEnvironment = applicationEngineEnvironment {
         log = LoggerFactory.getLogger("ktor.application")
         config = HoconApplicationConfig(ConfigFactory.load())
@@ -60,13 +78,18 @@ fun main() {
             databaseModule(
                 databaseEnvironment = environment.database,
             )
+            val narmesteLederRelasjonService = NarmesteLederRelasjonService(
+                database = applicationDatabase,
+                pdlClient = pdlClient,
+            )
             apiModule(
                 applicationState = applicationState,
                 database = applicationDatabase,
                 environment = environment,
                 wellKnownInternalAzureAD = wellKnownInternalAzureAD,
                 wellKnownSelvbetjening = wellKnownSelvbetjening,
-                redisStore = cache,
+                veilederTilgangskontrollClient = veilederTilgangskontrollClient,
+                narmesteLederRelasjonService = narmesteLederRelasjonService,
             )
         }
     }

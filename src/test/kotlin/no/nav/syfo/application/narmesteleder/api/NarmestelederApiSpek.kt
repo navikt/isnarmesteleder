@@ -29,6 +29,8 @@ import testhelper.UserConstants.ARBEIDSTAKER_VEILEDER_NO_ACCESS
 import testhelper.UserConstants.VEILEDER_IDENT
 import testhelper.UserConstants.VIRKSOMHETSNUMMER_NO_VIRKSOMHETSNAVN
 import testhelper.generator.generateNarmesteLederLeesah
+import testhelper.mock.eregOrganisasjonMockResponse
+import testhelper.mock.pdlPersonMockRespons
 import testhelper.mock.toHistoricalPersonIdentNumber
 import java.time.Duration
 import java.time.OffsetDateTime
@@ -49,6 +51,7 @@ class NarmestelederApiSpek : Spek({
         val eregClient = EregClient(
             clientEnvironment = externalMockEnvironment.environment.clients.ereg,
             redisStore = externalMockEnvironment.redisCache,
+            httpClient = externalMockEnvironment.mockHttpClient,
         )
 
         val virksomhetsnavnCronjob = VirksomhetsnavnCronjob(
@@ -60,14 +63,6 @@ class NarmestelederApiSpek : Spek({
 
         afterEachTest {
             database.dropData()
-        }
-
-        beforeGroup {
-            externalMockEnvironment.startExternalMocks()
-        }
-
-        afterGroup {
-            externalMockEnvironment.stopExternalMocks()
         }
 
         describe(NarmestelederApiSpek::class.java.simpleName) {
@@ -168,12 +163,12 @@ class NarmestelederApiSpek : Spek({
 
                             val narmesteLederRelasjonDeaktivert = narmestelederRelasjonList.first()
                             narmesteLederRelasjonDeaktivert.arbeidstakerPersonIdentNumber shouldBeEqualTo ARBEIDSTAKER_FNR.value
-                            narmesteLederRelasjonDeaktivert.virksomhetsnavn shouldBeEqualTo externalMockEnvironment.eregMock.eregOrganisasjonResponse.toEregVirksomhetsnavn().virksomhetsnavn
+                            narmesteLederRelasjonDeaktivert.virksomhetsnavn shouldBeEqualTo eregOrganisasjonMockResponse.toEregVirksomhetsnavn().virksomhetsnavn
                             narmesteLederRelasjonDeaktivert.virksomhetsnummer shouldBeEqualTo narmesteLederLeesah.orgnummer
                             narmesteLederRelasjonDeaktivert.narmesteLederPersonIdentNumber shouldBeEqualTo narmesteLederLeesah.narmesteLederFnr
                             narmesteLederRelasjonDeaktivert.narmesteLederTelefonnummer shouldBeEqualTo narmesteLederLeesah.narmesteLederTelefonnummer
                             narmesteLederRelasjonDeaktivert.narmesteLederEpost shouldBeEqualTo narmesteLederLeesah.narmesteLederEpost
-                            narmesteLederRelasjonDeaktivert.narmesteLederNavn shouldBeEqualTo externalMockEnvironment.pdlMock.respons.data.hentPersonBolk?.get(
+                            narmesteLederRelasjonDeaktivert.narmesteLederNavn shouldBeEqualTo pdlPersonMockRespons.data.hentPersonBolk?.get(
                                 0
                             )?.person?.fullName()
                             narmesteLederRelasjonDeaktivert.aktivFom shouldBeEqualTo narmesteLederLeesah.aktivFom

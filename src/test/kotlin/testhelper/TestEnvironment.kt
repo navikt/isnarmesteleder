@@ -9,7 +9,6 @@ import no.nav.syfo.client.ClientsEnvironment
 import no.nav.syfo.client.azuread.AzureEnvironment
 import no.nav.syfo.narmestelederrelasjon.api.access.PreAuthorizedClient
 import no.nav.syfo.util.configuredJacksonMapper
-import java.net.ServerSocket
 import java.net.URI
 
 fun testEnvironment(
@@ -71,10 +70,6 @@ fun testAppState() = ApplicationState(
     alive = true,
     ready = true,
 )
-
-fun getRandomPort() = ServerSocket(0).use {
-    it.localPort
-}
 
 const val testIsdialogmoteClientId = "isdialogmote-client-id"
 const val testSyfomodiapersonClientId = "syfomodiaperson-client-id"
