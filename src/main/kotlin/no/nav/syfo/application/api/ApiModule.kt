@@ -6,10 +6,7 @@ import io.ktor.server.routing.*
 import no.nav.syfo.application.ApplicationState
 import no.nav.syfo.application.Environment
 import no.nav.syfo.application.api.authentication.*
-import no.nav.syfo.application.cache.RedisStore
 import no.nav.syfo.application.database.DatabaseInterface
-import no.nav.syfo.client.azuread.AzureAdClient
-import no.nav.syfo.client.pdl.PdlClient
 import no.nav.syfo.client.veiledertilgang.VeilederTilgangskontrollClient
 import no.nav.syfo.client.wellknown.WellKnown
 import no.nav.syfo.narmestelederrelasjon.NarmesteLederRelasjonService
@@ -22,7 +19,8 @@ fun Application.apiModule(
     environment: Environment,
     wellKnownInternalAzureAD: WellKnown,
     wellKnownSelvbetjening: WellKnown,
-    redisStore: RedisStore,
+    veilederTilgangskontrollClient: VeilederTilgangskontrollClient,
+    narmesteLederRelasjonService: NarmesteLederRelasjonService,
 ) {
     installMetrics()
     installCallId()
@@ -42,27 +40,6 @@ fun Application.apiModule(
         ),
     )
     installStatusPages()
-
-    val azureAdClient = AzureAdClient(
-        azureEnviroment = environment.azure,
-        redisStore = redisStore,
-    )
-
-    val pdlClient = PdlClient(
-        azureAdClient = azureAdClient,
-        clientEnvironment = environment.clients.pdl,
-        redisStore = redisStore,
-    )
-
-    val veilederTilgangskontrollClient = VeilederTilgangskontrollClient(
-        azureAdClient = azureAdClient,
-        clientEnvironment = environment.clients.tilgangskontroll,
-    )
-
-    val narmesteLederRelasjonService = NarmesteLederRelasjonService(
-        database = database,
-        pdlClient = pdlClient,
-    )
 
     val apiConsumerAccessService = APIConsumerAccessService(
         azureAppPreAuthorizedApps = environment.azure.appPreAuthorizedApps,

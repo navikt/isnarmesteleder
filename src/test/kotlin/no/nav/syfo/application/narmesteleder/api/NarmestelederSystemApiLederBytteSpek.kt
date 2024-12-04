@@ -7,9 +7,6 @@ import io.ktor.http.HttpHeaders.Authorization
 import io.ktor.server.testing.*
 import io.mockk.*
 import kotlinx.coroutines.runBlocking
-import no.nav.syfo.client.ereg.EregClient
-import no.nav.syfo.cronjob.virksomhetsnavn.VirksomhetsnavnCronjob
-import no.nav.syfo.cronjob.virksomhetsnavn.VirksomhetsnavnService
 import no.nav.syfo.narmestelederrelasjon.api.NarmesteLederRelasjonDTO
 import no.nav.syfo.narmestelederrelasjon.api.narmesteLederSystemApiV1Path
 import no.nav.syfo.narmestelederrelasjon.domain.NarmesteLederRelasjonStatus
@@ -37,28 +34,8 @@ class NarmestelederSystemApiLederBytteSpek : Spek({
             externalMockEnvironment = externalMockEnvironment,
         )
 
-        val eregClient = EregClient(
-            clientEnvironment = externalMockEnvironment.environment.clients.ereg,
-            redisStore = externalMockEnvironment.redisCache,
-        )
-
-        val virksomhetsnavnCronjob = VirksomhetsnavnCronjob(
-            eregClient = eregClient,
-            virksomhetsnavnService = VirksomhetsnavnService(
-                database = database,
-            ),
-        )
-
         afterEachTest {
             database.dropData()
-        }
-
-        beforeGroup {
-            externalMockEnvironment.startExternalMocks()
-        }
-
-        afterGroup {
-            externalMockEnvironment.stopExternalMocks()
         }
 
         describe(NarmestelederSystemApiLederBytteSpek::class.java.simpleName) {

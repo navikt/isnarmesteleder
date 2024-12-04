@@ -1,18 +1,12 @@
 package testhelper.mock
 
-import io.ktor.server.application.*
-import io.ktor.server.engine.*
-import io.ktor.server.netty.*
-import io.ktor.server.request.*
-import io.ktor.server.response.*
-import io.ktor.server.routing.*
-import no.nav.syfo.application.api.installContentNegotiation
+import io.ktor.client.engine.mock.*
+import io.ktor.client.request.*
 import no.nav.syfo.client.pdl.PdlClient.Companion.IDENTER_HEADER
 import no.nav.syfo.client.pdl.domain.*
 import no.nav.syfo.domain.PersonIdentNumber
 import testhelper.UserConstants
 import testhelper.UserConstants.NARMESTELEDER_PERSONIDENTNUMBER
-import testhelper.getRandomPort
 
 fun PersonIdentNumber.toHistoricalPersonIdentNumber(): PersonIdentNumber {
     val firstDigit = this.value[0].digitToInt()
@@ -82,34 +76,16 @@ fun generatePdlPersonNavn() =
         etternavn = UserConstants.NARMESTELEDER_ETTERNAVN,
     )
 
-class PdlMock {
-    private val port = getRandomPort()
-    val url = "http://localhost:$port"
-    val name = "pdl"
+val pdlPersonMockRespons = generatePdlPersonResponse()
 
-    val respons = generatePdlPersonResponse()
-
-    val server = embeddedServer(
-        factory = Netty,
-        port = port,
-    ) {
-        installContentNegotiation()
-        routing {
-            post {
-                if (call.request.headers[IDENTER_HEADER] == IDENTER_HEADER) {
-                    val pdlRequest = call.receive<PdlHentIdenterRequest>()
-                    val personIdentNumber = PersonIdentNumber(pdlRequest.variables.ident)
-                    val response = generatePdlIdenterResponse(
-                        personIdentNumber = personIdentNumber,
-                    )
-                    call.respond(response)
-                } else {
-                    val pdlRequest = call.receive<PdlPersonBolkRequest>()
-                    if (pdlRequest.variables.identer.contains(NARMESTELEDER_PERSONIDENTNUMBER.value)) {
-                        call.respond(respons)
-                    }
-                }
-            }
-        }
+suspend fun MockRequestHandleScope.pdlMockResponse(request: HttpRequestData): HttpResponseData =
+    if (request.headers[IDENTER_HEADER] == IDENTER_HEADER) {
+        val pdlRequest = request.receiveBody<PdlHentIdenterRequest>()
+        val personIdentNumber = PersonIdentNumber(pdlRequest.variables.ident)
+        val response = generatePdlIdenterResponse(
+            personIdentNumber = personIdentNumber,
+        )
+        respondOk(response)
+    } else {
+        respondOk(pdlPersonMockRespons)
     }
-}

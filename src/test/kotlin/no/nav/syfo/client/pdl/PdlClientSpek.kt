@@ -5,7 +5,6 @@ import io.ktor.server.testing.*
 import io.mockk.*
 import kotlinx.coroutines.runBlocking
 import no.nav.syfo.application.cache.RedisStore
-import no.nav.syfo.client.ClientEnvironment
 import no.nav.syfo.client.azuread.*
 import no.nav.syfo.client.pdl.PdlClient.Companion.CACHE_PDL_PERSONIDENT_NAME_KEY_PREFIX
 import no.nav.syfo.client.pdl.PdlClient.Companion.CACHE_PDL_PERSONIDENT_NAME_TIME_TO_LIVE_SECONDS
@@ -14,8 +13,9 @@ import no.nav.syfo.util.configuredJacksonMapper
 import org.amshove.kluent.shouldBeEqualTo
 import org.spekframework.spek2.Spek
 import org.spekframework.spek2.style.specification.describe
+import testhelper.ExternalMockEnvironment
 import testhelper.UserConstants.NARMESTELEDER_PERSONIDENTNUMBER
-import testhelper.mock.PdlMock
+import testhelper.mock.pdlPersonMockRespons
 
 class PdlClientSpek : Spek({
 
@@ -28,23 +28,21 @@ class PdlClientSpek : Spek({
         with(TestApplicationEngine()) {
             start()
 
+            val externalMockEnvironment = ExternalMockEnvironment.instance
             val azureAdClientMock = mockk<AzureAdClient>(relaxed = true)
-            val pdlMock = PdlMock()
             val redisStoreMock = mockk<RedisStore>(relaxed = true)
 
             val pdlClientId = "pdlClientId"
 
             val client = PdlClient(
                 azureAdClient = azureAdClientMock,
-                clientEnvironment = ClientEnvironment(
-                    baseUrl = pdlMock.url,
-                    clientId = pdlClientId,
-                ),
+                clientEnvironment = externalMockEnvironment.environment.clients.pdl,
                 redisStore = redisStoreMock,
+                httpClient = externalMockEnvironment.mockHttpClient,
             )
 
             val pdlHentPersonIdent = NARMESTELEDER_PERSONIDENTNUMBER
-            val pdlHentPersonName = pdlMock.respons.data.hentPersonBolk?.first()?.person?.fullName() ?: ""
+            val pdlHentPersonName = pdlPersonMockRespons.data.hentPersonBolk?.first()?.person?.fullName() ?: ""
 
             val pdlPersonidentNameCacheKey = "$CACHE_PDL_PERSONIDENT_NAME_KEY_PREFIX${pdlHentPersonIdent.value}"
 
@@ -52,14 +50,6 @@ class PdlClientSpek : Spek({
                 name = pdlHentPersonName,
                 personIdent = pdlHentPersonIdent.value,
             )
-
-            beforeGroup {
-                pdlMock.server.start()
-            }
-
-            afterGroup {
-                pdlMock.server.stop(1L, 10L)
-            }
 
             beforeEachTest {
                 clearMocks(redisStoreMock)
