@@ -58,23 +58,29 @@ fun main() {
         clientEnvironment = environment.clients.tilgangskontroll,
     )
 
-    val applicationEngineEnvironment = applicationEngineEnvironment {
+    val applicationEngineEnvironment = applicationEnvironment {
         log = LoggerFactory.getLogger("ktor.application")
         config = HoconApplicationConfig(ConfigFactory.load())
+    }
+    val server = embeddedServer(
+        factory = Netty,
+        environment = applicationEngineEnvironment,
+        configure = {
+            connector {
+                port = applicationPort
+            }
+            connectionGroupSize = 8
+            workerGroupSize = 8
+            callGroupSize = 16
+        },
+        module = {
+            val wellKnownInternalAzureAD = getWellKnown(
+                wellKnownUrl = environment.azure.appWellKnownUrl
+            )
 
-        connector {
-            port = applicationPort
-        }
-
-        val wellKnownInternalAzureAD = getWellKnown(
-            wellKnownUrl = environment.azure.appWellKnownUrl
-        )
-
-        val wellKnownSelvbetjening = getWellKnown(
-            wellKnownUrl = environment.tokenx.tokenxWellKnownUrl
-        )
-
-        module {
+            val wellKnownSelvbetjening = getWellKnown(
+                wellKnownUrl = environment.tokenx.tokenxWellKnownUrl
+            )
             databaseModule(
                 databaseEnvironment = environment.database,
             )
@@ -91,33 +97,23 @@ fun main() {
                 veilederTilgangskontrollClient = veilederTilgangskontrollClient,
                 narmesteLederRelasjonService = narmesteLederRelasjonService,
             )
+            monitor.subscribe(ApplicationStarted) { application ->
+                applicationState.ready = true
+                application.environment.log.info("Application is ready, running Java VM ${Runtime.version()}")
+                launchKafkaTask(
+                    applicationState = applicationState,
+                    kafkaEnvironment = environment.kafka,
+                    database = applicationDatabase,
+                )
+                cronjobModule(
+                    applicationState = applicationState,
+                    database = applicationDatabase,
+                    environment = environment,
+                    redisStore = cache,
+                )
+            }
         }
-    }
-
-    applicationEngineEnvironment.monitor.subscribe(ApplicationStarted) { application ->
-        applicationState.ready = true
-        application.environment.log.info("Application is ready, running Java VM ${Runtime.version()}")
-        launchKafkaTask(
-            applicationState = applicationState,
-            kafkaEnvironment = environment.kafka,
-            database = applicationDatabase,
-        )
-        cronjobModule(
-            applicationState = applicationState,
-            database = applicationDatabase,
-            environment = environment,
-            redisStore = cache,
-        )
-    }
-
-    val server = embeddedServer(
-        factory = Netty,
-        environment = applicationEngineEnvironment,
-    ) {
-        connectionGroupSize = 8
-        workerGroupSize = 8
-        callGroupSize = 16
-    }
+    )
 
     Runtime.getRuntime().addShutdownHook(
         Thread {
