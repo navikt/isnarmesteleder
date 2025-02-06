@@ -1,7 +1,7 @@
 package testhelper
 
 import no.nav.syfo.application.ApplicationState
-import no.nav.syfo.application.cache.RedisStore
+import no.nav.syfo.application.cache.ValkeyStore
 import redis.clients.jedis.DefaultJedisClientConfig
 import redis.clients.jedis.HostAndPort
 import redis.clients.jedis.JedisPool
@@ -14,19 +14,19 @@ class ExternalMockEnvironment private constructor() {
 
     val environment = testEnvironment()
     val mockHttpClient = mockHttpClient(environment = environment)
-    private val redisConfig = environment.redisConfig
-    val cache = RedisStore(
+    private val redisConfig = environment.valkeyConfig
+    val cache = ValkeyStore(
         JedisPool(
             JedisPoolConfig(),
             HostAndPort(redisConfig.host, redisConfig.port),
             DefaultJedisClientConfig.builder()
                 .ssl(redisConfig.ssl)
-                .password(redisConfig.redisPassword)
+                .password(redisConfig.valkeyPassword)
                 .build()
         )
     )
 
-    val redisServer = testRedis(environment.redisConfig)
+    val redisServer = testRedis(environment.valkeyConfig)
 
     val wellKnownInternalAzureAD = wellKnownInternalAzureAD()
     val wellKnownSelvbetjening = wellKnownSelvbetjening()

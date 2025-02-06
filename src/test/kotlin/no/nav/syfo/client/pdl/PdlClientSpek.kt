@@ -3,7 +3,7 @@ package no.nav.syfo.client.pdl
 import com.fasterxml.jackson.databind.ObjectMapper
 import io.mockk.*
 import kotlinx.coroutines.runBlocking
-import no.nav.syfo.application.cache.RedisStore
+import no.nav.syfo.application.cache.ValkeyStore
 import no.nav.syfo.client.azuread.*
 import no.nav.syfo.client.pdl.PdlClient.Companion.CACHE_PDL_PERSONIDENT_NAME_KEY_PREFIX
 import no.nav.syfo.client.pdl.PdlClient.Companion.CACHE_PDL_PERSONIDENT_NAME_TIME_TO_LIVE_SECONDS
@@ -25,14 +25,14 @@ class PdlClientSpek : Spek({
     describe(PdlClientSpek::class.java.simpleName) {
         val externalMockEnvironment = ExternalMockEnvironment.instance
         val azureAdClientMock = mockk<AzureAdClient>(relaxed = true)
-        val redisStoreMock = mockk<RedisStore>(relaxed = true)
+        val valkeyStoreMock = mockk<ValkeyStore>(relaxed = true)
 
         val pdlClientId = "pdlClientId"
 
         val client = PdlClient(
             azureAdClient = azureAdClientMock,
             clientEnvironment = externalMockEnvironment.environment.clients.pdl,
-            redisStore = redisStoreMock,
+            valkeyStore = valkeyStoreMock,
             httpClient = externalMockEnvironment.mockHttpClient,
         )
 
@@ -47,13 +47,13 @@ class PdlClientSpek : Spek({
         )
 
         beforeEachTest {
-            clearMocks(redisStoreMock)
+            clearMocks(valkeyStoreMock)
         }
 
         describe("Get name") {
             it("returns cached PdlPersonidentName") {
                 every {
-                    redisStoreMock.get(keyList = listOf(pdlPersonidentNameCacheKey),)
+                    valkeyStoreMock.get(keyList = listOf(pdlPersonidentNameCacheKey),)
                 } returns listOf(objectMapper.writeValueAsString(pdlPersonidentNameCache))
 
                 runBlocking {
@@ -63,13 +63,13 @@ class PdlClientSpek : Spek({
                     ) shouldBeEqualTo mapOf(pdlHentPersonIdent.value to pdlHentPersonName)
                 }
                 verify(exactly = 1) {
-                    redisStoreMock.getObjectList(
+                    valkeyStoreMock.getObjectList(
                         classType = PdlPersonidentNameCache::class,
                         keyList = listOf(pdlPersonidentNameCacheKey),
                     )
                 }
                 verify(exactly = 0) {
-                    redisStoreMock.set(
+                    valkeyStoreMock.set(
                         key = any(),
                         value = any(),
                         expireSeconds = any(),
@@ -87,7 +87,7 @@ class PdlClientSpek : Spek({
                 ).toAzureAdToken()
 
                 every {
-                    redisStoreMock.getObjectList(
+                    valkeyStoreMock.getObjectList(
                         classType = PdlPersonidentNameCache::class,
                         keyList = listOf(pdlPersonidentNameCacheKey),
                     )
@@ -101,13 +101,13 @@ class PdlClientSpek : Spek({
                 }
 
                 verify(exactly = 1) {
-                    redisStoreMock.getObjectList(
+                    valkeyStoreMock.getObjectList(
                         classType = PdlPersonidentNameCache::class,
                         keyList = listOf(pdlPersonidentNameCacheKey),
                     )
                 }
                 verify(exactly = 1) {
-                    redisStoreMock.setObject(
+                    valkeyStoreMock.setObject(
                         key = pdlPersonidentNameCacheKey,
                         value = pdlPersonidentNameCache,
                         expireSeconds = CACHE_PDL_PERSONIDENT_NAME_TIME_TO_LIVE_SECONDS,

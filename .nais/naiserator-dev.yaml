@@ -72,7 +72,7 @@ spec:
       allowAllUsers: true
       enabled: true
       tenant: trygdeetaten.no
-  redis:
+  valkey:
     - instance: cache
       access: readwrite
   tokenx:

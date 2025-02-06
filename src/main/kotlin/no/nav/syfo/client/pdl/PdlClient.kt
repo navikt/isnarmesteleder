@@ -5,7 +5,7 @@ import io.ktor.client.call.*
 import io.ktor.client.request.*
 import io.ktor.client.statement.*
 import io.ktor.http.*
-import no.nav.syfo.application.cache.RedisStore
+import no.nav.syfo.application.cache.ValkeyStore
 import no.nav.syfo.client.ClientEnvironment
 import no.nav.syfo.client.azuread.AzureAdClient
 import no.nav.syfo.client.azuread.AzureAdToken
@@ -18,7 +18,7 @@ import org.slf4j.LoggerFactory
 class PdlClient(
     private val azureAdClient: AzureAdClient,
     private val clientEnvironment: ClientEnvironment,
-    private val redisStore: RedisStore,
+    private val valkeyStore: ValkeyStore,
     private val httpClient: HttpClient = httpClientDefault(),
 ) {
 
@@ -30,7 +30,7 @@ class PdlClient(
         val cacheKey = personIdentIdenterCacheKey(
             personIdentNumber = personIdentNumber,
         )
-        val cachedValue: PdlPersonidentIdenterCache? = redisStore.getObject(key = cacheKey)
+        val cachedValue: PdlPersonidentIdenterCache? = valkeyStore.getObject(key = cacheKey)
         if (cachedValue != null) {
             COUNT_CALL_PDL_IDENTER_CACHE_HIT.increment()
             return cachedValue.personIdentList.map { cachedPersonIdent ->
@@ -43,7 +43,7 @@ class PdlClient(
                 withHistory = withHistory,
                 personIdentNumber = personIdentNumber,
             )?.hentIdenter?.let { identer ->
-                redisStore.setObject(
+                valkeyStore.setObject(
                     key = cacheKey,
                     value = PdlPersonidentIdenterCache(
                         personIdentList = identer.identer.map { it.ident }
@@ -159,7 +159,7 @@ class PdlClient(
     private fun getCachedPersonidentNameMap(
         personIdentNumberList: List<PersonIdentNumber>
     ): Map<String, String> {
-        val cachedList = redisStore.getObjectList(
+        val cachedList = valkeyStore.getObjectList(
             classType = PdlPersonidentNameCache::class,
             keyList = personIdentNumberList.map { personIdentNumber ->
                 personIdentNameCacheKey(personIdentNumber.value)
@@ -175,7 +175,7 @@ class PdlClient(
 
     private fun setPersonidentNameMap(personIdentNameMap: Map<String, String>) {
         personIdentNameMap.forEach { personIdentName ->
-            redisStore.setObject(
+            valkeyStore.setObject(
                 key = personIdentNameCacheKey(personIdentName.key),
                 value = PdlPersonidentNameCache(
                     name = personIdentName.value,

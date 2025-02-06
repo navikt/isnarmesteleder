@@ -7,7 +7,7 @@ import redis.clients.jedis.*
 import redis.clients.jedis.exceptions.JedisConnectionException
 import kotlin.reflect.KClass
 
-class RedisStore(private val jedisPool: JedisPool) {
+class ValkeyStore(private val jedisPool: JedisPool) {
     val objectMapper: ObjectMapper = configuredJacksonMapper()
 
     inline fun <reified T> getObject(
@@ -26,7 +26,7 @@ class RedisStore(private val jedisPool: JedisPool) {
                 return jedis.get(key)
             }
         } catch (e: JedisConnectionException) {
-            log.warn("Got connection error when fetching from redis! Continuing without cached value", e)
+            log.warn("Got connection error when fetching from valkey! Continuing without cached value", e)
             return null
         }
     }
@@ -53,7 +53,7 @@ class RedisStore(private val jedisPool: JedisPool) {
                 jedis.mget(*keyList.toTypedArray()).filterNotNull()
             }
         } catch (e: JedisConnectionException) {
-            log.warn("Got connection error when fetching from redis! Continuing without cached value", e)
+            log.warn("Got connection error when fetching from valkey! Continuing without cached value", e)
             emptyList()
         }
     }
@@ -81,11 +81,11 @@ class RedisStore(private val jedisPool: JedisPool) {
                 )
             }
         } catch (e: JedisConnectionException) {
-            log.warn("Got connection error when storing in redis! Continue without caching", e)
+            log.warn("Got connection error when storing in valkey! Continue without caching", e)
         }
     }
 
     companion object {
-        private val log = LoggerFactory.getLogger(RedisStore::class.java)
+        private val log = LoggerFactory.getLogger(ValkeyStore::class.java)
     }
 }
