@@ -11,7 +11,7 @@ Applikasjon for å vise informasjon relasjoner mellom ansatte og deres narmeste 
 * Kafka
 * Ktor
 * Postgres
-* Redis
+* Valkey
 
 ##### Test Libraries:
 

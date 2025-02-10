@@ -12,7 +12,7 @@ fun Application.testApiModule(
 ) {
     val azureAdClient = AzureAdClient(
         azureEnviroment = externalMockEnvironment.environment.azure,
-        redisStore = externalMockEnvironment.cache,
+        valkeyStore = externalMockEnvironment.cache,
         httpClient = externalMockEnvironment.mockHttpClient,
     )
 
@@ -32,7 +32,7 @@ fun Application.testApiModule(
             pdlClient = PdlClient(
                 azureAdClient = azureAdClient,
                 clientEnvironment = externalMockEnvironment.environment.clients.pdl,
-                redisStore = externalMockEnvironment.cache,
+                valkeyStore = externalMockEnvironment.cache,
                 httpClient = externalMockEnvironment.mockHttpClient,
             ),
         )

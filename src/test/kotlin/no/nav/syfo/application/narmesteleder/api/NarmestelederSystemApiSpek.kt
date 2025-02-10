@@ -38,7 +38,7 @@ class NarmestelederSystemApiSpek : Spek({
 
     val eregClient = EregClient(
         clientEnvironment = externalMockEnvironment.environment.clients.ereg,
-        redisStore = externalMockEnvironment.cache,
+        valkeyStore = externalMockEnvironment.cache,
         httpClient = externalMockEnvironment.mockHttpClient,
     )
 

@@ -1,7 +1,7 @@
 package no.nav.syfo.cronjob
 
 import no.nav.syfo.application.*
-import no.nav.syfo.application.cache.RedisStore
+import no.nav.syfo.application.cache.ValkeyStore
 import no.nav.syfo.application.database.DatabaseInterface
 import no.nav.syfo.client.ereg.EregClient
 import no.nav.syfo.cronjob.leaderelection.LeaderPodClient
@@ -12,11 +12,11 @@ fun cronjobModule(
     applicationState: ApplicationState,
     database: DatabaseInterface,
     environment: Environment,
-    redisStore: RedisStore,
+    valkeyStore: ValkeyStore,
 ) {
     val eregClient = EregClient(
         clientEnvironment = environment.clients.ereg,
-        redisStore = redisStore,
+        valkeyStore = valkeyStore,
     )
 
     val leaderPodClient = LeaderPodClient(

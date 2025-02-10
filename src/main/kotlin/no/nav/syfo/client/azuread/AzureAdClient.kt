@@ -7,13 +7,13 @@ import io.ktor.client.request.*
 import io.ktor.client.request.forms.*
 import io.ktor.client.statement.*
 import io.ktor.http.*
-import no.nav.syfo.application.cache.RedisStore
+import no.nav.syfo.application.cache.ValkeyStore
 import no.nav.syfo.client.httpClientProxy
 import org.slf4j.LoggerFactory
 
 class AzureAdClient(
     private val azureEnviroment: AzureEnvironment,
-    private val redisStore: RedisStore,
+    private val valkeyStore: ValkeyStore,
     private val httpClient: HttpClient = httpClientProxy(),
 ) {
 
@@ -36,7 +36,7 @@ class AzureAdClient(
 
     suspend fun getSystemToken(scopeClientId: String): AzureAdToken? {
         val cacheKey = "${CACHE_AZUREAD_TOKEN_SYSTEM_KEY_PREFIX}$scopeClientId"
-        val cachedToken = redisStore.getObject<AzureAdToken>(key = cacheKey)
+        val cachedToken = valkeyStore.getObject<AzureAdToken>(key = cacheKey)
         if (cachedToken?.isExpired() == false) {
             COUNT_CALL_AZUREAD_TOKEN_SYSTEM_CACHE_HIT.increment()
             return cachedToken
@@ -52,7 +52,7 @@ class AzureAdClient(
             return azureAdTokenResponse?.let { token ->
                 val azureAdToken = token.toAzureAdToken()
                 COUNT_CALL_AZUREAD_TOKEN_SYSTEM_CACHE_MISS.increment()
-                redisStore.setObject(
+                valkeyStore.setObject(
                     key = cacheKey,
                     value = azureAdToken,
                     expireSeconds = token.expires_in
