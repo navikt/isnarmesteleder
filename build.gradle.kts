@@ -2,7 +2,7 @@ group = "no.nav.syfo"
 version = "1.0.0"
 
 val flyway = "10.17.2"
-val hikari = "5.0.1"
+val hikari = "6.3.0"
 val jacksonDataType = "2.18.3"
 val jedis = "5.2.0"
 val kafka = "3.7.0"
