@@ -15,6 +15,7 @@ val nimbusJoseJwt = "10.1"
 val micrometerRegistry = "1.12.13"
 val postgres = "42.7.5"
 val postgresEmbedded = "2.1.0"
+val postgresRuntimeVersion = "17.5.0"
 val redisEmbedded = "0.7.3"
 val spek = "2.0.19"
 
@@ -66,6 +67,7 @@ dependencies {
     implementation("com.zaxxer:HikariCP:$hikari")
     implementation("org.postgresql:postgresql:$postgres")
     testImplementation("io.zonky.test:embedded-postgres:$postgresEmbedded")
+    testImplementation(platform("io.zonky.test.postgres:embedded-postgres-binaries-bom:$postgresRuntimeVersion"))
 
     // Kafka
     val excludeLog4j = fun ExternalModuleDependency.() {
