@@ -15,9 +15,8 @@ Applikasjon for å vise informasjon relasjoner mellom ansatte og deres narmeste 
 
 ##### Test Libraries:
 
-* Kluent
+* JUnit
 * Mockk
-* Spek
 
 #### Requirements
 
