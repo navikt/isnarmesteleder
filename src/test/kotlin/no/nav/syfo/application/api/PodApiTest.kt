@@ -11,12 +11,12 @@ import org.junit.jupiter.api.Assertions.*
 import org.junit.jupiter.api.DisplayName
 import org.junit.jupiter.api.Nested
 import org.junit.jupiter.api.Test
-import testhelper.TestDatabase
+import testhelper.ExternalMockEnvironment
 import testhelper.TestDatabaseNotResponding
 
 class PodApiTest {
 
-    private val database = TestDatabase()
+    private val database = ExternalMockEnvironment.instance.database
     private val databaseNotResponding = TestDatabaseNotResponding()
 
     private fun ApplicationTestBuilder.setupPodApi(database: DatabaseInterface, applicationState: ApplicationState) {

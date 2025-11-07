@@ -6,34 +6,26 @@ import org.flywaydb.core.Flyway
 import java.sql.Connection
 
 class TestDatabase : DatabaseInterface {
-    private val pg: EmbeddedPostgres = PostgresDatabase.getDatabase()
+    private val pg: EmbeddedPostgres =  try {
+        EmbeddedPostgres.start()
+    } catch (e: Exception) {
+        EmbeddedPostgres.builder().setLocaleConfig("locale", "en_US").start()
+    }
 
     override val connection: Connection
         get() = pg.postgresDatabase.connection.apply {
             autoCommit = false
         }
 
-    fun stop() {
-        pg.close()
-    }
-}
-
-object PostgresDatabase {
-    private val pg: EmbeddedPostgres
-
     init {
-        pg = try {
-            EmbeddedPostgres.start()
-        } catch (e: Exception) {
-            EmbeddedPostgres.builder().setLocaleConfig("locale", "en_US").start()
-        }
-
         Flyway.configure().run {
             dataSource(pg.postgresDatabase).load().migrate()
         }
     }
 
-    fun getDatabase() = pg
+    fun stop() {
+        pg.close()
+    }
 }
 
 class TestDatabaseNotResponding : DatabaseInterface {
