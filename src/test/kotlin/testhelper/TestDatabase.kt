@@ -6,7 +6,7 @@ import org.flywaydb.core.Flyway
 import java.sql.Connection
 
 class TestDatabase : DatabaseInterface {
-    private val pg: EmbeddedPostgres =  try {
+    private val pg: EmbeddedPostgres = try {
         EmbeddedPostgres.start()
     } catch (e: Exception) {
         EmbeddedPostgres.builder().setLocaleConfig("locale", "en_US").start()
