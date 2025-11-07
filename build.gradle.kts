@@ -1,3 +1,5 @@
+import com.adarshr.gradle.testlogger.theme.ThemeType
+
 group = "no.nav.syfo"
 version = "1.0.0"
 
@@ -7,7 +9,6 @@ val jacksonDataType = "2.19.2"
 val jedis = "5.2.0"
 val kafka = "3.9.0"
 val ktor = "3.3.0"
-val kluent = "1.73"
 val logback = "1.5.18"
 val logstashEncoder = "8.1"
 val mockk = "1.14.5"
@@ -17,12 +18,12 @@ val postgres = "42.7.7"
 val postgresEmbedded = "2.1.1"
 val postgresRuntimeVersion = "17.6.0"
 val redisEmbedded = "0.7.3"
-val spek = "2.0.19"
 
 plugins {
     kotlin("jvm") version "2.2.10"
     id("com.gradleup.shadow") version "8.3.6"
     id("org.jlleitschuh.gradle.ktlint") version "11.4.1"
+    id("com.adarshr.test-logger") version "4.0.0"
 }
 
 val githubUser: String by project
@@ -79,13 +80,7 @@ dependencies {
     testImplementation("io.ktor:ktor-server-test-host:$ktor")
     testImplementation("io.ktor:ktor-client-mock:$ktor")
     testImplementation("io.mockk:mockk:$mockk")
-    testImplementation("org.amshove.kluent:kluent:$kluent")
-    testImplementation("org.spekframework.spek2:spek-dsl-jvm:$spek") {
-        exclude(group = "org.jetbrains.kotlin")
-    }
-    testRuntimeOnly("org.spekframework.spek2:spek-runner-junit5:$spek") {
-        exclude(group = "org.jetbrains.kotlin")
-    }
+    testImplementation(kotlin("test"))
 }
 
 kotlin {
@@ -111,9 +106,11 @@ tasks {
     }
 
     test {
-        useJUnitPlatform {
-            includeEngines("spek2")
+        useJUnitPlatform()
+        testlogger {
+            theme = ThemeType.STANDARD_PARALLEL
+            showFullStackTraces = true
+            showPassed = false
         }
-        testLogging.showStandardStreams = true
     }
 }

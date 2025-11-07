@@ -18,7 +18,6 @@ class TestDatabase : DatabaseInterface {
         }
 
     init {
-
         Flyway.configure().run {
             dataSource(pg.postgresDatabase).load().migrate()
         }
