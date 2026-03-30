@@ -17,7 +17,7 @@ val nimbusJoseJwt = "10.8"
 val micrometerRegistry = "1.16.4"
 val postgres = "42.7.10"
 val postgresEmbedded = "2.2.0"
-val postgresRuntimeVersion = "17.6.0"
+val postgresRuntimeVersion = "18.3.0"
 val redisEmbedded = "0.7.3"
 
 plugins {
