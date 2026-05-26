@@ -67,46 +67,6 @@ fun Connection.createNarmesteLederRelasjon(
     }
 }
 
-const val queryGetNarmesteLederRelasjonWithoutVirksomhetsnavn =
-    """
-    SELECT *
-    FROM NARMESTE_LEDER_RELASJON
-    WHERE virksomhetsnavn IS NULL
-    ORDER BY aktiv_fom DESC
-    LIMIT 5000
-    """
-
-fun DatabaseInterface.getNarmesteLederRelasjonWithoutVirksomhetsnavn(): List<PNarmesteLederRelasjon> {
-    return this.connection.use { connection ->
-        connection.prepareStatement(queryGetNarmesteLederRelasjonWithoutVirksomhetsnavn).use {
-            it.executeQuery().toList {
-                toPNarmesteLederRelasjon()
-            }
-        }
-    }
-}
-
-const val queryUpdateNarmesteLederRelasjonVirksomhetsnavn =
-    """
-    UPDATE NARMESTE_LEDER_RELASJON
-    SET virksomhetsnavn = ?
-    WHERE id = ?
-    """
-
-fun DatabaseInterface.updateNarmesteLederRelasjonVirksomhetsnavn(
-    narmesteLederRelasjonId: Int,
-    virksomhetsnavn: String,
-) {
-    this.connection.use { connection ->
-        connection.prepareStatement(queryUpdateNarmesteLederRelasjonVirksomhetsnavn).use {
-            it.setString(1, virksomhetsnavn)
-            it.setInt(2, narmesteLederRelasjonId)
-            it.execute()
-        }
-        connection.commit()
-    }
-}
-
 const val queryGetNarmesteLedere =
     """
     SELECT *
@@ -155,7 +115,6 @@ fun ResultSet.toPNarmesteLederRelasjon(): PNarmesteLederRelasjon =
         createdAt = getTimestamp("created_at").toOffsetDateTimeUTC(),
         updatedAt = getTimestamp("updated_at").toOffsetDateTimeUTC(),
         referanseUuid = UUID.fromString(getString("referanse_uuid")),
-        virksomhetsnavn = getString("virksomhetsnavn"),
         virksomhetsnummer = Virksomhetsnummer(getString("virksomhetsnummer")),
         arbeidstakerPersonIdentNumber = PersonIdentNumber(getString("arbeidstaker_personident")),
         narmesteLederPersonIdentNumber = PersonIdentNumber(getString("narmeste_leder_personident")),

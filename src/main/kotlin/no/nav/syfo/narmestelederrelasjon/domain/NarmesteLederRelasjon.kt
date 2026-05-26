@@ -15,7 +15,7 @@ data class NarmesteLederRelasjon(
     val updatedAt: OffsetDateTime,
     val referanseUuid: UUID,
     val arbeidstakerPersonIdentNumber: PersonIdentNumber,
-    val virksomhetsnavn: String?,
+    val virksomhetsnavn: String? = null,
     val virksomhetsnummer: Virksomhetsnummer,
     val narmesteLederPersonIdentNumber: PersonIdentNumber,
     val narmesteLederTelefonnummer: String,
@@ -55,6 +55,22 @@ fun List<NarmesteLederRelasjon>.addNarmesteLederName(
         narmesteLederRelasjon.copy(
             narmesteLederNavn = maybePersonIdentNumberNameMap[narmesteLederPersonIdentNumber]
         )
+    }
+}
+
+fun List<NarmesteLederRelasjon>.addVirksomhetsnavn(
+    maybeVirksomhetsnavnMap: Map<Virksomhetsnummer, String>,
+): List<NarmesteLederRelasjon> {
+    if (maybeVirksomhetsnavnMap.isEmpty()) {
+        return this
+    }
+    return this.map { narmesteLederRelasjon ->
+        maybeVirksomhetsnavnMap[narmesteLederRelasjon.virksomhetsnummer]
+            ?.let { virksomhetsnavn ->
+                narmesteLederRelasjon.copy(
+                    virksomhetsnavn = virksomhetsnavn,
+                )
+            } ?: narmesteLederRelasjon
     }
 }
 

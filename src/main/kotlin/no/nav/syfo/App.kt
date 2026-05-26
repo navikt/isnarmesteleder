@@ -12,10 +12,10 @@ import no.nav.syfo.application.cache.ValkeyStore
 import no.nav.syfo.application.database.applicationDatabase
 import no.nav.syfo.application.database.databaseModule
 import no.nav.syfo.client.azuread.AzureAdClient
+import no.nav.syfo.client.ereg.EregClient
 import no.nav.syfo.client.pdl.PdlClient
 import no.nav.syfo.client.veiledertilgang.VeilederTilgangskontrollClient
 import no.nav.syfo.client.wellknown.getWellKnown
-import no.nav.syfo.cronjob.cronjobModule
 import no.nav.syfo.narmestelederrelasjon.NarmesteLederRelasjonService
 import no.nav.syfo.narmestelederrelasjon.kafka.launchKafkaTask
 import org.slf4j.LoggerFactory
@@ -46,6 +46,10 @@ fun main() {
 
     val azureAdClient = AzureAdClient(
         azureEnviroment = environment.azure,
+        valkeyStore = cache,
+    )
+    val eregClient = EregClient(
+        clientEnvironment = environment.clients.ereg,
         valkeyStore = cache,
     )
     val pdlClient = PdlClient(
@@ -87,6 +91,7 @@ fun main() {
             val narmesteLederRelasjonService = NarmesteLederRelasjonService(
                 database = applicationDatabase,
                 pdlClient = pdlClient,
+                eregClient = eregClient
             )
             apiModule(
                 applicationState = applicationState,
@@ -104,12 +109,6 @@ fun main() {
                     applicationState = applicationState,
                     kafkaEnvironment = environment.kafka,
                     database = applicationDatabase,
-                )
-                cronjobModule(
-                    applicationState = applicationState,
-                    database = applicationDatabase,
-                    environment = environment,
-                    valkeyStore = cache,
                 )
             }
         }
