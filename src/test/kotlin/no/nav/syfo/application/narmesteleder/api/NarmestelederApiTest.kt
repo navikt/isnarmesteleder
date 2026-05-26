@@ -12,8 +12,6 @@ import kotlinx.coroutines.test.runTest
 import no.nav.syfo.client.ereg.EregClient
 import no.nav.syfo.client.ereg.toEregVirksomhetsnavn
 import no.nav.syfo.client.pdl.domain.fullName
-import no.nav.syfo.cronjob.virksomhetsnavn.VirksomhetsnavnCronjob
-import no.nav.syfo.cronjob.virksomhetsnavn.VirksomhetsnavnService
 import no.nav.syfo.narmestelederrelasjon.api.NarmesteLederRelasjonDTO
 import no.nav.syfo.narmestelederrelasjon.api.narmesteLederApiV1Path
 import no.nav.syfo.narmestelederrelasjon.api.narmesteLederApiV1PersonIdentPath
@@ -52,13 +50,6 @@ class NarmestelederApiTest {
         clientEnvironment = externalMockEnvironment.environment.clients.ereg,
         valkeyStore = externalMockEnvironment.cache,
         httpClient = externalMockEnvironment.mockHttpClient,
-    )
-
-    private val virksomhetsnavnCronjob = VirksomhetsnavnCronjob(
-        eregClient = eregClient,
-        virksomhetsnavnService = VirksomhetsnavnService(
-            database = database,
-        ),
     )
 
     private val url = "$narmesteLederApiV1Path$narmesteLederApiV1PersonIdentPath"
@@ -139,16 +130,6 @@ class NarmestelederApiTest {
                 )
 
                 verify(exactly = 1) { mockConsumer.commitSync() }
-
-                val result = virksomhetsnavnCronjob.virksomhetsnavnJob()
-
-                assertEquals(1, result.failed)
-                assertEquals(1, result.updated)
-
-                val result2 = virksomhetsnavnCronjob.virksomhetsnavnJob()
-
-                assertEquals(1, result2.failed)
-                assertEquals(0, result2.updated)
 
                 testApplication {
                     val client = setupApiAndClient()

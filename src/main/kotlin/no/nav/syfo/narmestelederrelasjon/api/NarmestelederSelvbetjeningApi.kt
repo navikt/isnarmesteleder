@@ -1,6 +1,5 @@
 package no.nav.syfo.narmestelederrelasjon.api
 
-import io.ktor.server.application.*
 import io.ktor.server.response.*
 import io.ktor.server.routing.*
 import no.nav.syfo.application.api.authentication.getPersonIdentFromToken
@@ -22,7 +21,7 @@ fun Route.registrerNarmesteLederRelasjonSelvbetjeningApi(
             val personIdent = getPersonIdentFromToken(token)
                 ?: throw IllegalArgumentException("No PersonIdent supplied to selvbetjening api when getting narmestelederRelasjoner, callID=$callId")
 
-            val narmesteLederRelasjonDTOList = narmesteLederRelasjonService.getNarmestelederRelasjonList(
+            val narmesteLederRelasjonDTOList = narmesteLederRelasjonService.getNarmesteLederRelasjonList(
                 callId = callId,
                 personIdentNumber = personIdent,
             ).map {

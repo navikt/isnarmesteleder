@@ -1,6 +1,5 @@
 package no.nav.syfo.narmestelederrelasjon.api
 
-import io.ktor.server.application.*
 import io.ktor.server.response.*
 import io.ktor.server.routing.*
 import no.nav.syfo.domain.PersonIdentNumber
@@ -32,7 +31,7 @@ fun Route.registrerNarmesteLederRelasjonSystemApi(
             }
                 ?: throw IllegalArgumentException("No PersonIdent supplied to system api when getting narmestelederRelasjoner, callID=$callId")
 
-            val narmesteLederRelasjonDTOList = narmesteLederRelasjonService.getNarmestelederRelasjonList(
+            val narmesteLederRelasjonDTOList = narmesteLederRelasjonService.getNarmesteLederRelasjonList(
                 callId = callId,
                 personIdentNumber = personIdentNumber,
             ).map {

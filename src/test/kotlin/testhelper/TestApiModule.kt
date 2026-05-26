@@ -3,6 +3,7 @@ package testhelper
 import io.ktor.server.application.*
 import no.nav.syfo.application.api.apiModule
 import no.nav.syfo.client.azuread.AzureAdClient
+import no.nav.syfo.client.ereg.EregClient
 import no.nav.syfo.client.pdl.PdlClient
 import no.nav.syfo.client.veiledertilgang.VeilederTilgangskontrollClient
 import no.nav.syfo.narmestelederrelasjon.NarmesteLederRelasjonService
@@ -29,6 +30,11 @@ fun Application.testApiModule(
         ),
         narmesteLederRelasjonService = NarmesteLederRelasjonService(
             database = externalMockEnvironment.database,
+            eregClient = EregClient(
+                clientEnvironment = externalMockEnvironment.environment.clients.ereg,
+                valkeyStore = externalMockEnvironment.cache,
+                httpClient = externalMockEnvironment.mockHttpClient,
+            ),
             pdlClient = PdlClient(
                 azureAdClient = azureAdClient,
                 clientEnvironment = externalMockEnvironment.environment.clients.pdl,

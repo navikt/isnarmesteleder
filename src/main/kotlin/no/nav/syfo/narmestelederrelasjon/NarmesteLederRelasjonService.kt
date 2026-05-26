@@ -1,59 +1,51 @@
 package no.nav.syfo.narmestelederrelasjon
 
+import kotlinx.coroutines.async
+import kotlinx.coroutines.awaitAll
+import kotlinx.coroutines.coroutineScope
 import no.nav.syfo.application.database.DatabaseInterface
+import no.nav.syfo.client.ereg.EregClient
 import no.nav.syfo.client.pdl.PdlClient
 import no.nav.syfo.domain.PersonIdentNumber
+import no.nav.syfo.domain.Virksomhetsnummer
 import no.nav.syfo.narmestelederrelasjon.database.domain.PNarmesteLederRelasjon
 import no.nav.syfo.narmestelederrelasjon.database.domain.toNarmesteLederRelasjonList
 import no.nav.syfo.narmestelederrelasjon.database.getNarmesteLederRelasjonList
 import no.nav.syfo.narmestelederrelasjon.database.getNarmesteLedere
 import no.nav.syfo.narmestelederrelasjon.domain.NarmesteLederRelasjon
 import no.nav.syfo.narmestelederrelasjon.domain.addNarmesteLederName
+import no.nav.syfo.narmestelederrelasjon.domain.addVirksomhetsnavn
 
 class NarmesteLederRelasjonService(
     private val database: DatabaseInterface,
     private val pdlClient: PdlClient,
+    private val eregClient: EregClient,
 ) {
     suspend fun getNarmesteLedere(
         callId: String,
         arbeidstakerPersonIdentNumber: PersonIdentNumber,
     ): List<NarmesteLederRelasjon> {
-        val narmesteLederRelasjonHistoryList = getNarmesteLedereHistory(
+        return getNarmesteLedereHistory(
             callId = callId,
             arbeidstakerPersonIdentNumber = arbeidstakerPersonIdentNumber,
         )
-
-        return if (narmesteLederRelasjonHistoryList.isEmpty()) {
-            narmesteLederRelasjonHistoryList
-        } else {
-            getNarmesteLederRelasjonListWithName(
-                callId = callId,
-                narmesteLederRelasjonList = narmesteLederRelasjonHistoryList,
-            ).map { narmesteLederRelasjon ->
+            .enrichRelationsWithNames(callId = callId)
+            .map { narmesteLederRelasjon ->
                 narmesteLederRelasjon.copy(
                     arbeidstakerPersonIdentNumber = arbeidstakerPersonIdentNumber,
                 )
             }
-        }
     }
 
-    suspend fun getNarmestelederRelasjonList(
+    suspend fun getNarmesteLederRelasjonList(
         callId: String,
         personIdentNumber: PersonIdentNumber,
     ): List<NarmesteLederRelasjon> {
-        val narmesteLederRelasjonHistoryList = getNarmesteLederRelasjonHistoryList(
+        return getNarmesteLederRelasjonHistoryList(
             callId = callId,
             personIdentNumber = personIdentNumber,
         )
-
-        return if (narmesteLederRelasjonHistoryList.isEmpty()) {
-            narmesteLederRelasjonHistoryList
-        } else {
-            getNarmesteLederRelasjonListWithName(
-                callId = callId,
-                narmesteLederRelasjonList = narmesteLederRelasjonHistoryList,
-            )
-        }
+            .enrichRelationsWithNames(callId = callId)
     }
 
     private suspend fun getNarmesteLederRelasjonHistoryList(
@@ -87,23 +79,6 @@ class NarmesteLederRelasjonService(
         )
     }
 
-    private suspend fun getNarmesteLederRelasjonListWithName(
-        callId: String,
-        narmesteLederRelasjonList: List<NarmesteLederRelasjon>,
-    ): List<NarmesteLederRelasjon> {
-        val narmesteLederPersonIdentNumberList = narmesteLederRelasjonList.map { narmesteLederRelasjon ->
-            narmesteLederRelasjon.narmesteLederPersonIdentNumber
-        }
-        pdlClient.personIdentNumberNavnMap(
-            callId = callId,
-            personIdentNumberList = narmesteLederPersonIdentNumberList,
-        ).let { personIdentNumberNameMap ->
-            return narmesteLederRelasjonList.addNarmesteLederName(
-                maybePersonIdentNumberNameMap = personIdentNumberNameMap,
-            )
-        }
-    }
-
     private suspend fun getNarmesteLedereHistory(
         callId: String,
         arbeidstakerPersonIdentNumber: PersonIdentNumber,
@@ -118,4 +93,58 @@ class NarmesteLederRelasjonService(
             )
         }?.toNarmesteLederRelasjonList()
             ?: emptyList()
+
+    private suspend fun List<NarmesteLederRelasjon>.enrichRelationsWithNames(
+        callId: String,
+    ): List<NarmesteLederRelasjon> =
+        if (isEmpty()) {
+            this
+        } else {
+            coroutineScope {
+                val virksomhetsnavnMapDeferred = async { virksomhetsnavnMapFromEreg(callId = callId) }
+                val narmesteLederNavnMapDeferred = async { narmesteLederNavnMapFromPdl(callId = callId) }
+
+                addVirksomhetsnavn(
+                    maybeVirksomhetsnavnMap = virksomhetsnavnMapDeferred.await(),
+                ).addNarmesteLederName(
+                    maybePersonIdentNumberNameMap = narmesteLederNavnMapDeferred.await(),
+                )
+            }
+        }
+
+    private suspend fun List<NarmesteLederRelasjon>.narmesteLederNavnMapFromPdl(
+        callId: String,
+    ): Map<String, String> =
+        if (isEmpty()) {
+            emptyMap()
+        } else {
+            val narmesteLederPersonIdentNumberList = map { narmesteLederRelasjon ->
+                narmesteLederRelasjon.narmesteLederPersonIdentNumber
+            }.distinct()
+            pdlClient.personIdentNumberNavnMap(
+                callId = callId,
+                personIdentNumberList = narmesteLederPersonIdentNumberList,
+            )
+        }
+
+    private suspend fun List<NarmesteLederRelasjon>.virksomhetsnavnMapFromEreg(
+        callId: String,
+    ): Map<Virksomhetsnummer, String> =
+        if (isEmpty()) {
+            emptyMap()
+        } else {
+            coroutineScope {
+                map { narmesteLederRelasjon ->
+                    narmesteLederRelasjon.virksomhetsnummer
+                }.distinct().map { virksomhetsnummer ->
+                    async {
+                        eregClient.organisasjonVirksomhetsnavn(
+                            callId = callId,
+                            virksomhetsnummer = virksomhetsnummer,
+                        )
+                            ?.let { eregOrganisasjonVirksomhetsnavn -> virksomhetsnummer to eregOrganisasjonVirksomhetsnavn.virksomhetsnavn }
+                    }
+                }.awaitAll().filterNotNull().toMap()
+            }
+        }
 }
