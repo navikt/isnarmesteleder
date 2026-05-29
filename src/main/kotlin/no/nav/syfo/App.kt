@@ -23,7 +23,6 @@ import redis.clients.jedis.DefaultJedisClientConfig
 import redis.clients.jedis.HostAndPort
 import redis.clients.jedis.JedisPool
 import redis.clients.jedis.JedisPoolConfig
-import java.util.concurrent.TimeUnit
 
 const val applicationPort = 8080
 
@@ -111,12 +110,9 @@ fun main() {
                     database = applicationDatabase,
                 )
             }
-        }
-    )
-
-    Runtime.getRuntime().addShutdownHook(
-        Thread {
-            server.stop(10, 10, TimeUnit.SECONDS)
+            monitor.subscribe(ApplicationStopPreparing) {
+                applicationState.ready = false
+            }
         }
     )
 
