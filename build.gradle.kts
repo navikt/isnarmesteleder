@@ -18,7 +18,6 @@ val micrometerRegistry = "1.17.0"
 val postgres = "42.7.13"
 val postgresEmbedded = "2.2.2"
 val postgresRuntimeVersion = "17.9.0"
-val redisEmbedded = "0.7.3"
 
 plugins {
     kotlin("jvm") version "2.4.0"
@@ -58,7 +57,6 @@ dependencies {
 
     // Cache
     implementation("redis.clients:jedis:$jedis")
-    testImplementation("it.ozimov:embedded-redis:$redisEmbedded")
 
     // (De-)serialization
     implementation("com.fasterxml.jackson.datatype:jackson-datatype-jsr310:$jacksonDataType")

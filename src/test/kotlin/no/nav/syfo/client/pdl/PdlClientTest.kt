@@ -3,7 +3,7 @@ package no.nav.syfo.client.pdl
 import com.fasterxml.jackson.databind.ObjectMapper
 import io.mockk.*
 import kotlinx.coroutines.test.runTest
-import no.nav.syfo.application.cache.ValkeyStore
+import no.nav.syfo.application.cache.IValkeyStore
 import no.nav.syfo.client.azuread.AzureAdClient
 import no.nav.syfo.client.azuread.AzureAdTokenResponse
 import no.nav.syfo.client.azuread.toAzureAdToken
@@ -24,7 +24,7 @@ class PdlClientTest {
     private val anyCallId = "callId"
     private val externalMockEnvironment = ExternalMockEnvironment.instance
     private val azureAdClientMock = mockk<AzureAdClient>(relaxed = true)
-    private val valkeyStoreMock = mockk<ValkeyStore>(relaxed = true)
+    private val valkeyStoreMock = mockk<IValkeyStore>(relaxed = true)
     private val pdlClientId = "pdlClientId"
 
     private val client = PdlClient(

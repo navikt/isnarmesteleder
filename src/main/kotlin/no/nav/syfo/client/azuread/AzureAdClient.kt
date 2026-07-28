@@ -7,13 +7,14 @@ import io.ktor.client.request.*
 import io.ktor.client.request.forms.*
 import io.ktor.client.statement.*
 import io.ktor.http.*
-import no.nav.syfo.application.cache.ValkeyStore
+import no.nav.syfo.application.cache.IValkeyStore
+import no.nav.syfo.application.cache.getObject
 import no.nav.syfo.client.httpClientProxy
 import org.slf4j.LoggerFactory
 
 class AzureAdClient(
     private val azureEnviroment: AzureEnvironment,
-    private val valkeyStore: ValkeyStore,
+    private val valkeyStore: IValkeyStore,
     private val httpClient: HttpClient = httpClientProxy(),
 ) {
 

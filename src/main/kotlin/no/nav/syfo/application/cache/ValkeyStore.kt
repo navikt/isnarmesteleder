@@ -7,18 +7,10 @@ import redis.clients.jedis.*
 import redis.clients.jedis.exceptions.JedisConnectionException
 import kotlin.reflect.KClass
 
-class ValkeyStore(private val jedisPool: JedisPool) {
+class ValkeyStore(private val jedisPool: JedisPool) : IValkeyStore {
     val objectMapper: ObjectMapper = configuredJacksonMapper()
 
-    inline fun <reified T> getObject(
-        key: String,
-    ): T? {
-        return get(key)?.let { it ->
-            objectMapper.readValue(it, T::class.java)
-        }
-    }
-
-    fun get(
+    override fun get(
         key: String,
     ): String? {
         try {
@@ -31,7 +23,7 @@ class ValkeyStore(private val jedisPool: JedisPool) {
         }
     }
 
-    fun <T : Any> getObjectList(
+    override fun <T : Any> getObjectList(
         classType: KClass<T>,
         keyList: List<String>,
     ): List<T> {
@@ -39,13 +31,12 @@ class ValkeyStore(private val jedisPool: JedisPool) {
             emptyList()
         } else {
             get(keyList = keyList).map {
-                classType.java
                 objectMapper.readValue(it, classType.java)
             }
         }
     }
 
-    fun get(
+    override fun get(
         keyList: List<String>,
     ): List<String> {
         return try {
@@ -58,7 +49,7 @@ class ValkeyStore(private val jedisPool: JedisPool) {
         }
     }
 
-    fun <T> setObject(
+    override fun <T> setObject(
         key: String,
         value: T,
         expireSeconds: Long,
@@ -67,7 +58,7 @@ class ValkeyStore(private val jedisPool: JedisPool) {
         set(key, valueJson, expireSeconds)
     }
 
-    fun set(
+    override fun set(
         key: String,
         value: String,
         expireSeconds: Long,
